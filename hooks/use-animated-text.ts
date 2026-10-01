@@ -29,14 +29,13 @@ type Options = {
   params: Params
   capH: (width: number) => number // hauteur des capitales selon la largeur dispo
   lineGap: number
-  intro?: boolean // broderie à l'arrivée
-  replay?: number // change de valeur → on rejoue la broderie
+  intro?: boolean // broderie quand le canvas apparaît
   alive?: boolean // la variation organique ondule en boucle
 }
 
 // Dessine le texte et l'anime :
 // 1. transitions : quand un réglage change, chaque pièce glisse de son ancienne place à la nouvelle ;
-// 2. broderie : à l'arrivée (ou sur demande), les pièces apparaissent une à une, dans l'ordre du trait ;
+// 2. broderie : quand le canvas apparaît, les pièces apparaissent une à une, dans l'ordre du trait ;
 // 3. vivant : la grille ondule en boucle.
 // Si le système demande de réduire les animations, tout est dessiné directement.
 export function useAnimatedText({
@@ -45,7 +44,6 @@ export function useAnimatedText({
   capH,
   lineGap,
   intro,
-  replay = 0,
   alive,
 }: Options) {
   const ref = useRef<HTMLCanvasElement>(null)
@@ -56,7 +54,6 @@ export function useAnimatedText({
   const anim = useRef({
     shown: [] as TextPiece[], // pièces telles qu'elles sont à l'écran en ce moment
     introPending: !!intro,
-    lastReplay: replay,
     phase: 0,
   })
 
@@ -81,12 +78,6 @@ export function useAnimatedText({
     const col = readColors()
     const content = text || " "
     let raf = 0
-
-    if (replay !== st.lastReplay) {
-      st.lastReplay = replay
-      st.introPending = true
-      st.shown = []
-    }
 
     // 3. Vivant : on recalcule la mise en page à chaque image, avec une phase qui avance
     if (alive && !reduce) {
@@ -158,17 +149,7 @@ export function useAnimatedText({
     return () => cancelAnimationFrame(raf)
     // capH est une nouvelle fonction à chaque rendu du parent : on suit sa valeur (size), pas la fonction
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    width,
-    size,
-    text,
-    params,
-    lineGap,
-    resolvedTheme,
-    fontsReady,
-    alive,
-    replay,
-  ])
+  }, [width, size, text, params, lineGap, resolvedTheme, fontsReady, alive])
 
   return ref
 }

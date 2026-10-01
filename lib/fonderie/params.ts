@@ -1,14 +1,14 @@
 // Tous les réglages de la police. Un seul objet, passé à chaque fonction du moteur.
 
 export const SHAPES = [
-  { id: "rond", label: "Rond" },
-  { id: "carre", label: "Carré" },
-  { id: "anneau", label: "Anneau" },
-  { id: "vis", label: "Vis" },
-  { id: "croix", label: "Croix" },
-  { id: "carrevide", label: "Carré vide" },
-  { id: "cible", label: "Cible" },
-  { id: "melange", label: "Mélange" },
+  { id: "rond", label: "Dot" },
+  { id: "carre", label: "Square" },
+  { id: "anneau", label: "Ring" },
+  { id: "vis", label: "Screw" },
+  { id: "croix", label: "Cross" },
+  { id: "carrevide", label: "Frame" },
+  { id: "cible", label: "Target" },
+  { id: "melange", label: "Mix" },
 ] as const
 
 export type ShapeKind = (typeof SHAPES)[number]["id"]
@@ -19,7 +19,7 @@ export type Params = {
   layout: Layout // grille : une pièce par case touchée ; trace : pièces enfilées le long du tracé
   spacing: number // mode tracé : distance entre deux pièces, en hauteurs de case
   orient: boolean // mode tracé : les pièces tournent pour suivre la direction du trait
-  lanes: number // mode tracé : nombre de rangées de pièces côte à côte
+  lanes: number // mode tracé : nombre de rangées de pièces côte à côte (1 ou 2)
   laneGap: number // mode tracé : distance entre deux rangées, en tailles de pièce
   cols: number // colonnes de la grille
   rows: number // lignes de la grille
@@ -81,6 +81,14 @@ export const USES_THICKNESS: ShapeKind[] = [
   "melange",
 ]
 export const USES_RADIUS: ShapeKind[] = ["carre", "carrevide"]
+// Formes qui changent quand on les fait tourner (les formes rondes restent identiques)
+export const USES_ROTATION: ShapeKind[] = [
+  "carre",
+  "vis",
+  "croix",
+  "carrevide",
+  "melange",
+]
 
 // Une police tirée au hasard, dans des plages qui donnent des résultats lisibles.
 // Le texte, la grille affichée et le mode plein/contour ne changent pas.
@@ -96,7 +104,7 @@ export function randomParams(current: Params): Params {
     layout: trace ? "trace" : "grille",
     spacing: rand(0.5, 1.3, 0.01),
     orient: trace && Math.random() < 0.5,
-    lanes: trace && Math.random() < 0.3 ? rand(2, 3, 1) : 1,
+    lanes: trace && Math.random() < 0.3 ? 2 : 1,
     laneGap: rand(0.9, 1.6, 0.01),
     cols: rand(3, 9, 1),
     rows: rand(5, 13, 1),

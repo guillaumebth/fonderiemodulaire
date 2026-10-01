@@ -28,12 +28,12 @@ export function ExportPanel({ params, legendClassName }: ExportPanelProps) {
       const { downloadFont, fileName } = await import("@/lib/fonderie/export")
       const family = name.trim() || "Fonderie Modulaire"
       downloadFont(params, family)
-      toast.success(`${fileName(family)} téléchargé`, {
-        description: "Double-clique sur le fichier pour installer la police.",
+      toast.success(`${fileName(family)} downloaded`, {
+        description: "Double-click the file to install the font.",
       })
     } catch (e) {
       console.error(e)
-      toast.error("L'export a échoué", { description: String(e) })
+      toast.error("Export failed", { description: String(e) })
     } finally {
       setBusy(false)
     }
@@ -41,9 +41,9 @@ export function ExportPanel({ params, legendClassName }: ExportPanelProps) {
 
   return (
     <FieldSet className="gap-3.5">
-      <FieldLegend className={legendClassName}>Télécharger</FieldLegend>
+      <FieldLegend className={legendClassName}>Download</FieldLegend>
       <Field>
-        <FieldLabel htmlFor="font-name">Nom de la police</FieldLabel>
+        <FieldLabel htmlFor="font-name">Font name</FieldLabel>
         <Input
           id="font-name"
           value={name}
@@ -53,12 +53,12 @@ export function ExportPanel({ params, legendClassName }: ExportPanelProps) {
       </Field>
       <Button type="button" onClick={download} disabled={busy}>
         <Download data-icon="inline-start" />
-        Télécharger la police (.otf)
+        Download font (.otf)
       </Button>
       <FieldDescription>
-        Capitales, minuscules, chiffres et ponctuation, avec le crénage.
+        Uppercase, lowercase, figures and punctuation, kerning included.
         {params.mode === "contour" &&
-          " Le fichier est toujours en plein : le contour n'existe qu'à l'écran."}
+          " The file is always solid: outline mode only exists on screen."}
       </FieldDescription>
     </FieldSet>
   )

@@ -14,7 +14,6 @@ type TextCanvasProps = {
   lineGap: number
   label: string
   intro?: boolean
-  replay?: number
   alive?: boolean
   className?: string
 }
@@ -26,7 +25,6 @@ export function TextCanvas({
   lineGap,
   label,
   intro,
-  replay,
   alive,
   className,
 }: TextCanvasProps) {
@@ -36,7 +34,6 @@ export function TextCanvas({
     capH: (W) => (W < 420 ? sizes[0] : W < 640 ? sizes[1] : sizes[2]),
     lineGap,
     intro,
-    replay,
     alive,
   })
   return (
