@@ -73,7 +73,10 @@ export const HERO_PARAMS: Params = {
   org: 0.3,
 }
 
-// Adresse du générateur ouvert avec ce style (le nom du style sert de texte)
-export function presetHref(p: Preset) {
-  return `/generator#${encodeShare(p.params, p.name, "")}`
+// Adresse du générateur ouvert avec ces réglages et ce texte
+export function generatorHref(params: Params, text: string) {
+  return `/generator#${encodeShare(params, text, "")}`
 }
+
+// Adresse du générateur ouvert avec ce style (le nom du style sert de texte)
+export const presetHref = (p: Preset) => generatorHref(p.params, p.name)

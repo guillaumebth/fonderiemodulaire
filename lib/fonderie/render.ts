@@ -10,9 +10,10 @@ import { bitmap, glyphCols, skeleton, vMetrics } from "./skeleton"
 
 export type Colors = { bg: string; fg: string; accent: string; line: string }
 
-// Les couleurs viennent des variables CSS de globals.css (et suivent donc le mode sombre)
-export function readColors(): Colors {
-  const s = getComputedStyle(document.documentElement)
+// Les couleurs viennent des variables CSS de globals.css (et suivent donc le mode sombre).
+// On les lit sur le canvas lui-même : un bloc parent peut les redéfinir (cartes colorées du Showcase).
+export function readColors(el: Element = document.documentElement): Colors {
+  const s = getComputedStyle(el)
   const g = (n: string) => s.getPropertyValue(n).trim()
   return {
     bg: g("--background"),

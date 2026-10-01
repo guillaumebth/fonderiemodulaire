@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 
+import { HowItWorks } from "@/components/fonderie/how-it-works"
 import { SiteHeader } from "@/components/fonderie/site-header"
 
 export const metadata: Metadata = {
@@ -12,11 +13,15 @@ export const metadata: Metadata = {
 const FAQ = [
   {
     q: "How do I install my font?",
-    a: "Click “Download font (.otf)” in the generator, then double-click the file and choose Install. It works in Figma, Word, InDesign and any app that reads OpenType fonts.",
+    a: "Click “Download free trial (.otf)” in the generator, then double-click the file and choose Install. It works in Figma, Word, InDesign and any app that reads OpenType fonts.",
   },
   {
-    q: "Which characters are included?",
-    a: "Uppercase A–Z, lowercase a–z, figures 0–9 and the punctuation . , ; : ! ? - ' \" ( ) / & @ # € %. Accented letters are coming next.",
+    q: "Is it free?",
+    a: "Yes. The download is a free trial of your font, with uppercase A–Z and figures 0–9. If you like what you made, you can support the project and pay what you want.",
+  },
+  {
+    q: "Which characters does the generator draw?",
+    a: "On screen: uppercase A–Z, lowercase a–z, figures 0–9 and the punctuation . , ; : ! ? - ' \" ( ) / & @ # € %. Accented letters are coming next.",
   },
   {
     q: "What’s the difference between Grid and Along the path?",
@@ -61,7 +66,12 @@ export default function AboutPage() {
         </p>
       </section>
 
-      <section className="grid max-w-[62ch] gap-6" aria-labelledby="faq">
+      <HowItWorks />
+
+      <section
+        className="grid max-w-[62ch] gap-6 border-t pt-8"
+        aria-labelledby="faq"
+      >
         <h2 id="faq" className="text-[22px] leading-tight font-bold">
           FAQ
         </h2>

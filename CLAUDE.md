@@ -29,14 +29,16 @@ Changer la grille, la graisse ou la forme recalcule tout l'alphabet. Aucune lett
 | `lib/fonderie/sfnt.ts` | Ajout de la table `kern` dans le fichier .otf |
 | `lib/fonderie/export.ts` | Export .otf (opentype.js) : arcs → Bézier, orientation des trous, coordonnées entières |
 | `hooks/use-canvas.ts` | Redessine un canvas (resize, thème, polices) — utilisé par les étapes de construction |
-| `hooks/use-animated-text.ts` | Texte animé : transitions entre réglages, broderie à l'arrivée, mode « vivant » (respecte « réduire les animations ») |
+| `hooks/use-animated-text.ts` | Texte animé : transitions entre réglages et mode « vivant » (pas d'animation d'apparition : retirée, jugée trop chargée) (respecte « réduire les animations ») |
 | `components/fonderie/` | Interface : éditeur (vues Text / Glyph / Charset, réglages Simple / Advanced), curseurs, canvas, barre de navigation |
 | `hooks/use-params-history.ts` | Réglages avec Undo / Redo (⌘Z, ⇧⌘Z) |
 | `lib/fonderie/share.ts` | Lien de partage : réglages + texte dans l'adresse (#…) |
 | `app/page.tsx` | Home (titre animé, styles d'exemple) — le logo y ramène |
 | `app/generator/page.tsx` | L'outil |
-| `app/how-it-works/page.tsx` | Explication des deux modes, étape par étape |
-| `app/about/page.tsx` | Page About + FAQ |
+| `app/templates/page.tsx` | Templates : affiches colorées qui ouvrent le générateur réglé (`lib/fonderie/templates.ts`, palettes `.palette-*` dans globals.css) |
+| `app/showcase/page.tsx` | Showcase : vrais projets d'utilisateurs — vide pour l'instant (état d'attente), pas de faux projets |
+| `app/about/page.tsx` | About : présentation, section How it works (#how-it-works), FAQ ; `/how-it-works` y redirige |
+| `lib/fonderie/config.ts` | `SUPPORT_URL` : lien de paiement « prix libre » (bouton caché tant qu'il est vide) |
 | `lib/fonderie/presets.ts` | Styles d'exemple de la home (LED, Stitch, Melt…) et réglages du titre |
 
 Tout le moteur reçoit les réglages en paramètre (`P: Params`) : plus de variable globale.
@@ -68,6 +70,7 @@ Tout le moteur reçoit les réglages en paramètre (`P: Params`) : plus de varia
 
 - Une police installable n'a qu'une couleur. Les visuels multicouches se feront à part (Figma ou export image), pas dans le .otf.
 - Tester les cas limites des curseurs : grille 3 × 5 avec une graisse forte, grille 12 × 15 avec une graisse faible, et les lettres à diagonales (K, M, N, V, W, X, Z, 7).
+- Modèle économique (test) : le téléchargement est une version Trial gratuite (A–Z + 0–9, « Trial » dans le nom, `TRIAL_CHARSET` dans `export.ts`) + bouton « Pay what you want ». Tout étant généré dans le navigateur, la limite est contournable : une vraie version payante devra être générée côté serveur après paiement (Lemon Squeezy ou Paddle conseillés pour la TVA).
 - L'interface du site est en anglais (libellés, messages, accessibilité). Le code, ses commentaires et cette doc restent en français.
 - Identité visuelle reprise du proto : fond vert-gris, encre presque noire, accent bleu (`--brand`), polices Familjen Grotesk + JetBrains Mono. Tout est dans `app/globals.css`.
 

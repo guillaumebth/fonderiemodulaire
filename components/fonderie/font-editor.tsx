@@ -108,7 +108,8 @@ export function FontEditor() {
   // Au chargement : réglages et texte depuis l'adresse (lien partagé, ou style choisi sur la home),
   // et préférence Simple / Advanced
   useEffect(() => {
-    if (window.location.hash.length > 1) {
+    // (un simple #download, venu du bouton « Trial ↓ » du menu, n'est pas un lien de réglages)
+    if (window.location.hash.includes("=")) {
       const shared = decodeShare(window.location.hash)
       replace(shared.params, false)
       if (shared.text !== null) setText(shared.text)
@@ -153,7 +154,6 @@ export function FontEditor() {
       <section className="grid items-start gap-5 md:grid-cols-[minmax(0,1fr)_300px]">
         {/* ---------- Aperçu : trois vues ---------- */}
         <Tabs defaultValue="text" className="min-w-0 gap-4">
-          {/* Chaque vue n'existe que quand elle est affichée : en changer rejoue la broderie */}
           <TabsList aria-label="Preview">
             <TabsTrigger value="text">Text</TabsTrigger>
             <TabsTrigger value="glyph">Glyph</TabsTrigger>
@@ -179,7 +179,6 @@ export function FontEditor() {
               params={P}
               sizes={[64, 92, 128]}
               lineGap={0.42}
-              intro
               alive={alive}
               label="Preview of your text in the modular font"
             />
@@ -232,7 +231,6 @@ export function FontEditor() {
               params={{ ...P, grid: true }}
               sizes={[220, 320, 380]}
               lineGap={0}
-              intro
               alive={alive}
               label={`The character ${glyph}, with its grid and path`}
             />
@@ -244,7 +242,6 @@ export function FontEditor() {
               params={P}
               sizes={[34, 52, 52]}
               lineGap={0.5}
-              intro
               alive={alive}
               label="Every letter and figure in the font"
             />

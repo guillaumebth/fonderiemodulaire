@@ -21,7 +21,6 @@ export function HomeContent() {
           params={HERO_PARAMS}
           sizes={[72, 120, 168]}
           lineGap={0.3}
-          intro
           alive
           label="Fonderie modulaire, written in a stitched modular font"
         />
@@ -40,7 +39,7 @@ export function HomeContent() {
               </Link>
             </Button>
             <Button asChild variant="outline">
-              <Link href="/how-it-works">How it works</Link>
+              <Link href="/about#how-it-works">How it works</Link>
             </Button>
           </div>
         </div>
@@ -64,7 +63,6 @@ export function HomeContent() {
                       params={p.params}
                       sizes={[48, 56, 56]}
                       lineGap={0.2}
-                      intro
                       label={`${p.name} style`}
                     />
                     <p className="text-sm text-muted-foreground">
@@ -76,6 +74,14 @@ export function HomeContent() {
             </li>
           ))}
         </ul>
+        <div>
+          <Button asChild variant="outline">
+            <Link href="/templates">
+              See all templates
+              <ArrowRight data-icon="inline-end" />
+            </Link>
+          </Button>
+        </div>
       </section>
     </>
   )

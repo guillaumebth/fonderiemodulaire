@@ -6,6 +6,8 @@
 
 @theme inline {
   --color-brand: var(--brand);
+  --color-highlight: var(--highlight);
+  --color-highlight-foreground: var(--highlight-foreground);
   --font-heading: var(--font-sans);
   --font-sans: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -51,6 +53,9 @@
 :root {
   /* Accent de la fonderie (bleu) : grille, tracé, focus */
   --brand: oklch(0.475 0.241 269.5);
+  /* Jaune-vert acide : page active du menu */
+  --highlight: oklch(0.94 0.22 118);
+  --highlight-foreground: oklch(0.197 0.007 135);
   --background: oklch(0.946 0.008 121.6);
   --foreground: oklch(0.197 0.007 135);
   --card: oklch(0.917 0.011 123.5);
@@ -131,5 +136,43 @@
   }
   html {
     @apply font-sans;
+  }
+}
+
+/* Palettes des templates : chaque carte redéfinit les couleurs que lit le dessin.
+   Ce sont des « affiches » : elles gardent leurs couleurs en mode sombre. */
+@layer components {
+  .palette-ink,
+  .palette-blue,
+  .palette-paper,
+  .palette-coral,
+  .palette-mint {
+    background: var(--background);
+    color: var(--foreground);
+  }
+  .palette-ink {
+    --background: oklch(0.197 0.007 135);
+    --foreground: oklch(0.946 0.008 121.6);
+    --muted-foreground: oklch(0.7 0.02 128);
+  }
+  .palette-blue {
+    --background: oklch(0.475 0.241 269.5);
+    --foreground: oklch(0.97 0.01 270);
+    --muted-foreground: oklch(0.85 0.06 270);
+  }
+  .palette-paper {
+    --background: oklch(0.946 0.008 121.6);
+    --foreground: oklch(0.475 0.241 269.5);
+    --muted-foreground: oklch(0.495 0.017 132.6);
+  }
+  .palette-coral {
+    --background: oklch(0.72 0.16 40);
+    --foreground: oklch(0.197 0.007 135);
+    --muted-foreground: oklch(0.32 0.05 40);
+  }
+  .palette-mint {
+    --background: oklch(0.88 0.08 160);
+    --foreground: oklch(0.3 0.06 160);
+    --muted-foreground: oklch(0.42 0.05 160);
   }
 }

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Download } from "lucide-react"
+import { Download, Heart } from "lucide-react"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
@@ -13,6 +13,7 @@ import {
   FieldSet,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { SUPPORT_URL } from "@/lib/fonderie/config"
 import type { Params } from "@/lib/fonderie/params"
 
 type ExportPanelProps = { params: Params; legendClassName?: string }
@@ -25,10 +26,9 @@ export function ExportPanel({ params, legendClassName }: ExportPanelProps) {
     setBusy(true)
     try {
       // Le module d'export (et opentype.js) ne se charge qu'au premier clic : la page reste légère
-      const { downloadFont, fileName } = await import("@/lib/fonderie/export")
-      const family = name.trim() || "Fonderie Modulaire"
-      downloadFont(params, family)
-      toast.success(`${fileName(family)} downloaded`, {
+      const { downloadFont } = await import("@/lib/fonderie/export")
+      const file = downloadFont(params, name.trim() || "Fonderie Modulaire")
+      toast.success(`${file} downloaded`, {
         description: "Double-click the file to install the font.",
       })
     } catch (e) {
@@ -40,7 +40,8 @@ export function ExportPanel({ params, legendClassName }: ExportPanelProps) {
   }
 
   return (
-    <FieldSet className="gap-3.5">
+    // id="download" : cible du bouton « Trial ↓ » du menu
+    <FieldSet id="download" className="scroll-mt-6 gap-3.5">
       <FieldLegend className={legendClassName}>Download</FieldLegend>
       <Field>
         <FieldLabel htmlFor="font-name">Font name</FieldLabel>
@@ -53,13 +54,22 @@ export function ExportPanel({ params, legendClassName }: ExportPanelProps) {
       </Field>
       <Button type="button" onClick={download} disabled={busy}>
         <Download data-icon="inline-start" />
-        Download font (.otf)
+        Download free trial (.otf)
       </Button>
       <FieldDescription>
-        Uppercase, lowercase, figures and punctuation, kerning included.
+        The trial includes uppercase A–Z and figures 0–9, kerning included.
         {params.mode === "contour" &&
           " The file is always solid: outline mode only exists on screen."}
       </FieldDescription>
+      {/* Prix libre : caché tant que le lien de paiement n'est pas renseigné (lib/fonderie/config.ts) */}
+      {SUPPORT_URL && (
+        <Button asChild variant="outline">
+          <a href={SUPPORT_URL} target="_blank" rel="noopener noreferrer">
+            <Heart data-icon="inline-start" />
+            Pay what you want
+          </a>
+        </Button>
+      )}
     </FieldSet>
   )
 }

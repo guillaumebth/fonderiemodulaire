@@ -13,7 +13,6 @@ type TextCanvasProps = {
   sizes: [number, number, number]
   lineGap: number
   label: string
-  intro?: boolean
   alive?: boolean
   className?: string
 }
@@ -24,7 +23,6 @@ export function TextCanvas({
   sizes,
   lineGap,
   label,
-  intro,
   alive,
   className,
 }: TextCanvasProps) {
@@ -33,7 +31,6 @@ export function TextCanvas({
     params,
     capH: (W) => (W < 420 ? sizes[0] : W < 640 ? sizes[1] : sizes[2]),
     lineGap,
-    intro,
     alive,
   })
   return (

@@ -267,7 +267,14 @@ function buildGlyph(c: string, P: Params) {
   })
 }
 
-export function buildFont(P: Params, familyName: string) {
+// Version d'essai gratuite : capitales et chiffres seulement (le site, lui, montre toute la police)
+export const TRIAL_CHARSET = CHARSET.filter((c) => /[A-Z0-9]/.test(c))
+
+export function buildFont(
+  P: Params,
+  familyName: string,
+  chars: string[] = CHARSET
+) {
   const U = CAP / P.rows
   const glyphs = [
     new Glyph({
@@ -281,7 +288,7 @@ export function buildFont(P: Params, familyName: string) {
       advanceWidth: Math.round(advance(" ", U, P)),
       path: new Path(),
     }),
-    ...CHARSET.map((c) => buildGlyph(c, P)),
+    ...chars.map((c) => buildGlyph(c, P)),
   ]
   return new Font({
     familyName,
@@ -303,12 +310,12 @@ export function fileName(familyName: string) {
   return (slug || "fonderie") + ".otf"
 }
 
-// Paires de crénage, en index de glyphes (0 = .notdef, 1 = espace, puis CHARSET dans l'ordre)
-function kernPairs(P: Params): KernPair[] {
+// Paires de crénage, en index de glyphes (0 = .notdef, 1 = espace, puis les caractères dans l'ordre)
+function kernPairs(P: Params, chars: string[]): KernPair[] {
   const U = CAP / P.rows
   const pairs: KernPair[] = []
-  CHARSET.forEach((a, i) =>
-    CHARSET.forEach((b, j) => {
+  chars.forEach((a, i) =>
+    chars.forEach((b, j) => {
       const value = Math.round(kerning(a, b, U, P))
       if (value) pairs.push({ left: i + 2, right: j + 2, value })
     })
@@ -316,20 +323,32 @@ function kernPairs(P: Params): KernPair[] {
   return pairs
 }
 
-// Le fichier .otf complet, crénage compris
-export function fontFile(P: Params, familyName: string) {
-  const bytes = buildFont(P, familyName).toArrayBuffer()
-  const pairs = kernPairs(P)
+// Le fichier .otf, crénage compris (toute la police, ou seulement les caractères donnés)
+export function fontFile(
+  P: Params,
+  familyName: string,
+  chars: string[] = CHARSET
+) {
+  const bytes = buildFont(P, familyName, chars).toArrayBuffer()
+  const pairs = kernPairs(P, chars)
   return pairs.length ? addTable(bytes, "kern", makeKernTable(pairs)) : bytes
 }
 
+// Nom de la version d'essai : « Trial » est ajouté au nom choisi
+export const trialName = (familyName: string) => `${familyName} Trial`
+
 // Construit la police et lance le téléchargement dans le navigateur
+// (pour l'instant, c'est toujours la version d'essai qui est téléchargée). Renvoie le nom du fichier.
 export function downloadFont(P: Params, familyName: string) {
-  const blob = new Blob([fontFile(P, familyName)], { type: "font/otf" })
+  const family = trialName(familyName)
+  const blob = new Blob([fontFile(P, family, TRIAL_CHARSET)], {
+    type: "font/otf",
+  })
   const url = URL.createObjectURL(blob)
   const a = document.createElement("a")
   a.href = url
-  a.download = fileName(familyName)
+  a.download = fileName(family)
   a.click()
   setTimeout(() => URL.revokeObjectURL(url), 1000)
+  return a.download
 }

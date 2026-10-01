@@ -1,8 +1,5 @@
 "use client"
 
-import Link from "next/link"
-
-import { Button } from "@/components/ui/button"
 import { DEFAULT_PARAMS, type Params } from "@/lib/fonderie/params"
 
 import { StepCanvas } from "./font-canvas"
@@ -41,28 +38,35 @@ const MODES: { title: string; intro: string; params: Params; steps: Step[] }[] =
     },
   ]
 
+// Section de la page About (ancre #how-it-works, visée par le bouton de la home)
 export function HowItWorks() {
   return (
-    <>
-      <section className="grid max-w-[62ch] gap-4">
-        <h1 className="text-[32px] leading-tight font-bold text-balance">
+    <section
+      id="how-it-works"
+      aria-labelledby="how-it-works-title"
+      className="grid scroll-mt-6 gap-8 border-t pt-8"
+    >
+      <div className="grid max-w-[62ch] gap-4">
+        <h2
+          id="how-it-works-title"
+          className="text-[22px] leading-tight font-bold"
+        >
           How it works
-        </h1>
+        </h2>
         <p>
           Each letter is described only once, as a path: a few lines and a few
           corners. That path doesn&apos;t depend on any grid, so the same
-          alphabet can be rebuilt at any size, with any pieces.
+          alphabet can be rebuilt at any size, with any pieces. There are two
+          ways to turn that path into a letter.
         </p>
-        <p>There are two ways to turn that path into a letter.</p>
-      </section>
-
+      </div>
       {MODES.map((mode) => (
-        <section
+        <div
           key={mode.title}
-          className="grid gap-7 border-t pt-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]"
+          className="grid gap-7 md:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]"
         >
           <div className="grid content-start gap-2.5">
-            <h2 className={SECTION_LABEL}>{mode.title}</h2>
+            <h3 className={SECTION_LABEL}>{mode.title}</h3>
             <p className="max-w-[60ch]">{mode.intro}</p>
           </div>
           <div className="grid grid-cols-3 content-start gap-3.5">
@@ -82,29 +86,14 @@ export function HowItWorks() {
               </div>
             ))}
           </div>
-        </section>
-      ))}
-
-      <section className="grid max-w-[62ch] gap-4 border-t pt-6">
-        <h2 className={SECTION_LABEL}>The rest</h2>
-        <p>
-          <b className="font-medium">Weight</b> decides how far the stroke
-          spills into neighbouring cells, or how big the pieces are along the
-          path. <b className="font-medium">Roundness</b> softens the corners of
-          the path. <b className="font-medium">Organic variation</b> makes some
-          columns and rows wider than others, so the grid feels hand-made.
-        </p>
-        <p>
-          When two letters sit side by side, the empty cells facing each other
-          are measured and the pair is tightened automatically. That kerning
-          goes into the font file you download, along with every letter.
-        </p>
-        <div>
-          <Button asChild>
-            <Link href="/generator">Try it in the generator</Link>
-          </Button>
         </div>
-      </section>
-    </>
+      ))}
+      <p className="max-w-[62ch] text-muted-foreground">
+        Weight decides how far the stroke spills into neighbouring cells, or how
+        big the pieces are along the path. Roundness softens the corners.
+        Organic variation makes some columns and rows wider than others. Kerning
+        is computed automatically and written into the font file.
+      </p>
+    </section>
   )
 }

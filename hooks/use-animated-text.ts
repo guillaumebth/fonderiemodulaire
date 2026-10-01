@@ -12,7 +12,6 @@ import {
 } from "@/lib/fonderie/render"
 
 const TWEEN_MS = 420 // durée d'une transition quand on bouge un réglage
-const PIECE_IN_MS = 160 // durée d'apparition d'une pièce pendant la broderie
 const BREATH_SPEED = 0.8 // vitesse de l'ondulation en mode vivant (radians par seconde)
 
 const ease = (t: number) => 1 - Math.pow(1 - t, 3)
@@ -29,21 +28,18 @@ type Options = {
   params: Params
   capH: (width: number) => number // hauteur des capitales selon la largeur dispo
   lineGap: number
-  intro?: boolean // broderie quand le canvas apparaît
   alive?: boolean // la variation organique ondule en boucle
 }
 
 // Dessine le texte et l'anime :
 // 1. transitions : quand un réglage change, chaque pièce glisse de son ancienne place à la nouvelle ;
-// 2. broderie : quand le canvas apparaît, les pièces apparaissent une à une, dans l'ordre du trait ;
-// 3. vivant : la grille ondule en boucle.
+// 2. vivant : la grille ondule en boucle.
 // Si le système demande de réduire les animations, tout est dessiné directement.
 export function useAnimatedText({
   text,
   params,
   capH,
   lineGap,
-  intro,
   alive,
 }: Options) {
   const ref = useRef<HTMLCanvasElement>(null)
@@ -53,7 +49,6 @@ export function useAnimatedText({
   // État de l'animation, gardé d'un rendu à l'autre
   const anim = useRef({
     shown: [] as TextPiece[], // pièces telles qu'elles sont à l'écran en ce moment
-    introPending: !!intro,
     phase: 0,
   })
 
@@ -75,11 +70,11 @@ export function useAnimatedText({
     if (!cv || !width) return
     const st = anim.current
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    const col = readColors()
+    const col = readColors(cv)
     const content = text || " "
     let raf = 0
 
-    // 3. Vivant : on recalcule la mise en page à chaque image, avec une phase qui avance
+    // 2. Vivant : on recalcule la mise en page à chaque image, avec une phase qui avance
     if (alive && !reduce) {
       let last = performance.now()
       const loop = (now: number) => {
@@ -105,20 +100,15 @@ export function useAnimatedText({
     const keys = new Set(L.pieces.map((p) => p.key))
     const leaving = st.shown.filter((p) => !keys.has(p.key))
     const tween = !reduce && st.shown.length > 0
-    const embroider = !reduce && st.introPending
-    st.introPending = false
-    // 2. Broderie : les pièces apparaissent une à une, en 1 à 2,5 secondes selon leur nombre
-    const total = Math.min(2500, Math.max(900, L.pieces.length * 14))
-    const gapMs = total / Math.max(1, L.pieces.length)
     const start = performance.now()
 
     const frame = (now: number) => {
       const t = tween ? Math.min(1, (now - start) / TWEEN_MS) : 1
       const e = ease(t)
-      const pieces = L.pieces.map((p, i) => {
+      const pieces = L.pieces.map((p) => {
         const f = from.get(p.key)
         // 1. Transition : position, taille et rotation glissent ; une nouvelle pièce grandit
-        let q: TextPiece = f
+        const q: TextPiece = f
           ? {
               ...p,
               x: lerp(f.x, p.x, e),
@@ -129,21 +119,13 @@ export function useAnimatedText({
               base: lerp(f.base, p.base, e),
             }
           : { ...p, s: tween ? e : 1 }
-        if (embroider) {
-          const k = Math.min(
-            1,
-            Math.max(0, (now - start - i * gapMs) / PIECE_IN_MS)
-          )
-          q = { ...q, s: q.s * ease(k) }
-        }
         return q
       })
       // Les pièces qui n'existent plus rétrécissent
       const gone = leaving.map((p) => ({ ...p, s: p.s * (1 - e) }))
       st.shown = pieces
       drawText(cv, L, [...gone, ...pieces], P, col)
-      const busy = t < 1 || (embroider && now - start < total + PIECE_IN_MS)
-      if (busy) raf = requestAnimationFrame(frame)
+      if (t < 1) raf = requestAnimationFrame(frame)
     }
     frame(performance.now())
     return () => cancelAnimationFrame(raf)
