@@ -120,6 +120,30 @@ export function shape(
   }
 }
 
+// Fait tourner tout ce qu'on dessine d'un angle `a` autour de (cx, cy).
+// Une rotation garde les cercles ronds : un arc reste un arc, décalé du même angle.
+export function rotated(
+  p: PathSink,
+  cx: number,
+  cy: number,
+  a: number
+): PathSink {
+  if (!a) return p
+  const cos = Math.cos(a)
+  const sin = Math.sin(a)
+  const t = (x: number, y: number): [number, number] => [
+    cx + (x - cx) * cos - (y - cy) * sin,
+    cy + (x - cx) * sin + (y - cy) * cos,
+  ]
+  return {
+    moveTo: (x, y) => p.moveTo(...t(x, y)),
+    lineTo: (x, y) => p.lineTo(...t(x, y)),
+    arc: (x, y, r, a0, a1, ccw) => p.arc(...t(x, y), r, a0 + a, a1 + a, ccw),
+    arcTo: (x1, y1, x2, y2, r) => p.arcTo(...t(x1, y1), ...t(x2, y2), r),
+    closePath: () => p.closePath(),
+  }
+}
+
 // « Mélange » tire au hasard, mais toujours le même tirage pour une même case
 export function pieceKind(seed: number, P: Params): Piece {
   if (P.shape !== "melange") return P.shape

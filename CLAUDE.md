@@ -23,6 +23,7 @@ Changer la grille, la graisse ou la forme recalcule tout l'alphabet. Aucune lett
 | `lib/fonderie/skeleton.ts` | `skeleton()` et `bitmap()` : du tracé à la grille |
 | `lib/fonderie/shapes.ts` | `shape()` : dessin des pièces (via `PathSink`, réutilisable pour l'export .otf) |
 | `lib/fonderie/render.ts` | Dessin canvas : texte, grille, étapes de construction ; `forEachPiece()` partagé avec l'export |
+| `lib/fonderie/trace.ts` | Mode « le long du tracé » : positions des pièces sur le trait |
 | `lib/fonderie/grid.ts` | Bords des colonnes et lignes (variation organique) |
 | `lib/fonderie/kerning.ts` | Crénage automatique, à partir des cases vides face à face |
 | `lib/fonderie/sfnt.ts` | Ajout de la table `kern` dans le fichier .otf |
@@ -52,7 +53,7 @@ Tout le moteur reçoit les réglages en paramètre (`P: Params`) : plus de varia
 1. ~~**Export .otf**~~ : fait, dans `lib/fonderie/export.ts` (bouton « Télécharger » du panneau). Reste à vérifier dans Figma / Word / FontDrop. Utiliser opentype.js dans le navigateur. Chaque glyphe est l'union des pièces de ses cases, converties en contours. Les arcs deviennent des Bézier cubiques, et les trous (anneau, vis…) doivent être des contours tournant dans le sens inverse, car OpenType utilise le remplissage nonzero, pas evenodd. Il faut aussi régler l'avance (largeur) et l'espace, et donner un nom à la police. Vérifier le fichier dans Figma, Word ou FontDrop.
 2. ~~**Transformer en vrai projet**~~ : fait, en Next.js (voir « Où est quoi »). Tout reste côté client, sans serveur.
 3. **Compléter le jeu de caractères** : ~~minuscules~~ (faites : tracés dans `glyphs.ts`, hauteur d'x et jambages réglables, voir `vMetrics()` dans `skeleton.ts`), accents français (É È Ê À Ç…). ~~Ponctuation~~ et ~~crénage~~ faits (crénage automatique dans `kerning.ts`, écrit dans le .otf via une table `kern` ajoutée par `sfnt.ts`, car opentype.js ne sait pas l'écrire).
-4. **Mode « le long du tracé »** (réf. `proto/refs/04-etoiles-le-long-du-trace.png`) : au lieu d'une grille, on pose les pièces à intervalles réguliers le long du tracé. Les courbes deviennent alors vraiment rondes. Ce serait un deuxième mode de rendu.
+4. ~~**Mode « le long du tracé »**~~ : fait (`lib/fonderie/trace.ts`, interrupteur « Construction : Grille / Le long du tracé »). Pièces à intervalles réguliers, une pièce sur chaque angle vif, option pour orienter les pièces selon le trait.
 5. **Identité du site** : nom, branding, page d'accueil. La réf. `proto/refs/05-marketing-couches.png` sert d'inspiration **pour les visuels marketing** (couches de couleurs, rendu « fusion », lettres faites de lettres). Ce n'est pas une fonctionnalité de l'outil pour l'instant.
 
 ## Notes

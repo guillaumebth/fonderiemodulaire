@@ -2,7 +2,8 @@
 
 import { GLYPHS } from "./glyphs"
 import type { Params } from "./params"
-import { pieceKind, shape, type Piece } from "./shapes"
+import { pieceKind, rotated, shape, type Piece } from "./shapes"
+import { tracePositions, traceSize } from "./trace"
 import { center, glyphGrid } from "./grid"
 import { kerning } from "./kerning"
 import { bitmap, glyphCols, skeleton, vMetrics } from "./skeleton"
@@ -26,7 +27,8 @@ type PieceVisitor = (
   cx: number,
   cy: number,
   w: number,
-  h: number
+  h: number,
+  angle: number
 ) => void
 
 // Parcourt les pièces d'une lettre (origine en haut à gauche de la grille).
@@ -37,6 +39,22 @@ export function forEachPiece(
   P: Params,
   visit: PieceVisitor
 ) {
+  if (P.layout === "trace") {
+    const size = traceSize(P) * U
+    tracePositions(c, P).forEach((p, k) => {
+      const kind = pieceKind(c.charCodeAt(0) * 97 + k * 13 + 1, P)
+      if (size > 0)
+        visit(
+          kind,
+          p.x * U,
+          p.y * U,
+          size * P.wid,
+          size,
+          P.orient ? p.angle : 0
+        )
+    })
+    return
+  }
   const bm = bitmap(c, P)
   const { xs, ys } = glyphGrid(c, U, P)
   bm.forEach((row, i) =>
@@ -49,7 +67,7 @@ export function forEachPiece(
       const h = (ch - inset * 2) * v
       if (w > 0 && h > 0) {
         const kind = pieceKind(c.charCodeAt(0) * 97 + i * 13 + j * 7 + 1, P)
-        visit(kind, (xs[j] + xs[j + 1]) / 2, (ys[i] + ys[i + 1]) / 2, w, h)
+        visit(kind, (xs[j] + xs[j + 1]) / 2, (ys[i] + ys[i + 1]) / 2, w, h, 0)
       }
     })
   )
@@ -65,9 +83,11 @@ export function glyphPieces(
   P: Params
 ) {
   const pieces: Path2D[] = []
-  forEachPiece(c, U, P, (kind, cx, cy, w, h) => {
+  forEachPiece(c, U, P, (kind, cx, cy, w, h, angle) => {
     const path = new Path2D()
-    shape(path, kind, ox + cx, oy + cy, w, h, P)
+    const x = ox + cx
+    const y = oy + cy
+    shape(rotated(path, x, y, angle), kind, x, y, w, h, P)
     pieces.push(path)
   })
   return pieces
@@ -211,9 +231,13 @@ function setupCanvas(cv: HTMLCanvasElement, cssW: number, cssH: number) {
 // De combien les pièces peuvent dépasser de la grille, en cases :
 // fusion (écart négatif, amplifié par la variation organique) et épaisseur du trait en mode contour.
 export function bleed(P: Params) {
-  return (
-    (Math.max(0, -P.gap) * (1 + P.org)) / 2 + (P.mode === "contour" ? P.str : 0)
-  )
+  const stroke = P.mode === "contour" ? P.str : 0
+  if (P.layout === "trace") {
+    // Pièce centrée sur le tracé, qui passe au centre des cases du bord ; une pièce tournée prend plus de place
+    const size = traceSize(P) * Math.max(1, P.wid) * (P.orient ? Math.SQRT2 : 1)
+    return Math.max(0, size / 2 - 0.5) * (1 + P.org) + stroke
+  }
+  return (Math.max(0, -P.gap) * (1 + P.org)) / 2 + stroke
 }
 
 // capH = hauteur des capitales en pixels ; la taille des cases s'en déduit
@@ -276,7 +300,16 @@ export function renderStep(
   const ox = (W - nc * U * P.wid) / 2
   const oy = (H - nr * U) / 2
   if (step === 1) drawGrid(ctx, c, ox, oy, U, P, col)
-  if (step === 2) {
+  if (step === 2 && P.layout === "trace") {
+    // Le tracé, avec un point à chaque endroit où une pièce sera posée
+    drawGrid(ctx, c, ox, oy, U, P, col)
+    ctx.fillStyle = col.fg
+    for (const p of tracePositions(c, P)) {
+      ctx.beginPath()
+      ctx.arc(ox + p.x * U, oy + p.y * U, Math.max(2, U * 0.14), 0, Math.PI * 2)
+      ctx.fill()
+    }
+  } else if (step === 2) {
     drawGrid(ctx, c, ox, oy, U, P, col, false)
     ctx.fillStyle = col.fg
     const { xs, ys } = glyphGrid(c, U, P)

@@ -25,6 +25,7 @@ import {
   SHAPES,
   USES_RADIUS,
   USES_THICKNESS,
+  type Layout,
   type Params,
   type RenderMode,
   type ShapeKind,
@@ -106,6 +107,7 @@ export function FontEditor() {
                       ...DEFAULT_PARAMS,
                       grid: p.grid,
                       mode: p.mode,
+                      layout: p.layout,
                     }))
                   }
                 >
@@ -113,6 +115,54 @@ export function FontEditor() {
                   Réinitialiser
                 </Button>
               </div>
+
+              <FieldSet className="gap-3.5">
+                <FieldLegend className={SECTION_LABEL}>
+                  Construction
+                </FieldLegend>
+                <ToggleGroup
+                  type="single"
+                  value={P.layout}
+                  onValueChange={(v) => v && set("layout")(v as Layout)}
+                  variant="outline"
+                  spacing={0}
+                  className="grid w-full grid-cols-2"
+                  aria-label="Construction des lettres"
+                >
+                  <ToggleGroupItem value="grille" className={PRESSED}>
+                    Grille
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="trace" className={PRESSED}>
+                    Le long du tracé
+                  </ToggleGroupItem>
+                </ToggleGroup>
+                {P.layout === "trace" && (
+                  <>
+                    <ControlSlider
+                      id="spacing"
+                      label="Espacement des pièces"
+                      value={P.spacing}
+                      min={0.15}
+                      max={2.5}
+                      step={0.01}
+                      format={(v) => v.toFixed(2).replace(".", ",") + " case"}
+                      onChange={set("spacing")}
+                    />
+                    <Field orientation="horizontal">
+                      <Switch
+                        id="orient"
+                        checked={P.orient}
+                        onCheckedChange={set("orient")}
+                      />
+                      <FieldLabel htmlFor="orient" className="font-normal">
+                        Pièces orientées selon le trait
+                      </FieldLabel>
+                    </Field>
+                  </>
+                )}
+              </FieldSet>
+
+              <FieldSeparator />
               <FieldSet className="gap-3.5">
                 <FieldLegend className={SECTION_LABEL}>
                   Grille et lettres
@@ -186,6 +236,7 @@ export function FontEditor() {
                   step={0.01}
                   format={(v) => (v ? pct(v) : "aucun")}
                   onChange={set("smo")}
+                  inactive={P.layout === "trace"}
                 />
                 <ControlSlider
                   id="org"
@@ -379,9 +430,21 @@ export function FontEditor() {
           {(
             [
               [1, "1. Le tracé", "la lettre décrite en lignes"],
-              [2, "2. La grille", "les cases que le trait touche"],
-              [3, "3. Les pièces", "une forme dans chaque case"],
-            ] as const
+              P.layout === "trace"
+                ? [
+                    2,
+                    "2. Les positions",
+                    "à intervalles réguliers sur le trait",
+                  ]
+                : [2, "2. La grille", "les cases que le trait touche"],
+              [
+                3,
+                "3. Les pièces",
+                P.layout === "trace"
+                  ? "une forme à chaque position"
+                  : "une forme dans chaque case",
+              ],
+            ] satisfies [1 | 2 | 3, string, string][]
           ).map(([step, title, desc]) => (
             <div key={step} className="grid gap-2">
               <StepCanvas

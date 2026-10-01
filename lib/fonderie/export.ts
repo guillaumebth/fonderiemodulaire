@@ -14,7 +14,7 @@ import { kerning } from "./kerning"
 import { advance, bleed, forEachPiece, tracking } from "./render"
 import { addTable, makeKernTable, type KernPair } from "./sfnt"
 import { vMetrics } from "./skeleton"
-import { shape, type PathSink } from "./shapes"
+import { rotated, shape, type PathSink } from "./shapes"
 
 type Pt = { x: number; y: number }
 type Seg = { kind: "L"; p: Pt } | { kind: "C"; c1: Pt; c2: Pt; p: Pt }
@@ -245,9 +245,9 @@ function buildGlyph(c: string, P: Params) {
     return { x: r(lsb + p.x + slant * y), y: r(y) }
   }
   const path = new Path()
-  forEachPiece(c, U, P, (kind, cx, cy, w, h) => {
+  forEachPiece(c, U, P, (kind, cx, cy, w, h, angle) => {
     const rec = new ContourRecorder()
-    shape(rec, kind, cx, cy, w, h, P)
+    shape(rotated(rec, cx, cy, angle), kind, cx, cy, w, h, P)
     const contours = orient(rec.done().map((ct) => mapContour(ct, toFont)))
     for (const ct of contours) {
       path.moveTo(ct.start.x, ct.start.y)

@@ -14,8 +14,12 @@ export const SHAPES = [
 
 export type ShapeKind = (typeof SHAPES)[number]["id"]
 export type RenderMode = "plein" | "contour"
+export type Layout = "grille" | "trace"
 
 export type Params = {
+  layout: Layout // grille : une pièce par case touchée ; trace : pièces enfilées le long du tracé
+  spacing: number // mode tracé : distance entre deux pièces, en hauteurs de case
+  orient: boolean // mode tracé : les pièces tournent pour suivre la direction du trait
   cols: number // colonnes de la grille
   rows: number // lignes de la grille
   wt: number // graisse, en cases
@@ -38,6 +42,9 @@ export type Params = {
 }
 
 export const DEFAULT_PARAMS: Params = {
+  layout: "grille",
+  spacing: 0.8,
+  orient: false,
   cols: 5,
   rows: 7,
   wt: 0.5,
@@ -79,8 +86,12 @@ export function randomParams(current: Params): Params {
   const sometimes = (chance: number, value: number) =>
     Math.random() < chance ? value : 0
   const shapes = SHAPES.map((s) => s.id)
+  const trace = Math.random() < 0.35
   return {
     ...current,
+    layout: trace ? "trace" : "grille",
+    spacing: rand(0.5, 1.3, 0.01),
+    orient: trace && Math.random() < 0.5,
     cols: rand(3, 9, 1),
     rows: rand(5, 13, 1),
     wt: rand(0.45, 1.1, 0.05),
