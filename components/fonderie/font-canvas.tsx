@@ -17,6 +17,7 @@ type TextCanvasProps = {
   label: string
   alive?: boolean
   center?: boolean
+  morph?: boolean
   className?: string
 }
 
@@ -29,6 +30,7 @@ export function TextCanvas({
   label,
   alive,
   center,
+  morph,
   className,
 }: TextCanvasProps) {
   const ref = useAnimatedText({
@@ -39,6 +41,7 @@ export function TextCanvas({
     lineGap,
     alive,
     center,
+    morph,
   })
   return (
     <canvas

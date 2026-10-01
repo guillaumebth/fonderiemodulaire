@@ -31,6 +31,7 @@ type Options = {
   lineGap: number
   alive?: boolean // la variation organique ondule en boucle
   center?: boolean // lignes centrées
+  morph?: boolean // false : pas de transition, le dessin change d'un coup (ex. logo)
 }
 
 // Dessine le texte et l'anime :
@@ -43,6 +44,7 @@ export function useAnimatedText({
   capH,
   lineGap,
   center,
+  morph = true,
   alive,
 }: Options) {
   const ref = useRef<HTMLCanvasElement>(null)
@@ -94,7 +96,11 @@ export function useAnimatedText({
     const changed = st.content !== "" && st.content !== signature
     st.content = signature
     const tween =
-      !reduce && st.shown.length > 0 && changed && now - st.bornAt > SETTLE_MS
+      morph &&
+      !reduce &&
+      st.shown.length > 0 &&
+      changed &&
+      now - st.bornAt > SETTLE_MS
     const start = performance.now()
     const blend = (target: TextPiece[], e: number) => {
       const keys = new Set(target.map((p) => p.key))
@@ -157,6 +163,7 @@ export function useAnimatedText({
     params,
     lineGap,
     center,
+    morph,
     resolvedTheme,
     fontsReady,
     alive,

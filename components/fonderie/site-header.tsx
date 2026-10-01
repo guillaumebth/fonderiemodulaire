@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation"
 
 import { cn } from "@/lib/utils"
 
+import { LogoLink } from "./logo-link"
+
 // Maquette Figma « HomePage » : logo à gauche, pastilles à droite.
 // Pastilles : contour noir en pointillés, fond blanc ; la page active est remplie en noir.
 const NAV = [
@@ -22,9 +24,7 @@ export function SiteHeader() {
 
   return (
     <header className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 px-5 pt-8 md:px-10">
-      <Link href="/" className="text-sm font-semibold">
-        Fonderie Modulaire
-      </Link>
+      <LogoLink />
       <nav aria-label="Main" className="flex flex-wrap items-center gap-1">
         {NAV.map((item) => {
           const active = pathname.startsWith(item.href)
