@@ -52,7 +52,10 @@ export function HomeContent() {
         tabIndex={0}
         onPointerEnter={() => setPaused(true)}
         onPointerLeave={() => setPaused(false)}
-        onFocus={() => setPaused(true)}
+        // Pause au focus clavier seulement : un clic donne aussi le focus, et bloquait le défilement
+        onFocus={(e) => {
+          if (e.currentTarget.matches(":focus-visible")) setPaused(true)
+        }}
         onBlur={() => setPaused(false)}
         onKeyDown={(e) => {
           if (e.key === "ArrowRight") go(1)
