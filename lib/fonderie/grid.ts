@@ -12,10 +12,22 @@ function noise(a: number, b: number) {
 // Bords des cases le long d'un axe : n cases de taille moyenne `size`.
 // Avec la variation organique, chaque case est plus large ou plus étroite,
 // mais le total ne change pas (la lettre garde sa largeur, la ligne sa hauteur).
-function edges(n: number, size: number, amount: number, seed: number) {
+// La phase fait tourner doucement chaque case entre deux tirages : en boucle, la grille « respire ».
+function edges(
+  n: number,
+  size: number,
+  amount: number,
+  seed: number,
+  phase = 0
+) {
   const f = Array.from(
     { length: n },
-    (_, k) => 1 + amount * 0.85 * noise(k + 1, seed)
+    (_, k) =>
+      1 +
+      amount *
+        0.85 *
+        (noise(k + 1, seed) * Math.cos(phase) +
+          noise(k + 1, seed + 0.37) * Math.sin(phase))
   )
   const scale = (n * size) / f.reduce((a, b) => a + b, 0)
   const out = [0]
@@ -36,7 +48,13 @@ export function center(e: number[], t: number) {
 // les colonnes varient d'une lettre à l'autre, mais toujours pareil pour une même lettre.
 export function glyphGrid(c: string, U: number, P: Params) {
   return {
-    xs: edges(glyphCols(c, P), U * P.wid, P.org, P.seed * 31 + c.charCodeAt(0)),
-    ys: edges(vMetrics(P).total, U, P.org, P.seed * 31 + 0.5),
+    xs: edges(
+      glyphCols(c, P),
+      U * P.wid,
+      P.org,
+      P.seed * 31 + c.charCodeAt(0),
+      P.phase
+    ),
+    ys: edges(vMetrics(P).total, U, P.org, P.seed * 31 + 0.5, P.phase * 0.8),
   }
 }

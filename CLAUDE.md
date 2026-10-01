@@ -22,13 +22,14 @@ Changer la grille, la graisse ou la forme recalcule tout l'alphabet. Aucune lett
 | `lib/fonderie/params.ts` | Tous les réglages (`Params`, `DEFAULT_PARAMS`, liste des formes) |
 | `lib/fonderie/skeleton.ts` | `skeleton()` et `bitmap()` : du tracé à la grille |
 | `lib/fonderie/shapes.ts` | `shape()` : dessin des pièces (via `PathSink`, réutilisable pour l'export .otf) |
-| `lib/fonderie/render.ts` | Dessin canvas : texte, grille, étapes de construction ; `forEachPiece()` partagé avec l'export |
+| `lib/fonderie/render.ts` | `layoutText()` calcule la liste des pièces du texte (avec une clé stable par pièce, pour animer), `drawText()` les dessine ; `forEachPiece()` partagé avec l'export |
 | `lib/fonderie/trace.ts` | Mode « le long du tracé » : positions des pièces sur le trait |
 | `lib/fonderie/grid.ts` | Bords des colonnes et lignes (variation organique) |
 | `lib/fonderie/kerning.ts` | Crénage automatique, à partir des cases vides face à face |
 | `lib/fonderie/sfnt.ts` | Ajout de la table `kern` dans le fichier .otf |
 | `lib/fonderie/export.ts` | Export .otf (opentype.js) : arcs → Bézier, orientation des trous, coordonnées entières |
-| `hooks/use-canvas.ts` | Redessine un canvas (resize, thème, polices) |
+| `hooks/use-canvas.ts` | Redessine un canvas (resize, thème, polices) — utilisé par les étapes de construction |
+| `hooks/use-animated-text.ts` | Texte animé : transitions entre réglages, broderie à l'arrivée, mode « vivant » (respecte « réduire les animations ») |
 | `components/fonderie/` | Interface : éditeur, curseurs, canvas |
 
 Tout le moteur reçoit les réglages en paramètre (`P: Params`) : plus de variable globale.

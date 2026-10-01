@@ -141,32 +141,6 @@ export function drawGrid(
   ctx.restore()
 }
 
-function drawGlyph(
-  ctx: CanvasRenderingContext2D,
-  c: string,
-  ox: number,
-  oy: number,
-  U: number,
-  P: Params,
-  col: Colors
-) {
-  if (!GLYPHS[c]) return
-  const pieces = glyphPieces(c, ox, oy, U, P)
-  if (P.mode === "plein") {
-    ctx.fillStyle = col.fg
-    fillPieces(ctx, pieces)
-  } else {
-    // Contour : trait épais, puis remplissage couleur du fond par-dessus
-    ctx.lineWidth = P.str * U * 2
-    ctx.lineJoin = "round"
-    ctx.strokeStyle = col.fg
-    for (const p of pieces) ctx.stroke(p)
-    ctx.fillStyle = col.bg
-    fillPieces(ctx, pieces)
-  }
-  if (P.grid) drawGrid(ctx, c, ox, oy, U, P, col)
-}
-
 export function tracking(U: number, P: Params) {
   return U * P.wid * Math.max(1, Math.round(P.rows / 7))
 }
@@ -241,16 +215,39 @@ export function bleed(P: Params) {
   return (Math.max(0, -P.gap) * (1 + P.org)) / 2 + stroke
 }
 
+// Une pièce du texte, prête à dessiner (ou à animer).
+// key identifie la pièce d'un réglage à l'autre (n° du caractère dans le texte, n° de la pièce dans la lettre) ;
+// x, y sont donnés avant l'inclinaison, qui se fait autour de la ligne de base (base).
+export type TextPiece = {
+  key: string
+  kind: Piece
+  x: number
+  y: number
+  w: number
+  h: number
+  angle: number
+  base: number
+  s: number // échelle d'apparition (0 = invisible, 1 = normale)
+}
+
+export type TextLayout = {
+  W: number
+  H: number
+  U: number
+  slant: number
+  pieces: TextPiece[]
+  glyphs: { c: string; x: number; top: number; base: number }[]
+}
+
+// Met le texte en page et calcule toutes ses pièces.
 // capH = hauteur des capitales en pixels ; la taille des cases s'en déduit
-export function renderText(
-  cv: HTMLCanvasElement,
+export function layoutText(
+  W: number,
   text: string,
   capH: number,
   lineGap: number,
-  P: Params,
-  col: Colors
-) {
-  const W = cv.clientWidth || cv.parentElement?.clientWidth || 300
+  P: Params
+): TextLayout {
   const slant = Math.tan((P.sla * Math.PI) / 180)
   const m = vMetrics(P)
   // Place prise en plus du texte, en part de capH : inclinaison, débordement des pièces des deux côtés,
@@ -268,20 +265,106 @@ export function renderText(
   const lines = layout(text, U, W - capH * extra() - 2, P)
   const lh = capH * (1 + lineGap) + descH + 2 * pad
   const H = (lines.length - 1) * lh + capH + descH + 2 * pad + 4
-  const ctx = setupCanvas(cv, W, H)
+
+  const pieces: TextPiece[] = []
+  const glyphs: TextLayout["glyphs"] = []
+  let index = 0 // n° du caractère dans le texte, pour reconnaître les pièces d'un réglage à l'autre
   lines.forEach((line, li) => {
-    ctx.save()
-    ctx.translate(padLeft, pad + li * lh + capH)
-    ctx.transform(1, 0, -slant, 1, 0, 0)
-    let x = 0
+    const base = pad + li * lh + capH
+    const top = base - capH
+    let x = padLeft
     const chars = [...line]
     chars.forEach((c, i) => {
       if (i) x += kerning(chars[i - 1], c, U, P)
-      drawGlyph(ctx, c, x, -capH, U, P, col)
+      if (GLYPHS[c]) {
+        glyphs.push({ c, x, top, base })
+        let k = 0
+        const ci = index
+        forEachPiece(c, U, P, (kind, cx, cy, w, h, angle) => {
+          pieces.push({
+            key: `${ci}:${k++}`,
+            kind,
+            x: x + cx,
+            y: top + cy,
+            w,
+            h,
+            angle,
+            base,
+            s: 1,
+          })
+        })
+      }
       x += advance(c, U, P)
+      index++
     })
-    ctx.restore()
+    index++ // l'espace ou le retour à la ligne qui sépare les lignes
   })
+  return { W, H, U, slant, pieces, glyphs }
+}
+
+// Ne redimensionne le canvas que si sa taille change (sinon on l'efface simplement)
+function prepareCanvas(cv: HTMLCanvasElement, cssW: number, cssH: number) {
+  const dpr = window.devicePixelRatio || 1
+  const w = Math.round(cssW * dpr)
+  const h = Math.round(cssH * dpr)
+  if (cv.width !== w || cv.height !== h) {
+    cv.width = w
+    cv.height = h
+    cv.style.height = cssH + "px"
+  }
+  const ctx = cv.getContext("2d")!
+  ctx.setTransform(1, 0, 0, 1, 0, 0)
+  ctx.clearRect(0, 0, w, h)
+  return { ctx, dpr }
+}
+
+// Dessine des pièces (celles de la mise en page, ou une étape d'animation)
+export function drawText(
+  cv: HTMLCanvasElement,
+  L: TextLayout,
+  pieces: TextPiece[],
+  P: Params,
+  col: Colors
+) {
+  const { ctx, dpr } = prepareCanvas(cv, L.W, L.H)
+  // Inclinaison autour de la ligne de base de chaque pièce
+  const frame = (base: number) =>
+    ctx.setTransform(dpr, 0, -L.slant * dpr, dpr, L.slant * base * dpr, 0)
+  const path = (p: TextPiece) => {
+    const path = new Path2D()
+    shape(
+      rotated(path, p.x, p.y, p.angle),
+      p.kind,
+      p.x,
+      p.y,
+      p.w * p.s,
+      p.h * p.s,
+      P
+    )
+    return path
+  }
+  const visible = pieces.filter((p) => p.s > 0.01)
+  const paths = visible.map(path)
+  if (P.mode === "contour") {
+    // Contour : trait épais, puis remplissage couleur du fond par-dessus
+    ctx.lineWidth = P.str * L.U * 2
+    ctx.lineJoin = "round"
+    ctx.strokeStyle = col.fg
+    visible.forEach((p, i) => {
+      frame(p.base)
+      ctx.stroke(paths[i])
+    })
+  }
+  ctx.fillStyle = P.mode === "contour" ? col.bg : col.fg
+  visible.forEach((p, i) => {
+    frame(p.base)
+    ctx.fill(paths[i], "evenodd")
+  })
+  if (P.grid)
+    for (const g of L.glyphs) {
+      frame(g.base)
+      drawGrid(ctx, g.c, g.x, g.top, L.U, P, col)
+    }
 }
 
 export function renderStep(

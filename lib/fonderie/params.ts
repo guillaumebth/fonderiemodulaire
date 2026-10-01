@@ -30,6 +30,7 @@ export type Params = {
   desc: number // longueur des jambages (g, p, q…), en part de la hauteur des capitales
   org: number // variation organique : cases plus ou moins larges / hautes (0 = grille régulière)
   seed: number // tirage de la variation organique
+  phase: number // mode « vivant » : avancement de l'ondulation de la variation organique (0 = pose de départ)
   shape: ShapeKind
   gap: number // écart entre pièces ; négatif = les pièces débordent de leur case et fusionnent
   thk: number // épaisseur des formes évidées
@@ -57,6 +58,7 @@ export const DEFAULT_PARAMS: Params = {
   desc: 0.3,
   org: 0,
   seed: 1,
+  phase: 0,
   shape: "rond",
   gap: 0.12,
   thk: 0.2,

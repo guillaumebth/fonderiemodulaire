@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 
-import { Dices, RotateCcw, Shuffle } from "lucide-react"
+import { Dices, Play, RotateCcw, Shuffle } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -52,6 +52,8 @@ const PRESSED =
 export function FontEditor() {
   const [P, setP] = useState<Params>(DEFAULT_PARAMS)
   const [text, setText] = useState("Fonderie\nmodulaire 26")
+  const [alive, setAlive] = useState(false) // la variation organique ondule en boucle
+  const [replay, setReplay] = useState(0) // incrémenté pour rejouer la broderie
   const set =
     <K extends keyof Params>(key: K) =>
     (value: Params[K]) =>
@@ -61,9 +63,20 @@ export function FontEditor() {
     <>
       <section className="grid items-start gap-5 md:grid-cols-[minmax(0,1fr)_300px]">
         <Field className="min-w-0 gap-3">
-          <FieldLabel htmlFor="txt" className={SECTION_LABEL}>
-            Tape ton texte
-          </FieldLabel>
+          <div className="flex items-center justify-between gap-2">
+            <FieldLabel htmlFor="txt" className={SECTION_LABEL}>
+              Tape ton texte
+            </FieldLabel>
+            <Button
+              type="button"
+              variant="ghost"
+              size="xs"
+              onClick={() => setReplay((r) => r + 1)}
+            >
+              <Play data-icon="inline-start" />
+              Rejouer
+            </Button>
+          </div>
           <Textarea
             id="txt"
             rows={2}
@@ -77,6 +90,9 @@ export function FontEditor() {
             params={P}
             sizes={[64, 92, 128]}
             lineGap={0.42}
+            intro
+            replay={replay}
+            alive={alive}
             label="Aperçu du texte dans la police modulaire"
           />
         </Field>
@@ -280,6 +296,20 @@ export function FontEditor() {
                   <Shuffle data-icon="inline-start" />
                   Autre tirage
                 </Button>
+                <Field orientation="horizontal">
+                  <Switch
+                    id="alive"
+                    checked={alive}
+                    onCheckedChange={(on) => {
+                      setAlive(on)
+                      // Sans variation organique, il n'y a rien à faire onduler
+                      if (on && !P.org) set("org")(0.35)
+                    }}
+                  />
+                  <FieldLabel htmlFor="alive" className="font-normal">
+                    Vivant : la grille ondule
+                  </FieldLabel>
+                </Field>
               </FieldSet>
 
               <FieldSeparator />
@@ -493,6 +523,7 @@ export function FontEditor() {
           params={P}
           sizes={[34, 52, 52]}
           lineGap={0.5}
+          alive={alive}
           label="Toutes les lettres et chiffres de la police"
         />
       </section>

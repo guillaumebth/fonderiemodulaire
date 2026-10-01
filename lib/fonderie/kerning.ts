@@ -17,8 +17,10 @@ type Profile = { left: number[]; right: number[] }
 // Profils calculés pour U = 1 (tout est proportionnel à la taille des cases)
 const cache = new Map<string, Profile>()
 function profile(c: string, P: Params): Profile {
+  // Tout ce qui change la place des pièces
   const key = [
     c,
+    P.layout,
     P.cols,
     P.rows,
     P.xh,
@@ -29,9 +31,20 @@ function profile(c: string, P: Params): Profile {
     P.wid,
     P.org,
     P.seed,
+    P.phase,
+    P.spacing,
+    P.lanes,
+    P.laneGap,
+    P.gap,
   ].join("|")
   const hit = cache.get(key)
   if (hit) return hit
+  if (cache.size > 2000) cache.clear()
+  if (P.layout === "trace") {
+    const p = traceProfile(c, P)
+    cache.set(key, p)
+    return p
+  }
   const bm = bitmap(c, P)
   const { xs } = glyphGrid(c, 1, P)
   const width = xs[xs.length - 1]
@@ -43,7 +56,6 @@ function profile(c: string, P: Params): Profile {
     left.push(first < 0 ? Infinity : xs[first])
     right.push(first < 0 ? Infinity : width - xs[last + 1])
   }
-  if (cache.size > 2000) cache.clear()
   const p = { left, right }
   cache.set(key, p)
   return p

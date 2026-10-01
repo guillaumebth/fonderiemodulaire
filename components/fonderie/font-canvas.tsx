@@ -2,7 +2,8 @@
 
 import { useCanvas } from "@/hooks/use-canvas"
 import type { Params } from "@/lib/fonderie/params"
-import { renderStep, renderText } from "@/lib/fonderie/render"
+import { renderStep } from "@/lib/fonderie/render"
+import { useAnimatedText } from "@/hooks/use-animated-text"
 import { cn } from "@/lib/utils"
 
 type TextCanvasProps = {
@@ -12,6 +13,9 @@ type TextCanvasProps = {
   sizes: [number, number, number]
   lineGap: number
   label: string
+  intro?: boolean
+  replay?: number
+  alive?: boolean
   className?: string
 }
 
@@ -21,11 +25,19 @@ export function TextCanvas({
   sizes,
   lineGap,
   label,
+  intro,
+  replay,
+  alive,
   className,
 }: TextCanvasProps) {
-  const { ref } = useCanvas((cv, col, W) => {
-    const capH = W < 420 ? sizes[0] : W < 640 ? sizes[1] : sizes[2]
-    renderText(cv, text || " ", capH, lineGap, params, col)
+  const ref = useAnimatedText({
+    text,
+    params,
+    capH: (W) => (W < 420 ? sizes[0] : W < 640 ? sizes[1] : sizes[2]),
+    lineGap,
+    intro,
+    replay,
+    alive,
   })
   return (
     <canvas
