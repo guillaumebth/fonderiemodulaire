@@ -2,7 +2,6 @@ import type { Metadata } from "next"
 import Link from "next/link"
 
 import { HowItWorks } from "@/components/fonderie/how-it-works"
-import { SiteHeader } from "@/components/fonderie/site-header"
 
 export const metadata: Metadata = {
   title: "About — Fonderie modulaire",
@@ -39,9 +38,7 @@ const FAQ = [
 
 export default function AboutPage() {
   return (
-    <main className="mx-auto grid max-w-[1180px] gap-10 px-5 pt-7 pb-16">
-      <SiteHeader />
-
+    <main className="mx-auto grid w-full max-w-[1180px] gap-10 px-5 pt-7 pb-16">
       <section className="grid max-w-[62ch] gap-4">
         <h1 className="text-[32px] leading-tight font-bold text-balance">
           A font generator made of pieces

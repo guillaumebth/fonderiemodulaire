@@ -1,14 +1,16 @@
 import type { Metadata } from "next"
-import { Familjen_Grotesk, JetBrains_Mono } from "next/font/google"
+import { Inter, JetBrains_Mono } from "next/font/google"
 
 import "./globals.css"
 import { Toaster } from "sonner"
 
+import { SiteFooter } from "@/components/fonderie/site-footer"
+import { SiteHeader } from "@/components/fonderie/site-header"
 import { ThemeProvider } from "@/components/theme-provider"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
 
-const fontSans = Familjen_Grotesk({
+const fontSans = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
 })
@@ -36,9 +38,15 @@ export default function RootLayout({
         "font-sans"
       )}
     >
-      <body>
-        <ThemeProvider>
-          <TooltipProvider>{children}</TooltipProvider>
+      {/* Colonne pleine hauteur : le footer se cale en bas de l'écran */}
+      <body className="flex min-h-dvh flex-col">
+        {/* La maquette est en clair uniquement : on force le mode clair (les couleurs sombres restent prêtes dans globals.css) */}
+        <ThemeProvider forcedTheme="light">
+          <TooltipProvider>
+            <SiteHeader />
+            {children}
+            <SiteFooter />
+          </TooltipProvider>
           <Toaster />
         </ThemeProvider>
       </body>

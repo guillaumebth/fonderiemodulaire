@@ -178,7 +178,7 @@ export function FontEditor() {
               text={text}
               params={P}
               sizes={[64, 92, 128]}
-              lineGap={0.42}
+              lineGap={P.leading}
               alive={alive}
               label="Preview of your text in the modular font"
             />
@@ -428,6 +428,16 @@ export function FontEditor() {
                   step={0.05}
                   format={cells}
                   onChange={set("wt")}
+                />
+                <ControlSlider
+                  id="leading"
+                  label="Line height"
+                  value={P.leading}
+                  min={-0.3}
+                  max={1.5}
+                  step={0.01}
+                  format={(v) => Math.round((1 + v) * 100) + "%"}
+                  onChange={set("leading")}
                 />
                 {advanced && (
                   <>

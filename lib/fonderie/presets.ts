@@ -2,6 +2,7 @@
 
 import { DEFAULT_PARAMS, type Params } from "./params"
 import { encodeShare } from "./share"
+import { TEMPLATES } from "./templates"
 
 export type Preset = { name: string; description: string; params: Params }
 
@@ -80,3 +81,24 @@ export function generatorHref(params: Params, text: string) {
 
 // Adresse du générateur ouvert avec ce style (le nom du style sert de texte)
 export const presetHref = (p: Preset) => generatorHref(p.params, p.name)
+
+// Les polices du panneau noir de la home, dans l'ordre où elles défilent.
+// Toutes les polices de la home et des templates, sans doublons (le titre ouvre le bal).
+// Le panneau est « vivant » : chaque police reçoit un peu de variation organique pour onduler.
+const ALIVE_MIN = 0.4
+const alive = (params: Params): Params => ({
+  ...params,
+  org: Math.max(params.org, ALIVE_MIN),
+})
+
+export const HERO_STYLES: { name: string; params: Params }[] = [
+  { name: "Stitch", params: alive(HERO_PARAMS) },
+  ...PRESETS.filter((p) => p.name !== "Stitch").map((p) => ({
+    name: p.name,
+    params: alive(p.params),
+  })),
+  ...TEMPLATES.filter((t) => /Signal|Moon/.test(t.text)).map((t) => ({
+    name: t.text.replace(/\n/g, " "),
+    params: alive(t.params),
+  })),
+]

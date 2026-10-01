@@ -11,9 +11,12 @@ type TextCanvasProps = {
   params: Params
   // hauteur des capitales selon la largeur dispo : [< 420px, < 640px, au-delà]
   sizes: [number, number, number]
+  // ou bien : hauteur des capitales proportionnelle à la largeur (ex. 0.12 = 12 % de la largeur)
+  fluid?: number
   lineGap: number
   label: string
   alive?: boolean
+  center?: boolean
   className?: string
 }
 
@@ -21,17 +24,21 @@ export function TextCanvas({
   text,
   params,
   sizes,
+  fluid,
   lineGap,
   label,
   alive,
+  center,
   className,
 }: TextCanvasProps) {
   const ref = useAnimatedText({
     text,
     params,
-    capH: (W) => (W < 420 ? sizes[0] : W < 640 ? sizes[1] : sizes[2]),
+    capH: (W) =>
+      fluid ? W * fluid : W < 420 ? sizes[0] : W < 640 ? sizes[1] : sizes[2],
     lineGap,
     alive,
+    center,
   })
   return (
     <canvas

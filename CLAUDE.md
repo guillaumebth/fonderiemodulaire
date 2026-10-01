@@ -72,7 +72,8 @@ Tout le moteur reçoit les réglages en paramètre (`P: Params`) : plus de varia
 - Tester les cas limites des curseurs : grille 3 × 5 avec une graisse forte, grille 12 × 15 avec une graisse faible, et les lettres à diagonales (K, M, N, V, W, X, Z, 7).
 - Modèle économique (test) : le téléchargement est une version Trial gratuite (A–Z + 0–9, « Trial » dans le nom, `TRIAL_CHARSET` dans `export.ts`) + bouton « Pay what you want ». Tout étant généré dans le navigateur, la limite est contournable : une vraie version payante devra être générée côté serveur après paiement (Lemon Squeezy ou Paddle conseillés pour la TVA).
 - L'interface du site est en anglais (libellés, messages, accessibilité). Le code, ses commentaires et cette doc restent en français.
-- Identité visuelle reprise du proto : fond vert-gris, encre presque noire, accent bleu (`--brand`), polices Familjen Grotesk + JetBrains Mono. Tout est dans `app/globals.css`.
+- Maquette Figma de la home : https://www.figma.com/design/uIaxWJkNlPTJVDcIgQac3n/Untitled?node-id=42-75 (fond #f1f1f1, police Inter, pastilles pointillées, bouton bleu #08f « Make your font » — renommé depuis « Test now »). L'en-tête est commun à toutes les pages (`app/layout.tsx`).
+- Identité visuelle reprise du proto (en partie remplacée par la maquette) : fond vert-gris, encre presque noire, accent bleu (`--brand`), polices Familjen Grotesk + JetBrains Mono. Tout est dans `app/globals.css`.
 
 ---
 

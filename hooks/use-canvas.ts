@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useLayoutEffect, useRef, useState } from "react"
 import { useTheme } from "next-themes"
 
 import { readColors, type Colors } from "@/lib/fonderie/render"
@@ -14,9 +14,12 @@ export function useCanvas(
   const [fontsReady, setFontsReady] = useState(false)
   const { resolvedTheme } = useTheme()
 
-  useEffect(() => {
+  // Mesure et premier dessin AVANT l'affichage (useLayoutEffect) : le canvas apparaît directement
+  // à sa vraie taille, sans sauter de sa hauteur par défaut (150 px) à la bonne hauteur.
+  useLayoutEffect(() => {
     const cv = ref.current
     if (!cv) return
+    setWidth(Math.round(cv.getBoundingClientRect().width))
     const ro = new ResizeObserver(([entry]) =>
       setWidth(Math.round(entry.contentRect.width))
     )
@@ -25,7 +28,7 @@ export function useCanvas(
     return () => ro.disconnect()
   }, [])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (ref.current && width) draw(ref.current, readColors(), width)
   })
 

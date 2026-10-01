@@ -37,6 +37,7 @@ export type Params = {
   rad: number // arrondi des carrés
   wid: number // largeur des cases
   sla: number // inclinaison, en degrés
+  leading: number // interligne de l'aperçu : espace ajouté entre deux lignes, en part de la hauteur des capitales
   kern: number // crénage automatique : part de l'espace vide retirée entre deux lettres (0 = aucun)
   mode: RenderMode
   str: number // épaisseur du contour
@@ -65,6 +66,7 @@ export const DEFAULT_PARAMS: Params = {
   rad: 0.1,
   wid: 1,
   sla: 0,
+  leading: 0.42,
   kern: 0.7,
   mode: "plein",
   str: 0.08,

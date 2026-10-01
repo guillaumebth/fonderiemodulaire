@@ -7,6 +7,10 @@
 @theme inline {
   --color-brand: var(--brand);
   --color-highlight: var(--highlight);
+  --color-surface: var(--surface);
+  --color-cursor: var(--cursor);
+  --color-action: var(--action);
+  --color-action-foreground: var(--action-foreground);
   --color-highlight-foreground: var(--highlight-foreground);
   --font-heading: var(--font-sans);
   --font-sans: var(--font-sans);
@@ -53,10 +57,22 @@
 :root {
   /* Accent de la fonderie (bleu) : grille, tracé, focus */
   --brand: oklch(0.475 0.241 269.5);
-  /* Jaune-vert acide : page active du menu */
+  /* Pastilles du menu (blanc) et bouton d'action principal (bleu vif #08f) */
+  --surface: oklch(1 0 0);
+  /* Couleurs « punchy » du bouton « Make your font » au survol (texte noir lisible sur chacune) */
+  --punch-1: oklch(0.94 0.22 118); /* jaune-vert acide */
+  --punch-2: oklch(0.7 0.25 350); /* rose */
+  --punch-3: oklch(0.74 0.19 50); /* orange */
+  --punch-4: oklch(0.85 0.15 200); /* cyan */
+  --punch-5: oklch(0.92 0.19 100); /* jaune */
+  /* Curseur rond du panneau noir de la home (#d9d9d9) */
+  --cursor: oklch(0.89 0 0);
+  --action: oklch(0.632 0.202 254.1);
+  --action-foreground: oklch(0 0 0);
+  /* Jaune-vert acide (plus utilisé par le menu, gardé en réserve) */
   --highlight: oklch(0.94 0.22 118);
   --highlight-foreground: oklch(0.197 0.007 135);
-  --background: oklch(0.946 0.008 121.6);
+  --background: oklch(0.958 0 0); /* #f1f1f1 */
   --foreground: oklch(0.197 0.007 135);
   --card: oklch(0.917 0.011 123.5);
   --card-foreground: oklch(0.197 0.007 135);
@@ -92,6 +108,10 @@
 
 [data-theme="dark"] {
   color-scheme: dark;
+  --surface: oklch(0.226 0.01 132.7);
+  --cursor: oklch(0.89 0 0);
+  --action: oklch(0.632 0.202 254.1);
+  --action-foreground: oklch(0 0 0);
   /* Accent de la fonderie (bleu) : grille, tracé, focus */
   --brand: oklch(0.713 0.151 277.3);
   --background: oklch(0.183 0.007 135);
@@ -136,12 +156,16 @@
   }
   html {
     @apply font-sans;
+    /* Réserve toujours la place de la barre de défilement : la page ne se décale pas
+       entre une page qui défile et une page qui tient dans l'écran (la home) */
+    scrollbar-gutter: stable;
   }
 }
 
 /* Palettes des templates : chaque carte redéfinit les couleurs que lit le dessin.
    Ce sont des « affiches » : elles gardent leurs couleurs en mode sombre. */
 @layer components {
+  .palette-black,
   .palette-ink,
   .palette-blue,
   .palette-paper,
@@ -149,6 +173,11 @@
   .palette-mint {
     background: var(--background);
     color: var(--foreground);
+  }
+  .palette-black {
+    --background: oklch(0 0 0);
+    --foreground: oklch(0.958 0 0);
+    --muted-foreground: oklch(0.7 0 0);
   }
   .palette-ink {
     --background: oklch(0.197 0.007 135);

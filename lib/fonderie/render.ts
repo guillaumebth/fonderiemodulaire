@@ -247,7 +247,8 @@ export function layoutText(
   text: string,
   capH: number,
   lineGap: number,
-  P: Params
+  P: Params,
+  center = false // centre chaque ligne dans la largeur
 ): TextLayout {
   const slant = Math.tan((P.sla * Math.PI) / 180)
   const m = vMetrics(P)
@@ -273,8 +274,16 @@ export function layoutText(
   lines.forEach((line, li) => {
     const base = pad + li * lh + capH
     const top = base - capH
-    let x = padLeft
     const chars = [...line]
+    // Largeur de la ligne (sans l'espace qui suit la dernière lettre), pour la centrer
+    const lineW = center
+      ? chars.reduce(
+          (w, c, i) =>
+            w + advance(c, U, P) + (i ? kerning(chars[i - 1], c, U, P) : 0),
+          0
+        ) - tracking(U, P)
+      : 0
+    let x = center ? Math.max(padLeft, (W - lineW) / 2) : padLeft
     chars.forEach((c, i) => {
       if (i) x += kerning(chars[i - 1], c, U, P)
       if (GLYPHS[c]) {
