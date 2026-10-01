@@ -3,7 +3,7 @@
 import { GLYPHS } from "./glyphs"
 import type { Params } from "./params"
 import { pieceKind, rotated, shape, type Piece } from "./shapes"
-import { tracePositions, traceSize } from "./trace"
+import { traceHalfWidth, tracePositions, traceSize } from "./trace"
 import { center, glyphGrid } from "./grid"
 import { kerning } from "./kerning"
 import { bitmap, glyphCols, skeleton, vMetrics } from "./skeleton"
@@ -233,9 +233,10 @@ function setupCanvas(cv: HTMLCanvasElement, cssW: number, cssH: number) {
 export function bleed(P: Params) {
   const stroke = P.mode === "contour" ? P.str : 0
   if (P.layout === "trace") {
-    // Pièce centrée sur le tracé, qui passe au centre des cases du bord ; une pièce tournée prend plus de place
-    const size = traceSize(P) * Math.max(1, P.wid) * (P.orient ? Math.SQRT2 : 1)
-    return Math.max(0, size / 2 - 0.5) * (1 + P.org) + stroke
+    // Le tracé passe au centre des cases du bord ; on déborde de la demi-épaisseur du trait
+    // (rangées comprises) ; une pièce tournée prend plus de place
+    const grow = Math.max(1, P.wid) * (P.orient ? Math.SQRT2 : 1)
+    return Math.max(0, traceHalfWidth(P) * grow - 0.5) * (1 + P.org) + stroke
   }
   return (Math.max(0, -P.gap) * (1 + P.org)) / 2 + stroke
 }

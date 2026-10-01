@@ -148,6 +148,27 @@ export function FontEditor() {
                       format={(v) => v.toFixed(2).replace(".", ",") + " case"}
                       onChange={set("spacing")}
                     />
+                    <ControlSlider
+                      id="lanes"
+                      label="Rangées côte à côte"
+                      value={P.lanes}
+                      min={1}
+                      max={5}
+                      step={1}
+                      format={String}
+                      onChange={set("lanes")}
+                    />
+                    <ControlSlider
+                      id="laneGap"
+                      label="Écart entre rangées"
+                      value={P.laneGap}
+                      min={0.5}
+                      max={3}
+                      step={0.01}
+                      format={(v) => v.toFixed(2).replace(".", ",") + " ×"}
+                      onChange={set("laneGap")}
+                      inactive={P.lanes === 1}
+                    />
                     <Field orientation="horizontal">
                       <Switch
                         id="orient"

@@ -104,19 +104,6 @@ export function shape(
         Math.max(P.rad * s - t, 0)
       )
       break
-    case "etoile": {
-      const ri = r * (0.28 + P.thk * 0.9)
-      for (let k = 0; k < 10; k++) {
-        const a = -Math.PI / 2 + (k * Math.PI) / 5
-        const rr = k % 2 ? ri : r
-        const x = cx + Math.cos(a) * rr
-        const y = cy + Math.sin(a) * rr * 1.04 + r * 0.06
-        if (k) p.lineTo(x, y)
-        else p.moveTo(x, y)
-      }
-      p.closePath()
-      break
-    }
   }
 }
 

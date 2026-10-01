@@ -8,7 +8,6 @@ export const SHAPES = [
   { id: "croix", label: "Croix" },
   { id: "carrevide", label: "Carré vide" },
   { id: "cible", label: "Cible" },
-  { id: "etoile", label: "Étoile" },
   { id: "melange", label: "Mélange" },
 ] as const
 
@@ -20,6 +19,8 @@ export type Params = {
   layout: Layout // grille : une pièce par case touchée ; trace : pièces enfilées le long du tracé
   spacing: number // mode tracé : distance entre deux pièces, en hauteurs de case
   orient: boolean // mode tracé : les pièces tournent pour suivre la direction du trait
+  lanes: number // mode tracé : nombre de rangées de pièces côte à côte
+  laneGap: number // mode tracé : distance entre deux rangées, en tailles de pièce
   cols: number // colonnes de la grille
   rows: number // lignes de la grille
   wt: number // graisse, en cases
@@ -43,8 +44,10 @@ export type Params = {
 
 export const DEFAULT_PARAMS: Params = {
   layout: "grille",
-  spacing: 0.8,
+  spacing: 1,
   orient: false,
+  lanes: 1,
+  laneGap: 1.1,
   cols: 5,
   rows: 7,
   wt: 0.5,
@@ -74,7 +77,6 @@ export const USES_THICKNESS: ShapeKind[] = [
   "cible",
   "carrevide",
   "melange",
-  "etoile",
 ]
 export const USES_RADIUS: ShapeKind[] = ["carre", "carrevide"]
 
@@ -92,6 +94,8 @@ export function randomParams(current: Params): Params {
     layout: trace ? "trace" : "grille",
     spacing: rand(0.5, 1.3, 0.01),
     orient: trace && Math.random() < 0.5,
+    lanes: trace && Math.random() < 0.3 ? rand(2, 3, 1) : 1,
+    laneGap: rand(0.9, 1.6, 0.01),
     cols: rand(3, 9, 1),
     rows: rand(5, 13, 1),
     wt: rand(0.45, 1.1, 0.05),
