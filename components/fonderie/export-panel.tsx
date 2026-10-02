@@ -1,14 +1,19 @@
 "use client"
 
-import { useState } from "react"
-import { Heart } from "lucide-react"
+import { useEffect, useState } from "react"
 import { toast } from "sonner"
 
-import { SUPPORT_URL } from "@/lib/fonderie/config"
+import { CHECKOUT_URL, MIN_PRICE } from "@/lib/fonderie/config"
+import {
+  rememberFontBeforeCheckout,
+  savedLicense,
+  takeFontAfterCheckout,
+  unlockLicense,
+} from "@/lib/fonderie/license"
 import type { Params } from "@/lib/fonderie/params"
 
 import { DashOutline } from "./dash-outline"
-import { PanelSection, Pill, PILL, PillChoice } from "./panel-ui"
+import { PanelSection, Pill, PillChoice, pillLink } from "./panel-ui"
 
 // Rendu de l'image : tel qu'à l'écran, ou vue de conception (grille, tracé rouge, contour)
 export type ImageLook = "shown" | "blueprint"
@@ -22,8 +27,15 @@ type ExportPanelProps = {
   onLookChange?: (look: ImageLook) => void
 }
 
-// Sections Download et Image of the preview du panneau (maquette Figma « Generator ») :
-// nom de la police, bouton de téléchargement de la version d'essai, petite mention.
+const FIELD =
+  "w-full rounded-full bg-field px-[7px] py-[2px] text-xs leading-normal font-medium text-field-foreground outline-none placeholder:text-field-foreground focus:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
+
+// Sections Download et Image of the preview du panneau (maquette Figma « Generator »).
+// Download : nom de la police, essai gratuit (A–Z, 0–9) et version complète.
+// Version complète : on paie ce qu'on veut sur Stripe (à partir de MIN_PRICE). Au retour, l'adresse
+// contient l'identifiant du paiement (?session_id=cs_…) : il est vérifié, sert de clé de licence et le
+// bouton télécharge alors tous les caractères, sans « Trial ». La police en cours est mémorisée avant
+// de partir payer et retrouvée au retour. Sur un autre ordinateur, on colle la clé à la main.
 // id="download" : cible des liens « #download » vers cette section.
 export function ExportPanel({
   params,
@@ -33,13 +45,47 @@ export function ExportPanel({
 }: ExportPanelProps) {
   const [name, setName] = useState("Fonderie modulaire")
   const [busy, setBusy] = useState(false)
+  // version complète débloquée : la clé validée sur ce navigateur
+  const [license, setLicense] = useState<string | null>(null)
+  const full = license !== null
+  const [key, setKey] = useState("")
+  const [checking, setChecking] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  async function verify(candidate: string) {
+    setChecking(true)
+    setError(null)
+    const problem = await unlockLicense(candidate)
+    setChecking(false)
+    if (problem) return setError(problem)
+    setLicense(candidate.trim())
+    toast.success("Full version unlocked", {
+      description: "Every character is now in your download. Thank you!",
+    })
+  }
+
+  useEffect(() => {
+    setLicense(savedLicense())
+    // Retour du paiement Stripe. Cet effet passe avant celui de l'éditeur (composant parent) :
+    // la police remise dans l'adresse (#…) est donc celle que l'éditeur charge.
+    const session = new URLSearchParams(window.location.search).get(
+      "session_id"
+    )
+    if (!session) return
+    const pending = takeFontAfterCheckout()
+    if (pending?.name) setName(pending.name)
+    const hash = window.location.hash || pending?.hash || ""
+    window.history.replaceState(null, "", window.location.pathname + hash)
+    verify(session)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   async function download() {
     setBusy(true)
     try {
       // Le module d'export (et opentype.js) ne se charge qu'au premier clic : la page reste légère
       const { downloadFont } = await import("@/lib/fonderie/export")
-      const file = downloadFont(params, name.trim() || "Fonderie Modulaire")
+      const file = downloadFont(params, name.trim() || "Fonderie Modulaire", full)
       toast.success(`${file} downloaded`, {
         description: "Double-click the file to install the font.",
       })
@@ -49,6 +95,11 @@ export function ExportPanel({
     } finally {
       setBusy(false)
     }
+  }
+
+  function unlock(e: React.FormEvent) {
+    e.preventDefault()
+    verify(key)
   }
 
   return (
@@ -65,31 +116,73 @@ export function ExportPanel({
           value={name}
           maxLength={40}
           onChange={(e) => setName(e.target.value)}
-          className="w-full rounded-full bg-field px-[7px] py-[2px] text-xs leading-normal font-medium text-field-foreground outline-none placeholder:text-field-foreground focus:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
+          className={FIELD}
           placeholder="Fonderie modulaire"
         />
         <div>
           <Pill active onClick={download} disabled={busy}>
-            Download free trial (.otf)
+            {full ? "Download full font (.otf)" : "Download free trial (.otf)"}
           </Pill>
         </div>
         <p className="text-[10px] leading-normal font-medium">
-          The trial includes uppercase A–Z and figures 0–9, kerning included.
+          {full
+            ? "Full version: every character, kerning and a commercial license. Thank you for your support!"
+            : "The trial includes uppercase A–Z and figures 0–9, kerning included."}
           {params.mode === "contour" &&
             " The file is always solid: outline mode only exists on screen."}
         </p>
-        {/* Prix libre : caché tant que le lien de paiement n'est pas renseigné (lib/fonderie/config.ts) */}
-        {SUPPORT_URL && (
-          <a
-            href={SUPPORT_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`${PILL} w-fit gap-1`}
-          >
-            <DashOutline />
-            <Heart className="size-3" />
-            Pay what you want
-          </a>
+        {license && (
+          <p className="text-[10px] leading-normal font-medium">
+            Your license key, to unlock the full version on another computer:{" "}
+            <span className="break-all select-all">{license}</span>
+          </p>
+        )}
+        {/* Version complète : cachée tant que le lien de paiement n'est pas renseigné (lib/fonderie/config.ts) */}
+        {CHECKOUT_URL && !full && (
+          <>
+            <p className="pt-2 text-xs leading-normal font-medium">
+              Full version: lowercase, accents, punctuation and a commercial
+              license. Pay what you want, from {MIN_PRICE}.
+            </p>
+            <div>
+              <a
+                href={CHECKOUT_URL}
+                // la police en cours est retrouvée au retour du paiement
+                onClick={() => rememberFontBeforeCheckout(name)}
+                className={pillLink()}
+              >
+                <DashOutline />
+                Get the full font
+              </a>
+            </div>
+            <form onSubmit={unlock} className="grid gap-2 pt-2">
+              <label
+                htmlFor="license-key"
+                className="text-xs leading-normal font-medium"
+              >
+                Already paid? Paste your license key
+              </label>
+              <div className="flex gap-1">
+                <input
+                  id="license-key"
+                  value={key}
+                  onChange={(e) => setKey(e.target.value)}
+                  autoComplete="off"
+                  spellCheck={false}
+                  className={FIELD}
+                  placeholder="cs_live_…"
+                />
+                <Pill muted type="submit" disabled={checking || !key.trim()}>
+                  {checking ? "Checking…" : "Unlock"}
+                </Pill>
+              </div>
+              {error && (
+                <p role="alert" className="text-[10px] leading-normal font-medium">
+                  {error}
+                </p>
+              )}
+            </form>
+          </>
         )}
       </PanelSection>
       {onExportImage && (

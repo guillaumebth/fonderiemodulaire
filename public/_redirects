@@ -1,0 +1,5 @@
+# Redirections lues par Cloudflare Pages (le site est statique, Next ne peut plus les faire lui-même)
+# « Generator » est devenu « Atelier » : les anciens liens partagés (réglages après #) restent valables
+/generator /atelier 301
+# L'ancienne page How it works est devenue une section de la page About
+/how-it-works /about#how-it-works 301

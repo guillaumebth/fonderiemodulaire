@@ -1,18 +1,12 @@
 import type { NextConfig } from "next"
 
+// Le site est 100 % statique : tout (dessin des lettres, .otf, images) se calcule dans le navigateur.
+// « export » produit un dossier out/ de simples fichiers, hébergé gratuitement sur Cloudflare Pages.
+// Les redirections (/generator → /atelier, /how-it-works → /about) sont dans public/_redirects.
 const nextConfig: NextConfig = {
-  // L'ancienne page How it works est devenue une section de la page About
-  async redirects() {
-    return [
-      // « Generator » est devenu « Atelier » : les anciens liens partagés (réglages après #) restent valables
-      { source: "/generator", destination: "/atelier", permanent: true },
-      {
-        source: "/how-it-works",
-        destination: "/about#how-it-works",
-        permanent: true,
-      },
-    ]
-  },
+  output: "export",
+  // pas de serveur pour retravailler les images : elles sont servies telles quelles (quelques SVG)
+  images: { unoptimized: true },
 }
 
 export default nextConfig

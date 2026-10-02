@@ -250,11 +250,11 @@ export function fontFile(
 // Nom de la version d'essai : « Trial » est ajouté au nom choisi
 export const trialName = (familyName: string) => `${familyName} Trial`
 
-// Construit la police et lance le téléchargement dans le navigateur
-// (pour l'instant, c'est toujours la version d'essai qui est téléchargée). Renvoie le nom du fichier.
-export function downloadFont(P: Params, familyName: string) {
-  const family = trialName(familyName)
-  const blob = new Blob([fontFile(P, family, TRIAL_CHARSET)], {
+// Construit la police et lance le téléchargement dans le navigateur. Renvoie le nom du fichier.
+// full : version complète (tous les caractères, sans « Trial »), débloquée par une clé de licence.
+export function downloadFont(P: Params, familyName: string, full = false) {
+  const family = full ? familyName : trialName(familyName)
+  const blob = new Blob([fontFile(P, family, full ? CHARSET : TRIAL_CHARSET)], {
     type: "font/otf",
   })
   const url = URL.createObjectURL(blob)

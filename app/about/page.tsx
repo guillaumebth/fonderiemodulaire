@@ -5,6 +5,7 @@ import { HowItWorks } from "@/components/fonderie/how-it-works"
 import { PAGE, PageIntro } from "@/components/fonderie/page-intro"
 import { PanelSection } from "@/components/fonderie/panel-ui"
 import { pillLink } from "@/components/fonderie/pill-styles"
+import { CHECKOUT_URL, MIN_PRICE } from "@/lib/fonderie/config"
 
 export const metadata: Metadata = {
   title: "About · Fonderie modulaire",
@@ -19,11 +20,14 @@ const FAQ = [
   },
   {
     q: "Is it free?",
-    a: "Yes. The download is a free trial of your font, with uppercase A–Z and figures 0–9. If you like what you made, you can support the project and pay what you want.",
+    // la réponse dépend de la version payante : ouverte seulement quand le lien de paiement est renseigné
+    a: CHECKOUT_URL
+      ? `The trial is free: uppercase A–Z and figures 0–9. The full version adds lowercase, accents, punctuation and a commercial license. Pay what you want, from ${MIN_PRICE}: you get a license key, paste it in the atelier once, and every download is complete.`
+      : "Yes. The download is a free trial of your font, with uppercase A–Z and figures 0–9.",
   },
   {
     q: "Which characters are included?",
-    a: "Uppercase A–Z, lowercase a–z, French accented letters (é è ê ë à â ä ç î ï ô ö ù û ü ÿ œ æ, plus á í ó ú ñ, in capitals too), figures 0–9 and the punctuation . , ; : ! ? - ' \" ( ) / & @ # € %.",
+    a: "In the full version: uppercase A–Z, lowercase a–z, French accented letters (é è ê ë à â ä ç î ï ô ö ù û ü ÿ œ æ, plus á í ó ú ñ, in capitals too), figures 0–9 and the punctuation . , ; : ! ? - ' \" ( ) / & @ # € %.",
   },
   {
     q: "What’s the difference between Grid and Along the path?",
