@@ -6,8 +6,10 @@
 //   un trou doit tourner dans le sens inverse du contour qui l'entoure. On calcule donc, pour chaque pièce,
 //   la profondeur de chaque contour (combien d'autres contours l'entourent) et on l'oriente en conséquence.
 
+import { strToU8, zipSync } from "fflate"
 import { Font, Glyph, Path } from "opentype.js"
 
+import { licenseText, readmeText } from "./font-package"
 import { ACCENT_NAMES, CHARSET } from "./glyphs"
 import type { Params } from "./params"
 import { kerning } from "./kerning"
@@ -250,17 +252,37 @@ export function fontFile(
 // Nom de la version d'essai : « Trial » est ajouté au nom choisi
 export const trialName = (familyName: string) => `${familyName} Trial`
 
-// Construit la police et lance le téléchargement dans le navigateur. Renvoie le nom du fichier.
+// Construit la police et lance le téléchargement d'un zip : la police, LICENSE.txt et README.txt.
 // full : version complète (tous les caractères, sans « Trial »), débloquée par une clé de licence.
-export function downloadFont(P: Params, familyName: string, full = false) {
+// url : adresse qui rouvre la police dans l'atelier (mise dans le README). Renvoie le nom du zip.
+export function downloadFont(
+  P: Params,
+  familyName: string,
+  full = false,
+  extras: { key?: string; url: string } = { url: "" }
+) {
   const family = full ? familyName : trialName(familyName)
-  const blob = new Blob([fontFile(P, family, full ? CHARSET : TRIAL_CHARSET)], {
-    type: "font/otf",
+  const file = fileName(family)
+  const folder = file.replace(/\.otf$/, "")
+  const date = new Date().toISOString().slice(0, 10)
+  const zip = zipSync({
+    [folder]: {
+      [file]: new Uint8Array(
+        fontFile(P, family, full ? CHARSET : TRIAL_CHARSET)
+      ),
+      "LICENSE.txt": strToU8(
+        licenseText({ family, full, key: extras.key, date, P })
+      ),
+      "README.txt": strToU8(
+        readmeText({ family, file, full, url: extras.url })
+      ),
+    },
   })
+  const blob = new Blob([zip], { type: "application/zip" })
   const url = URL.createObjectURL(blob)
   const a = document.createElement("a")
   a.href = url
-  a.download = fileName(family)
+  a.download = `${folder}.zip`
   a.click()
   setTimeout(() => URL.revokeObjectURL(url), 1000)
   return a.download

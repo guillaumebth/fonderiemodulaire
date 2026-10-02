@@ -28,6 +28,7 @@ Changer la grille, la graisse ou la forme recalcule tout l'alphabet. Aucune lett
 | `lib/fonderie/kerning.ts` | Crénage automatique, à partir des cases vides face à face |
 | `lib/fonderie/sfnt.ts` | Ajout de la table `kern` dans le fichier .otf |
 | `lib/fonderie/export.ts` | Export .otf (opentype.js) : arcs → Bézier, orientation des trous, coordonnées entières |
+| `lib/fonderie/font-package.ts` | Contenu du zip téléchargé (`downloadFont` dans `export.ts`, avec fflate) : `LICENSE.txt` (essai : usage personnel ; complète : usage commercial, pas de revente du fichier ; en tête, LICENSE dessiné en caractères avec la grille de la police) et `README.txt` (installation, lien pour rouvrir la police dans l'atelier) |
 | `hooks/use-canvas.ts` | Redessine un canvas (resize, thème, polices) — utilisé par les étapes de construction |
 | `hooks/use-animated-text.ts` | Texte animé : transitions entre réglages et mode « vivant » (pas d'animation d'apparition : retirée, jugée trop chargée) (respecte « réduire les animations ») |
 | `components/fonderie/` | Interface : éditeur (vues Text / Glyph / Charset, réglages Simple / Advanced), curseurs, canvas, barre de navigation |
@@ -74,7 +75,7 @@ Brutalisme doux : la structure est visible, l'interface s'efface derrière la po
 - **La structure se montre** : sections séparées par un filet noir de 1 px avec un petit trait vertical de 12 px à gauche (le « coin »), pastilles à contour pointillé, curseurs réduits à une ligne et un point. Composants : `components/fonderie/panel-ui.tsx` (`PanelSection`, `Pill`, `PillChoice`, `PanelSlider`, `PanelSwitch`).
 - **Une seule voix typographique** : Inter, petite et medium — 10 px (mentions), 12 px (libellés, pastilles), 14 px (titres de section). Seuls la police générée et le bouton d'action sont grands.
 - **Le noir comme seul accent d'état** : actif = rempli en noir, inactif = pointillés sur blanc. Pas de couleur pour « sélectionné ».
-- **La couleur est rare et réservée aux moments forts** : bleu vif `#08f` du bouton d'action, couleurs « punch » au survol, rouge vif (`--path`) pour le tracé des lettres dans la vue technique. Aucune autre couleur d'interface.
+- **La couleur est rare et réservée aux moments forts** : bleu vif `#08f` du bouton d'action, couleurs « punch » (au survol du bouton, et en fond des affiches de la page Templates : `.palette-punch-1` à `5`), rouge vif (`--path`) pour le tracé des lettres dans la vue technique. Aucune autre couleur d'interface.
 - **De l'humour dans les interactions, pas dans le visuel** : bouton qui tremble, logo qui défile, curseur rond en invert, interrupteur Invert. Animations avec GSAP, toujours désactivées si « réduire les animations ».
 - **Des réglages, pas des thèmes** : on donne des curseurs plutôt que des styles prédéfinis (les templates ne sont que des points de départ).
 - **Pas d'icônes décoratives** : chevrons bruts (assets de la maquette), texte plutôt qu'icône.

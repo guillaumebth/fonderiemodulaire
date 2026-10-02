@@ -55,7 +55,20 @@ export default function RootLayout({
             {children}
             <SiteFooter />
           </TooltipProvider>
-          <Toaster />
+          {/* Notifications à la direction artistique : bloc noir, texte blanc en Inter 12 / 10 px,
+              sans coins arrondis, ombre ni icône */}
+          <Toaster
+            toastOptions={{
+              unstyled: true,
+              classNames: {
+                toast:
+                  "grid w-[var(--width)] gap-0.5 bg-foreground px-4 py-3 text-background",
+                title: "text-xs leading-normal font-medium",
+                description: "text-[10px] leading-normal font-medium",
+                icon: "hidden",
+              },
+            }}
+          />
         </ThemeProvider>
       </body>
     </html>

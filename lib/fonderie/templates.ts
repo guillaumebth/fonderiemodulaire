@@ -3,7 +3,16 @@
 
 import { DEFAULT_PARAMS, type Params } from "./params"
 
-export type Palette = "black" | "white" | "grey"
+// black / white / grey : monochromes ; punch-1 à 5 : les couleurs vives du bouton « Make your font »
+export type Palette =
+  | "black"
+  | "white"
+  | "grey"
+  | "punch-1"
+  | "punch-2"
+  | "punch-3"
+  | "punch-4"
+  | "punch-5"
 
 export type Template = {
   text: string
@@ -35,19 +44,19 @@ export const TEMPLATES: Template[] = [
   {
     text: "Open\n24/7",
     caption: "Grid · Dot · 5 × 7",
-    palette: "white",
+    palette: "punch-1",
     params: p({}),
   },
   {
     text: "Melt",
     caption: "Grid · Dot · merged",
-    palette: "grey",
+    palette: "punch-2",
     params: p({ gap: -0.7, rows: 9, cols: 6 }),
   },
   {
     text: "Rivets\n& bolts",
     caption: "Along the path · Screw · rotated",
-    palette: "white",
+    palette: "punch-3",
     params: p({
       layout: "trace",
       shape: "vis",
@@ -73,7 +82,7 @@ export const TEMPLATES: Template[] = [
   {
     text: "Signal 26",
     caption: "Grid · Target · wide · slanted",
-    palette: "black",
+    palette: "punch-4",
     wide: true,
     params: p({
       shape: "cible",
@@ -87,7 +96,7 @@ export const TEMPLATES: Template[] = [
   {
     text: "Chain",
     caption: "Along the path · Ring · 2 rails",
-    palette: "white",
+    palette: "punch-5",
     params: p({
       layout: "trace",
       shape: "anneau",
@@ -102,7 +111,7 @@ export const TEMPLATES: Template[] = [
   {
     text: "Moon\nbase",
     caption: "Grid · Frame · outline",
-    palette: "grey",
+    palette: "black",
     params: p({
       shape: "carrevide",
       mode: "contour",

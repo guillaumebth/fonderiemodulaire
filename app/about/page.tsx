@@ -16,14 +16,14 @@ export const metadata: Metadata = {
 const FAQ = [
   {
     q: "How do I install my font?",
-    a: "Click “Download free trial (.otf)” in the atelier, then double-click the file and choose Install. It works in Figma, Word, InDesign and any app that reads OpenType fonts.",
+    a: "Click “Download” in the atelier. You get a .zip with your font, its license and a link to edit it again: unzip it, double-click the .otf file and choose Install. It works in Figma, Word, InDesign and any app that reads OpenType fonts.",
   },
   {
     q: "Is it free?",
     // la réponse dépend de la version payante : ouverte seulement quand le lien de paiement est renseigné
     a: CHECKOUT_URL
-      ? `The trial is free: uppercase A–Z and figures 0–9. The full version adds lowercase, accents, punctuation and a commercial license, for ${PRICE}. After paying you get a license key, paste it in the atelier once, and every download is complete.`
-      : "Yes. The download is a free trial of your font, with uppercase A–Z and figures 0–9.",
+      ? `The trial is free, for personal projects: uppercase A–Z and figures 0–9. The full version adds lowercase, accents, punctuation and a commercial license, for ${PRICE}. After paying you get a license key, paste it in the atelier once, and every download is complete.`
+      : "Yes. The download is a free trial of your font, with uppercase A–Z and figures 0–9, for personal projects.",
   },
   {
     q: "Which characters are included?",

@@ -178,7 +178,7 @@
   }
 }
 
-/* Palettes des templates et du panneau de la home : monochromes (direction artistique).
+/* Palettes des templates et du panneau de la home : monochromes, ou les couleurs « punch » du bouton d'action.
    Ce sont des « affiches » : elles gardent leurs couleurs en mode sombre. */
 @layer components {
   .palette-black,
@@ -202,6 +202,32 @@
     --background: oklch(0.885 0 0); /* #d9d9d9 */
     --foreground: oklch(0 0 0);
     --muted-foreground: oklch(0.4 0 0);
+  }
+  /* Les couleurs vives du bouton « Make your font » (--punch-*), lettres noires */
+  .palette-punch-1,
+  .palette-punch-2,
+  .palette-punch-3,
+  .palette-punch-4,
+  .palette-punch-5 {
+    background: var(--background);
+    color: var(--foreground);
+    --foreground: oklch(0 0 0);
+    --muted-foreground: oklch(0.25 0 0);
+  }
+  .palette-punch-1 {
+    --background: var(--punch-1);
+  }
+  .palette-punch-2 {
+    --background: var(--punch-2);
+  }
+  .palette-punch-3 {
+    --background: var(--punch-3);
+  }
+  .palette-punch-4 {
+    --background: var(--punch-4);
+  }
+  .palette-punch-5 {
+    --background: var(--punch-5);
   }
 }
 
@@ -230,8 +256,10 @@ html.inverted body {
 .dash-outline rect {
   fill: none;
   stroke: currentColor;
-  stroke-width: 1;
-  stroke-dasharray: 3 2;
+  /* des points ronds : traits de longueur 0 aux bouts arrondis, un tous les 3 px */
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-dasharray: 0 3;
 }
 .pill:hover .dash-outline rect,
 .pill:focus-visible .dash-outline rect,
@@ -245,7 +273,7 @@ html.inverted body {
 }
 @keyframes dash-march {
   to {
-    stroke-dashoffset: -10;
+    stroke-dashoffset: -6; /* deux pas de points : la boucle ne saute pas */
   }
 }
 @media (prefers-reduced-motion: reduce) {

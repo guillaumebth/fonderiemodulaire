@@ -14,6 +14,7 @@ import type { Params } from "@/lib/fonderie/params"
 
 import { DashOutline } from "./dash-outline"
 import { PanelSection, Pill, PillChoice, pillLink } from "./panel-ui"
+import { PurchaseDialog, type Purchase } from "./purchase-dialog"
 
 // Rendu de l'image : tel qu'à l'écran, ou vue de conception (grille, tracé rouge, contour)
 export type ImageLook = "shown" | "blueprint"
@@ -51,6 +52,8 @@ export function ExportPanel({
   const [key, setKey] = useState("")
   const [checking, setChecking] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  // retour du paiement : fenêtre de remerciement (vérification, téléchargement, clé à garder)
+  const [purchase, setPurchase] = useState<Purchase | null>(null)
 
   async function verify(candidate: string) {
     setChecking(true)
@@ -76,7 +79,29 @@ export function ExportPanel({
     if (pending?.name) setName(pending.name)
     const hash = window.location.hash || pending?.hash || ""
     window.history.replaceState(null, "", window.location.pathname + hash)
-    verify(session)
+    // En local seulement (npm run dev) : aperçu de la fenêtre sans vrai paiement
+    // ?session_id=preview → paiement confirmé ; ?session_id=preview-error → échec. Ignoré en ligne.
+    if (
+      process.env.NODE_ENV === "development" &&
+      session.startsWith("preview")
+    ) {
+      const key = "cs_live_a1B2c3D4e5F6g7H8i9J0kLmNoPqRsTuVwXyZ"
+      if (session === "preview-error")
+        return setPurchase({
+          key,
+          status: "error",
+          error: "This key isn't a paid Fonderie modulaire license.",
+        })
+      setLicense(key) // débloqué le temps de la visite, sans être retenu
+      return setPurchase({ key, status: "ok" })
+    }
+    setPurchase({ key: session, status: "checking" })
+    unlockLicense(session).then((problem) => {
+      if (problem)
+        return setPurchase({ key: session, status: "error", error: problem })
+      setLicense(session)
+      setPurchase({ key: session, status: "ok" })
+    })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -85,9 +110,22 @@ export function ExportPanel({
     try {
       // Le module d'export (et opentype.js) ne se charge qu'au premier clic : la page reste légère
       const { downloadFont } = await import("@/lib/fonderie/export")
-      const file = downloadFont(params, name.trim() || "Fonderie Modulaire", full)
+      // le zip contient aussi la licence et un lien pour rouvrir la police (l'adresse suit les réglages)
+      const file = downloadFont(
+        params,
+        name.trim() || "Fonderie Modulaire",
+        full,
+        {
+          key: license ?? undefined,
+          url:
+            window.location.origin +
+            window.location.pathname +
+            window.location.hash,
+        }
+      )
       toast.success(`${file} downloaded`, {
-        description: "Double-click the file to install the font.",
+        description:
+          "Unzip it, then double-click the .otf to install the font.",
       })
     } catch (e) {
       console.error(e)
@@ -104,6 +142,13 @@ export function ExportPanel({
 
   return (
     <div id="download" className="grid scroll-mt-6 gap-6">
+      <PurchaseDialog
+        purchase={purchase}
+        params={params}
+        busy={busy}
+        onDownload={download}
+        onClose={() => setPurchase(null)}
+      />
       <PanelSection title="Download" collapsible>
         <label
           htmlFor="font-name"
@@ -121,13 +166,16 @@ export function ExportPanel({
         />
         <div>
           <Pill active onClick={download} disabled={busy}>
-            {full ? "Download full font (.otf)" : "Download free trial (.otf)"}
+            {full ? "Download full font" : "Download free trial"}
           </Pill>
         </div>
         <p className="text-[10px] leading-normal font-medium">
           {full
             ? "Full version: every character, kerning and a commercial license. Thank you for your support!"
-            : "The trial includes uppercase A–Z and figures 0–9, kerning included."}
+            : "The trial includes uppercase A–Z and figures 0–9, kerning included, for personal projects."}
+          {
+            " A .zip with the .otf file, its license and a link to edit it again."
+          }
           {params.mode === "contour" &&
             " The file is always solid: outline mode only exists on screen."}
         </p>
@@ -177,7 +225,10 @@ export function ExportPanel({
                 </Pill>
               </div>
               {error && (
-                <p role="alert" className="text-[10px] leading-normal font-medium">
+                <p
+                  role="alert"
+                  className="text-[10px] leading-normal font-medium"
+                >
                   {error}
                 </p>
               )}

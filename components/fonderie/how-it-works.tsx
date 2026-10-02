@@ -36,22 +36,11 @@ const MODES: { title: string; intro: string; params: Params; steps: Step[] }[] =
     },
   ]
 
-// Section de la page About (ancre #how-it-works, visée par le bouton de la home)
 // Section de la page About (ancre #how-it-works, visée par le bouton de la home).
 // Direction artistique : filet en coin par section, Inter 12 / 14 px medium.
 export function HowItWorks() {
   return (
     <div id="how-it-works" className="grid scroll-mt-6 gap-10">
-      <div className="max-w-[470px]">
-        <PanelSection title="How it works">
-          <p className="text-xs leading-normal">
-            Each letter is described only once, as a path: a few lines and a few
-            corners. That path doesn&apos;t depend on any grid, so the same
-            alphabet can be rebuilt at any size, with any pieces. There are two
-            ways to turn that path into a letter.
-          </p>
-        </PanelSection>
-      </div>
       {MODES.map((mode) => (
         <PanelSection key={mode.title} title={mode.title}>
           <div className="grid gap-6 md:grid-cols-[minmax(0,470px)_minmax(0,1fr)]">
