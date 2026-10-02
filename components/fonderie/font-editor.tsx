@@ -278,27 +278,17 @@ export function FontEditor() {
         {/* Les poignées des curseurs sont dessinées avec la pièce choisie */}
         <PieceContext value={P}>
           <aside aria-label="Settings" className="grid content-start gap-6">
-            {/* Reset / Randomize, à droite */}
-            <div className="flex justify-end gap-1.5">
-              <Pill
-                muted
-                onClick={() =>
-                  replace({
-                    ...DEFAULT_PARAMS,
-                    grid: P.grid,
-                    mode: P.mode,
-                    layout: P.layout,
-                  })
-                }
-              >
-                Reset
-              </Pill>
-              <Pill active onClick={() => replace(randomParams(P))}>
-                Randomize
-              </Pill>
-            </div>
+            {/* « Show all settings » (l'affichage) en haut à droite ;
+                dessous, toutes les actions sur les réglages sur une même ligne :
+                Undo / Redo (chevrons) à gauche, Reset / Randomize à droite */}
+            <label className="flex items-center justify-end gap-2 text-xs font-medium">
+              Show all settings
+              <PanelSwitch
+                checked={advanced}
+                onCheckedChange={toggleAdvanced}
+              />
+            </label>
 
-            {/* Undo / Redo (chevrons) et « Show all settings » */}
             <div className="-mt-2 flex items-center justify-between gap-4">
               <div className="flex gap-4">
                 <HistoryButton
@@ -315,13 +305,24 @@ export function FontEditor() {
                   onClick={history.redo}
                 />
               </div>
-              <label className="flex items-center gap-2 text-xs font-medium">
-                Show all settings
-                <PanelSwitch
-                  checked={advanced}
-                  onCheckedChange={toggleAdvanced}
-                />
-              </label>
+              <div className="flex gap-1.5">
+                <Pill
+                  muted
+                  onClick={() =>
+                    replace({
+                      ...DEFAULT_PARAMS,
+                      grid: P.grid,
+                      mode: P.mode,
+                      layout: P.layout,
+                    })
+                  }
+                >
+                  Reset
+                </Pill>
+                <Pill active onClick={() => replace(randomParams(P))}>
+                  Randomize
+                </Pill>
+              </div>
             </div>
 
             <PanelSection title="Construction">

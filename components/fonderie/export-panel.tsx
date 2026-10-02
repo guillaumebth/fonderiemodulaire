@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
 
-import { CHECKOUT_URL, PRICE } from "@/lib/fonderie/config"
+import { CHECKOUT_URL, CONTACT_URL, PRICE } from "@/lib/fonderie/config"
 import {
   rememberFontBeforeCheckout,
   savedLicense,
@@ -15,6 +15,7 @@ import { playDownload } from "@/lib/fonderie/sound"
 import { cn } from "@/lib/utils"
 
 import { PanelSection, Pill, PillChoice } from "./panel-ui"
+import { DashOutline } from "./dash-outline"
 import { ACTION_COLORS, PILL } from "./pill-styles"
 import { PurchaseDialog, type Purchase } from "./purchase-dialog"
 import { ShakeLink } from "./shake-link"
@@ -33,6 +34,22 @@ type ExportPanelProps = {
 
 const FIELD =
   "w-full rounded-full bg-field px-[7px] py-[2px] text-xs leading-normal font-medium text-field-foreground outline-none placeholder:text-field-foreground focus:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
+
+// E-mail prérempli pour proposer sa police aux templates. L'adresse de la page contient
+// tous les réglages et le texte (après le #) : c'est elle qu'on envoie.
+function submitHref(name: string) {
+  const url = typeof window === "undefined" ? "" : window.location.href
+  const to = CONTACT_URL.replace(/^mailto:/, "")
+  const subject = `Template submission: ${name || "my font"}`
+  const body = [
+    `Font name: ${name}`,
+    `Link: ${url}`,
+    "",
+    "Credit me as (name, X or Instagram handle): ",
+    "",
+  ].join("\n")
+  return `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+}
 
 // Sections Download et Image of the preview du panneau (maquette Figma « Generator »).
 // Download : nom de la police, essai gratuit (A–Z, 0–9) et version complète.
@@ -279,6 +296,31 @@ export function ExportPanel({
               ? "Exactly as on screen, on a transparent background."
               : "Your font as a construction drawing: grid, red path and outlined pieces."}{" "}
             The SVG opens in Figma.
+          </p>
+        </PanelSection>
+      )}
+      {/* Communauté : on envoie sa police par e-mail (lien de l'atelier = tous les réglages),
+          pour qu'elle rejoigne peut-être les templates, avec son nom */}
+      {CONTACT_URL && (
+        <PanelSection title="Submit to templates" collapsible>
+          <p className="text-xs leading-normal font-medium">
+            Proud of this one? Send it over: the best fonts join the templates,
+            with your name on them.
+          </p>
+          <div>
+            <a
+              href={submitHref(name)}
+              // l'adresse suit les réglages sans recharger la page : on la relit au moment du clic
+              onClick={(e) => (e.currentTarget.href = submitHref(name))}
+              className={PILL}
+            >
+              <DashOutline />
+              Submit my font
+            </a>
+          </div>
+          <p className="text-[10px] leading-normal font-medium">
+            Opens an email with the link to your font. Add your name or your X /
+            Instagram handle for the credit.
           </p>
         </PanelSection>
       )}

@@ -20,6 +20,8 @@ export type Template = {
   palette: Palette
   wide?: boolean // occupe toute la largeur
   params: Params
+  // police envoyée par quelqu'un (bouton « Submit to templates » de l'atelier) : son nom ou son compte
+  author?: string
 }
 
 const p = (x: Partial<Params>): Params => ({ ...DEFAULT_PARAMS, ...x })

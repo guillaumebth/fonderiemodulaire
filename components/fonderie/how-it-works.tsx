@@ -1,5 +1,7 @@
 "use client"
 
+import { useEffect, useState } from "react"
+
 import { DEFAULT_PARAMS, type Params } from "@/lib/fonderie/params"
 
 import { StepCanvas } from "./font-canvas"
@@ -36,30 +38,58 @@ const MODES: { title: string; intro: string; params: Params; steps: Step[] }[] =
     },
   ]
 
+// Lettres qui défilent dans les schémas : droites, courbes, diagonales, chiffre, minuscule
+const LETTERS = ["R", "A", "G", "S", "K", "8", "Q", "e", "&"]
+const CYCLE_MS = 2000
+
 // Section de la page About (ancre #how-it-works, visée par le bouton de la home).
-// Direction artistique : filet en coin par section, Inter 12 / 14 px medium.
+// Chaque mode : un texte, puis ses 3 étapes dans des cartes blanches (sans ombre ni coins arrondis).
+// La lettre change toute seule toutes les 2 s (même lettre dans toutes les cartes), ou au clic sur une carte.
+// Pas de défilement automatique si le système demande de réduire les animations.
 export function HowItWorks() {
+  const [index, setIndex] = useState(0)
+  const char = LETTERS[index]
+  const next = () => setIndex((i) => (i + 1) % LETTERS.length)
+
+  // Le compte repart à chaque changement de lettre (clic compris)
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
+    const id = setTimeout(
+      () => setIndex((i) => (i + 1) % LETTERS.length),
+      CYCLE_MS
+    )
+    return () => clearTimeout(id)
+  }, [index])
+
   return (
     <div id="how-it-works" className="grid scroll-mt-6 gap-10">
       {MODES.map((mode) => (
         <PanelSection key={mode.title} title={mode.title}>
-          <div className="grid gap-6 md:grid-cols-[minmax(0,470px)_minmax(0,1fr)]">
-            <p className="text-xs leading-normal">{mode.intro}</p>
-            <div className="grid max-w-[560px] grid-cols-3 content-start gap-4">
+          <div className="grid max-w-[900px] gap-4">
+            <p className="max-w-[470px] text-xs leading-normal">{mode.intro}</p>
+            <div className="grid grid-cols-3 gap-2">
               {mode.steps.map(([step, title, desc]) => (
-                <div key={step} className="grid gap-2">
+                <button
+                  key={step}
+                  type="button"
+                  onClick={next}
+                  aria-label={`${title}, ${desc}. Show another letter`}
+                  className="grid content-start gap-3 bg-surface p-3 text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/50 md:p-4"
+                >
+                  <span className="flex items-baseline justify-between text-xs leading-normal font-medium">
+                    {title}
+                    <span className="text-[10px] text-muted-foreground tabular-nums">
+                      {char}
+                    </span>
+                  </span>
                   <StepCanvas
                     step={step}
-                    char="R"
+                    char={char}
                     params={mode.params}
-                    label={`${mode.title}, step ${title}`}
+                    label={`${mode.title}, step ${title}, letter ${char}`}
                   />
-                  <span className="text-[10px] leading-normal">
-                    <b className="text-xs font-medium">{title}</b>
-                    <br />
-                    {desc}
-                  </span>
-                </div>
+                  <span className="text-[10px] leading-normal">{desc}</span>
+                </button>
               ))}
             </div>
           </div>

@@ -13,7 +13,7 @@ import { PILL, PILL_ACTIVE } from "./pill-styles"
 // Pastilles : contour noir en pointillés, fond blanc ; la page active est remplie en noir.
 const NAV = [
   { href: "/atelier", label: "Atelier" },
-  { href: "/templates", label: "Template" },
+  { href: "/templates", label: "Templates" },
   { href: "/showcase", label: "Showcase" },
   { href: "/about", label: "About" },
 ]

@@ -34,6 +34,12 @@ export function TemplateGrid() {
             <div className="flex items-end justify-between gap-3 self-end">
               <span className="text-[10px] leading-normal font-medium text-muted-foreground">
                 {s.caption}
+                {s.author && (
+                  <>
+                    <br />
+                    <span className="text-foreground">by {s.author}</span>
+                  </>
+                )}
               </span>
               {/* Pastille qui se remplit au survol de l'affiche */}
               <span
