@@ -66,7 +66,7 @@ export const DEFAULT_PARAMS: Params = {
   rad: 0.1,
   wid: 1,
   sla: 0,
-  leading: 0.42,
+  leading: -0.1, // 90 % affiché
   kern: 0.7,
   mode: "plein",
   str: 0.08,

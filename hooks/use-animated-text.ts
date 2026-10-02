@@ -32,6 +32,8 @@ type Options = {
   alive?: boolean // la variation organique ondule en boucle
   center?: boolean // lignes centrées
   morph?: boolean // false : pas de transition, le dessin change d'un coup (ex. logo)
+  // appelé après chaque mise en page avec la position de fin du texte (curseur de saisie)
+  onEnd?: (end: { x: number; top: number; height: number }) => void
 }
 
 // Dessine le texte et l'anime :
@@ -45,6 +47,7 @@ export function useAnimatedText({
   lineGap,
   center,
   morph = true,
+  onEnd,
   alive,
 }: Options) {
   const ref = useRef<HTMLCanvasElement>(null)
@@ -150,6 +153,7 @@ export function useAnimatedText({
       const { pieces, gone } = blend(L.pieces, ease(t))
       st.shown = pieces
       drawText(cv, L, [...gone, ...pieces], P, col)
+      onEnd?.({ x: L.end.x, top: L.end.top, height: L.end.base - L.end.top })
       if (live || t < 1) raf = requestAnimationFrame(frame)
     }
     frame(performance.now())

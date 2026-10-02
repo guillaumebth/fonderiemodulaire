@@ -238,6 +238,8 @@ export type TextLayout = {
   slant: number
   pieces: TextPiece[]
   glyphs: { c: string; x: number; top: number; base: number }[]
+  // Position juste après la dernière lettre (pour dessiner le curseur de saisie)
+  end: { x: number; top: number; base: number }
 }
 
 // Met le texte en page et calcule toutes ses pièces.
@@ -271,6 +273,7 @@ export function layoutText(
   const pieces: TextPiece[] = []
   const glyphs: TextLayout["glyphs"] = []
   let index = 0 // n° du caractère dans le texte, pour reconnaître les pièces d'un réglage à l'autre
+  let end = { x: padLeft, top: pad, base: pad + capH }
   lines.forEach((line, li) => {
     const base = pad + li * lh + capH
     const top = base - capH
@@ -308,8 +311,10 @@ export function layoutText(
       index++
     })
     index++ // l'espace ou le retour à la ligne qui sépare les lignes
+    // le curseur se place au milieu de l'espace qui suit la dernière lettre
+    end = { x: chars.length ? x - tracking(U, P) / 2 : x, top, base }
   })
-  return { W, H, U, slant, pieces, glyphs }
+  return { W, H, U, slant, pieces, glyphs, end }
 }
 
 // Ne redimensionne le canvas que si sa taille change (sinon on l'efface simplement)

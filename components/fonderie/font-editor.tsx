@@ -2,21 +2,9 @@
 
 import { useEffect, useRef, useState } from "react"
 
-import { Dices, Redo2, RotateCcw, Shuffle, Undo2 } from "lucide-react"
+import Image from "next/image"
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import {
-  Field,
-  FieldGroup,
-  FieldLabel,
-  FieldLegend,
-  FieldSeparator,
-  FieldSet,
-} from "@/components/ui/field"
-import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Textarea } from "@/components/ui/textarea"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import {
   Tooltip,
@@ -37,10 +25,19 @@ import {
   type ShapeKind,
 } from "@/lib/fonderie/params"
 import { decodeShare, encodeShare } from "@/lib/fonderie/share"
+import { cn } from "@/lib/utils"
+import chevron from "@/public/images/chevron-24.svg"
 
-import { ControlSlider } from "./control-slider"
 import { ExportPanel } from "./export-panel"
 import { TextCanvas } from "./font-canvas"
+import {
+  PanelSection,
+  PanelSlider,
+  PanelSwitch,
+  Pill,
+  PILL,
+  PillChoice,
+} from "./panel-ui"
 
 const DEFAULT_TEXT = "Fonderie\nmodulaire 26"
 const pct = (v: number) => Math.round(v * 100) + "%"
@@ -55,39 +52,48 @@ const ALPHABET = [
   .join("\n")
 // Cascade de tailles dans la vue Text (hauteur des capitales en px), comme le « Typewriter » de Metaflop
 const WATERFALL = [16, 28, 48]
-const SECTION_LABEL =
-  "font-mono text-[11px] tracking-[0.08em] text-muted-foreground uppercase"
 const PRESSED =
   "data-[state=on]:border-foreground data-[state=on]:bg-foreground data-[state=on]:text-background"
 const ADVANCED_KEY = "fonderie:advanced"
+// Onglets Text / Glyph / Charset en pastilles (charte du menu et du panneau) : actif en noir
+const TAB_LIST = "h-auto gap-1 rounded-none bg-transparent p-0"
+const TAB = cn(
+  PILL,
+  "h-auto flex-none text-foreground shadow-none after:hidden group-data-[variant=default]/tabs-list:data-active:shadow-none hover:text-foreground data-[state=active]:bg-foreground data-[state=active]:text-background data-active:bg-foreground data-active:text-background dark:data-active:bg-foreground"
+)
 
-// Bouton icône avec info-bulle (Undo, Redo)
-function IconAction({
+// Undo / Redo : chevrons de la maquette (‹ ›) avec info-bulle et raccourci
+function HistoryButton({
   label,
   shortcut,
   disabled,
   onClick,
-  children,
+  flip,
 }: {
   label: string
   shortcut: string
   disabled: boolean
   onClick: () => void
-  children: React.ReactNode
+  flip?: boolean
 }) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button
+        <button
           type="button"
-          variant="outline"
-          size="icon-sm"
           aria-label={label}
           disabled={disabled}
           onClick={onClick}
+          className="rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-30"
         >
-          {children}
-        </Button>
+          <Image
+            src={chevron}
+            alt=""
+            width={24}
+            height={24}
+            className={cn(flip && "rotate-180")}
+          />
+        </button>
       </TooltipTrigger>
       <TooltipContent>
         {label} <kbd className="ml-1 font-mono opacity-70">{shortcut}</kbd>
@@ -146,63 +152,54 @@ export function FontEditor() {
 
   return (
     <>
-      <p className="-mt-2 max-w-[62ch] text-pretty text-muted-foreground">
-        Every letter is a path laid on a grid. Tune the grid, the weight and the
-        shape of the pieces, and the whole alphabet rebuilds itself.
-      </p>
-
-      <section className="grid items-start gap-5 md:grid-cols-[minmax(0,1fr)_300px]">
+      <section className="grid items-start gap-8 md:grid-cols-[minmax(0,1fr)_350px] lg:gap-12">
         {/* ---------- Aperçu : trois vues ---------- */}
-        <Tabs defaultValue="text" className="min-w-0 gap-4">
-          <TabsList aria-label="Preview">
-            <TabsTrigger value="text">Text</TabsTrigger>
-            <TabsTrigger value="glyph">Glyph</TabsTrigger>
-            <TabsTrigger value="charset">Charset</TabsTrigger>
+        <Tabs defaultValue="text" className="min-w-0 gap-10">
+          <TabsList aria-label="Preview" className={TAB_LIST}>
+            <TabsTrigger value="text" className={TAB}>
+              Text
+            </TabsTrigger>
+            <TabsTrigger value="glyph" className={TAB}>
+              Glyph
+            </TabsTrigger>
+            <TabsTrigger value="charset" className={TAB}>
+              Charset
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="text" className="grid gap-5">
-            <Field className="gap-3">
-              <FieldLabel htmlFor="txt" className={SECTION_LABEL}>
-                Type your text
-              </FieldLabel>
-              <Textarea
-                id="txt"
-                rows={2}
-                spellCheck={false}
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                className="min-h-0 resize-none rounded-none border-0 border-b bg-transparent px-0 font-mono shadow-none focus-visible:border-brand focus-visible:ring-0 dark:bg-transparent"
-              />
-            </Field>
             <TextCanvas
               text={text}
               params={P}
-              sizes={[64, 92, 128]}
+              sizes={[44, 56, 72]}
               lineGap={P.leading}
               alive={alive}
               label="Preview of your text in the modular font"
+              onTextChange={setText}
             />
-            <div className="grid gap-4 border-t pt-4">
-              <span className={SECTION_LABEL}>Sizes</span>
-              {WATERFALL.map((size) => (
-                <div
-                  key={size}
-                  className="grid grid-cols-[3rem_minmax(0,1fr)] items-start gap-3"
-                >
-                  <span className="pt-1 font-mono text-xs text-muted-foreground tabular-nums">
-                    {size}px
-                  </span>
-                  <TextCanvas
-                    text={text.replace(/\n/g, " ")}
-                    params={P}
-                    sizes={[size, size, size]}
-                    lineGap={0.3}
-                    alive={alive}
-                    label={`Your text at ${size} pixels`}
-                  />
-                </div>
-              ))}
-            </div>
+            {/* Même filet et mêmes typos que les sections du panneau */}
+            <PanelSection title="Sizes">
+              <div className="grid gap-4">
+                {WATERFALL.map((size) => (
+                  <div
+                    key={size}
+                    className="grid grid-cols-[56px_minmax(0,1fr)] items-start"
+                  >
+                    <span className="text-xs leading-normal font-medium tabular-nums">
+                      {size}px
+                    </span>
+                    <TextCanvas
+                      text={text.replace(/\n/g, " ")}
+                      params={P}
+                      sizes={[size, size, size]}
+                      lineGap={0.3}
+                      alive={alive}
+                      label={`Your text at ${size} pixels`}
+                    />
+                  </div>
+                ))}
+              </div>
+            </PanelSection>
           </TabsContent>
 
           <TabsContent value="glyph" className="grid gap-4">
@@ -248,428 +245,345 @@ export function FontEditor() {
           </TabsContent>
         </Tabs>
 
-        {/* ---------- Réglages ---------- */}
-        <Card
-          role="complementary"
-          aria-label="Settings"
-          className="rounded-md ring-0"
-        >
-          <CardContent>
-            <FieldGroup>
-              <div className="grid gap-2">
-                <div className="flex gap-2">
-                  <IconAction
-                    label="Undo"
-                    shortcut="⌘Z"
-                    disabled={!history.canUndo}
-                    onClick={history.undo}
-                  >
-                    <Undo2 />
-                  </IconAction>
-                  <IconAction
-                    label="Redo"
-                    shortcut="⇧⌘Z"
-                    disabled={!history.canRedo}
-                    onClick={history.redo}
-                  >
-                    <Redo2 />
-                  </IconAction>
-                  <Button
-                    type="button"
-                    size="sm"
-                    className="flex-1"
-                    onClick={() => replace(randomParams(P))}
-                  >
-                    <Dices data-icon="inline-start" />
-                    Randomize
-                  </Button>
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="outline"
-                    className="flex-1"
-                    onClick={() =>
-                      replace({
-                        ...DEFAULT_PARAMS,
-                        grid: P.grid,
-                        mode: P.mode,
-                        layout: P.layout,
-                      })
-                    }
-                  >
-                    <RotateCcw data-icon="inline-start" />
-                    Reset
-                  </Button>
-                </div>
-              </div>
+        {/* ---------- Réglages (maquette Figma « Generator ») ---------- */}
+        <aside aria-label="Settings" className="grid content-start gap-6">
+          {/* Reset / Randomize, à droite */}
+          <div className="flex justify-end gap-1.5">
+            <Pill
+              muted
+              onClick={() =>
+                replace({
+                  ...DEFAULT_PARAMS,
+                  grid: P.grid,
+                  mode: P.mode,
+                  layout: P.layout,
+                })
+              }
+            >
+              Reset
+            </Pill>
+            <Pill active onClick={() => replace(randomParams(P))}>
+              Randomize
+            </Pill>
+          </div>
 
-              <Field orientation="horizontal">
-                <Switch
-                  id="advanced"
-                  checked={advanced}
-                  onCheckedChange={toggleAdvanced}
-                />
-                <FieldLabel htmlFor="advanced" className="font-normal">
-                  Show all settings
-                </FieldLabel>
-              </Field>
+          {/* Undo / Redo (chevrons) et « Show all settings » */}
+          <div className="-mt-2 flex items-center justify-between gap-4">
+            <div className="flex gap-4">
+              <HistoryButton
+                label="Undo"
+                shortcut="⌘Z"
+                disabled={!history.canUndo}
+                onClick={history.undo}
+                flip
+              />
+              <HistoryButton
+                label="Redo"
+                shortcut="⇧⌘Z"
+                disabled={!history.canRedo}
+                onClick={history.redo}
+              />
+            </div>
+            <label className="flex items-center gap-2 text-xs font-medium">
+              Show all settings
+              <PanelSwitch
+                checked={advanced}
+                onCheckedChange={toggleAdvanced}
+              />
+            </label>
+          </div>
 
-              <FieldSeparator />
-
-              <FieldSet className="gap-3.5">
-                <FieldLegend className={SECTION_LABEL}>
-                  Construction
-                </FieldLegend>
-                <ToggleGroup
-                  type="single"
-                  value={P.layout}
-                  onValueChange={(v) => v && set("layout")(v as Layout)}
-                  variant="outline"
-                  spacing={0}
-                  className="grid w-full grid-cols-2"
-                  aria-label="How letters are built"
-                >
-                  <ToggleGroupItem value="grille" className={PRESSED}>
-                    Grid
-                  </ToggleGroupItem>
-                  <ToggleGroupItem value="trace" className={PRESSED}>
-                    Along the path
-                  </ToggleGroupItem>
-                </ToggleGroup>
-                {P.layout === "trace" && (
-                  <>
-                    <ControlSlider
-                      id="spacing"
-                      label="Piece spacing"
-                      value={P.spacing}
-                      min={0.15}
-                      max={2.5}
-                      step={0.01}
-                      format={cells}
-                      onChange={set("spacing")}
-                    />
-                    <ControlSlider
-                      id="lanes"
-                      label="Parallel rows"
-                      value={P.lanes}
-                      min={1}
-                      max={2}
-                      step={1}
-                      format={String}
-                      onChange={set("lanes")}
-                    />
-                    {advanced && (
-                      <ControlSlider
-                        id="laneGap"
-                        label="Row spacing"
-                        value={P.laneGap}
-                        min={0.5}
-                        max={3}
-                        step={0.01}
-                        format={(v) => v.toFixed(2) + "×"}
-                        onChange={set("laneGap")}
-                        inactive={P.lanes === 1}
-                      />
-                    )}
-                    {/* Sans effet sur les formes rondes (rond, anneau, cible) : grisé */}
-                    <Field
-                      orientation="horizontal"
-                      data-disabled={!USES_ROTATION.includes(P.shape)}
-                      className="transition-opacity data-[disabled=true]:opacity-40"
-                    >
-                      <Switch
-                        id="orient"
-                        checked={P.orient}
-                        onCheckedChange={set("orient")}
-                        disabled={!USES_ROTATION.includes(P.shape)}
-                      />
-                      <FieldLabel htmlFor="orient" className="font-normal">
-                        Rotate pieces along the stroke
-                      </FieldLabel>
-                    </Field>
-                  </>
-                )}
-              </FieldSet>
-
-              <FieldSeparator />
-
-              <FieldSet className="gap-3.5">
-                <FieldLegend className={SECTION_LABEL}>
-                  Grid & letters
-                </FieldLegend>
-                <ControlSlider
-                  id="cols"
-                  label="Columns"
-                  value={P.cols}
-                  min={3}
-                  max={12}
-                  step={1}
-                  format={String}
-                  onChange={set("cols")}
-                />
-                <ControlSlider
-                  id="rows"
-                  label="Rows"
-                  value={P.rows}
-                  min={5}
-                  max={15}
-                  step={1}
-                  format={String}
-                  onChange={set("rows")}
-                />
-                <ControlSlider
-                  id="wt"
-                  label="Weight"
-                  value={P.wt}
-                  min={0.45}
-                  max={1.8}
-                  step={0.05}
-                  format={cells}
-                  onChange={set("wt")}
-                />
-                <ControlSlider
-                  id="leading"
-                  label="Line height"
-                  value={P.leading}
-                  min={-0.3}
-                  max={1.5}
+          <PanelSection title="Construction">
+            <PillChoice
+              label="How letters are built"
+              value={P.layout}
+              onChange={(v: Layout) => set("layout")(v)}
+              options={[
+                { id: "grille", label: "Grid" },
+                { id: "trace", label: "Along the path" },
+              ]}
+            />
+            {P.layout === "trace" && (
+              <div className="mt-2 grid gap-2">
+                <PanelSlider
+                  id="spacing"
+                  label="Piece spacing"
+                  value={P.spacing}
+                  min={0.15}
+                  max={2.5}
                   step={0.01}
-                  format={(v) => Math.round((1 + v) * 100) + "%"}
-                  onChange={set("leading")}
+                  format={cells}
+                  onChange={set("spacing")}
+                />
+                <PanelSlider
+                  id="lanes"
+                  label="Parallel rows"
+                  value={P.lanes}
+                  min={1}
+                  max={2}
+                  step={1}
+                  format={String}
+                  onChange={set("lanes")}
                 />
                 {advanced && (
-                  <>
-                    <ControlSlider
-                      id="xh"
-                      label="x-height"
-                      value={P.xh}
-                      min={0.4}
-                      max={0.85}
-                      step={0.01}
-                      format={pct}
-                      onChange={set("xh")}
-                    />
-                    <ControlSlider
-                      id="desc"
-                      label="Descenders (g, p, q…)"
-                      value={P.desc}
-                      min={0.15}
-                      max={0.5}
-                      step={0.01}
-                      format={pct}
-                      onChange={set("desc")}
-                    />
-                    <ControlSlider
-                      id="rnd"
-                      label="Roundness"
-                      value={P.rnd}
-                      min={0}
-                      max={1}
-                      step={0.01}
-                      format={pct}
-                      onChange={set("rnd")}
-                    />
-                    <ControlSlider
-                      id="smo"
-                      label="Corner dots"
-                      value={P.smo}
-                      min={0}
-                      max={0.6}
-                      step={0.01}
-                      format={(v) => (v ? pct(v) : "none")}
-                      onChange={set("smo")}
-                      inactive={P.layout === "trace"}
-                    />
-                  </>
+                  <PanelSlider
+                    id="laneGap"
+                    label="Row spacing"
+                    value={P.laneGap}
+                    min={0.5}
+                    max={3}
+                    step={0.01}
+                    format={(v) => v.toFixed(2) + "×"}
+                    onChange={set("laneGap")}
+                    inactive={P.lanes === 1}
+                  />
                 )}
-                <ControlSlider
-                  id="org"
-                  label="Organic variation"
-                  value={P.org}
+                {/* Sans effet sur les formes rondes (rond, anneau, cible) : grisé */}
+                <label
+                  className={cn(
+                    "flex items-center gap-2 text-xs font-medium",
+                    !USES_ROTATION.includes(P.shape) && "opacity-40"
+                  )}
+                >
+                  Rotate pieces
+                  <PanelSwitch
+                    checked={P.orient}
+                    onCheckedChange={set("orient")}
+                    disabled={!USES_ROTATION.includes(P.shape)}
+                  />
+                </label>
+              </div>
+            )}
+          </PanelSection>
+
+          <PanelSection title="Grid & letters">
+            <PanelSlider
+              id="cols"
+              label="Columns"
+              value={P.cols}
+              min={3}
+              max={12}
+              step={1}
+              format={String}
+              onChange={set("cols")}
+            />
+            <PanelSlider
+              id="rows"
+              label="Rows"
+              value={P.rows}
+              min={5}
+              max={15}
+              step={1}
+              format={String}
+              onChange={set("rows")}
+            />
+            <PanelSlider
+              id="wt"
+              label="Weight"
+              value={P.wt}
+              min={0.45}
+              max={1.8}
+              step={0.05}
+              format={cells}
+              onChange={set("wt")}
+            />
+            <PanelSlider
+              id="leading"
+              label="Line height"
+              value={P.leading}
+              min={-0.3}
+              max={1.5}
+              step={0.01}
+              format={(v) => Math.round((1 + v) * 100) + "%"}
+              onChange={set("leading")}
+            />
+            {advanced && (
+              <>
+                <PanelSlider
+                  id="xh"
+                  label="x-height"
+                  value={P.xh}
+                  min={0.4}
+                  max={0.85}
+                  step={0.01}
+                  format={pct}
+                  onChange={set("xh")}
+                />
+                <PanelSlider
+                  id="desc"
+                  label="Descenders"
+                  value={P.desc}
+                  min={0.15}
+                  max={0.5}
+                  step={0.01}
+                  format={pct}
+                  onChange={set("desc")}
+                />
+                <PanelSlider
+                  id="rnd"
+                  label="Roundness"
+                  value={P.rnd}
                   min={0}
                   max={1}
                   step={0.01}
-                  format={(v) => (v ? pct(v) : "none")}
-                  onChange={set("org")}
+                  format={pct}
+                  onChange={set("rnd")}
                 />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  disabled={!P.org}
-                  onClick={() => set("seed")(P.seed + 1)}
-                  className="w-fit"
-                >
-                  <Shuffle data-icon="inline-start" />
-                  Reshuffle
-                </Button>
-                <Field orientation="horizontal">
-                  <Switch
-                    id="alive"
-                    checked={alive}
-                    onCheckedChange={(on) => {
-                      setAlive(on)
-                      // Sans variation organique, il n'y a rien à faire onduler
-                      if (on && !P.org) set("org")(0.35)
-                    }}
-                  />
-                  <FieldLabel htmlFor="alive" className="font-normal">
-                    Alive: the grid breathes
-                  </FieldLabel>
-                </Field>
-              </FieldSet>
-
-              <FieldSeparator />
-
-              <FieldSet className="gap-3.5">
-                <FieldLegend className={SECTION_LABEL}>Pieces</FieldLegend>
-                <ToggleGroup
-                  type="single"
-                  value={P.shape}
-                  onValueChange={(v) => v && set("shape")(v as ShapeKind)}
-                  className="flex-wrap"
-                  spacing={1.5}
-                  aria-label="Pieces"
-                >
-                  {SHAPES.map((s) => (
-                    <ToggleGroupItem
-                      key={s.id}
-                      value={s.id}
-                      variant="outline"
-                      size="sm"
-                      className={`rounded-full ${PRESSED}`}
-                    >
-                      {s.label}
-                    </ToggleGroupItem>
-                  ))}
-                </ToggleGroup>
-                <ControlSlider
-                  id="gap"
-                  label="Piece gap"
-                  value={P.gap}
-                  min={-1}
-                  max={0.9}
+                <PanelSlider
+                  id="smo"
+                  label="Corner dots"
+                  value={P.smo}
+                  min={0}
+                  max={0.6}
                   step={0.01}
-                  format={(v) =>
-                    v < 0 ? `merge ${Math.round(-v * 100)}%` : pct(v)
-                  }
-                  onChange={set("gap")}
+                  format={(v) => (v ? pct(v) : "none")}
+                  onChange={set("smo")}
+                  inactive={P.layout === "trace"}
                 />
-                {advanced && (
-                  <>
-                    <ControlSlider
-                      id="thk"
-                      label="Shape thickness"
-                      value={P.thk}
-                      min={0.08}
-                      max={0.4}
-                      step={0.01}
-                      format={pct}
-                      onChange={set("thk")}
-                      inactive={!USES_THICKNESS.includes(P.shape)}
-                    />
-                    <ControlSlider
-                      id="rad"
-                      label="Corner radius"
-                      value={P.rad}
-                      min={0}
-                      max={0.5}
-                      step={0.01}
-                      format={(v) => Math.round(v * 200) + "%"}
-                      onChange={set("rad")}
-                      inactive={!USES_RADIUS.includes(P.shape)}
-                    />
-                  </>
-                )}
-              </FieldSet>
+              </>
+            )}
+            <div className="mt-4">
+              <PanelSlider
+                id="org"
+                label="Organic variation"
+                value={P.org}
+                min={0}
+                max={1}
+                step={0.01}
+                format={(v) => (v ? pct(v) : "none")}
+                onChange={set("org")}
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="flex items-center gap-2 text-xs font-medium">
+                Alive
+                <PanelSwitch
+                  checked={alive}
+                  onCheckedChange={(on) => {
+                    setAlive(on)
+                    // Sans variation organique, il n'y a rien à faire onduler
+                    if (on && !P.org) set("org")(0.35)
+                  }}
+                />
+              </label>
+              <Pill
+                active
+                disabled={!P.org}
+                onClick={() => set("seed")(P.seed + 1)}
+              >
+                Reshuffle
+              </Pill>
+            </div>
+          </PanelSection>
 
-              {advanced && (
-                <>
-                  <FieldSeparator />
+          <PanelSection title="Pieces">
+            <PillChoice
+              label="Pieces"
+              value={P.shape}
+              onChange={(v: ShapeKind) => set("shape")(v)}
+              options={SHAPES}
+            />
+            <PanelSlider
+              id="gap"
+              label="Piece gap"
+              value={P.gap}
+              min={-1}
+              max={0.9}
+              step={0.01}
+              format={(v) =>
+                v < 0 ? `merge ${Math.round(-v * 100)}%` : pct(v)
+              }
+              onChange={set("gap")}
+            />
+            {advanced && (
+              <>
+                <PanelSlider
+                  id="thk"
+                  label="Shape thickness"
+                  value={P.thk}
+                  min={0.08}
+                  max={0.4}
+                  step={0.01}
+                  format={pct}
+                  onChange={set("thk")}
+                  inactive={!USES_THICKNESS.includes(P.shape)}
+                />
+                <PanelSlider
+                  id="rad"
+                  label="Corner radius"
+                  value={P.rad}
+                  min={0}
+                  max={0.5}
+                  step={0.01}
+                  format={(v) => Math.round(v * 200) + "%"}
+                  onChange={set("rad")}
+                  inactive={!USES_RADIUS.includes(P.shape)}
+                />
+              </>
+            )}
+          </PanelSection>
 
-                  <FieldSet className="gap-3.5">
-                    <FieldLegend className={SECTION_LABEL}>
-                      Rendering
-                    </FieldLegend>
-                    <ControlSlider
-                      id="wid"
-                      label="Width"
-                      value={P.wid}
-                      min={0.55}
-                      max={1.7}
-                      step={0.01}
-                      format={pct}
-                      onChange={set("wid")}
-                    />
-                    <ControlSlider
-                      id="kern"
-                      label="Auto kerning"
-                      value={P.kern}
-                      min={0}
-                      max={1}
-                      step={0.01}
-                      format={(v) => (v ? pct(v) : "none")}
-                      onChange={set("kern")}
-                    />
-                    <ControlSlider
-                      id="sla"
-                      label="Slant"
-                      value={P.sla}
-                      min={0}
-                      max={20}
-                      step={1}
-                      format={(v) => v + "°"}
-                      onChange={set("sla")}
-                    />
-                    <ToggleGroup
-                      type="single"
-                      value={P.mode}
-                      onValueChange={(v) => v && set("mode")(v as RenderMode)}
-                      variant="outline"
-                      spacing={0}
-                      className="grid w-full grid-cols-2"
-                      aria-label="Solid or outline"
-                    >
-                      <ToggleGroupItem value="plein" className={PRESSED}>
-                        Solid
-                      </ToggleGroupItem>
-                      <ToggleGroupItem value="contour" className={PRESSED}>
-                        Outline
-                      </ToggleGroupItem>
-                    </ToggleGroup>
-                    <ControlSlider
-                      id="str"
-                      label="Outline thickness"
-                      value={P.str}
-                      min={0.03}
-                      max={0.3}
-                      step={0.01}
-                      format={pct}
-                      onChange={set("str")}
-                      inactive={P.mode === "plein"}
-                    />
-                    <Field orientation="horizontal">
-                      <Switch
-                        id="grid"
-                        checked={P.grid}
-                        onCheckedChange={set("grid")}
-                      />
-                      <FieldLabel htmlFor="grid" className="font-normal">
-                        Show grid & path
-                      </FieldLabel>
-                    </Field>
-                  </FieldSet>
-                </>
-              )}
+          {advanced && (
+            <PanelSection title="Rendering">
+              <PanelSlider
+                id="wid"
+                label="Width"
+                value={P.wid}
+                min={0.55}
+                max={1.7}
+                step={0.01}
+                format={pct}
+                onChange={set("wid")}
+              />
+              <PanelSlider
+                id="kern"
+                label="Auto kerning"
+                value={P.kern}
+                min={0}
+                max={1}
+                step={0.01}
+                format={(v) => (v ? pct(v) : "none")}
+                onChange={set("kern")}
+              />
+              <PanelSlider
+                id="sla"
+                label="Slant"
+                value={P.sla}
+                min={0}
+                max={20}
+                step={1}
+                format={(v) => v + "°"}
+                onChange={set("sla")}
+              />
+              <PillChoice
+                label="Solid or outline"
+                value={P.mode}
+                onChange={(v: RenderMode) => set("mode")(v)}
+                options={[
+                  { id: "plein", label: "Solid" },
+                  { id: "contour", label: "Outline" },
+                ]}
+              />
+              <PanelSlider
+                id="str"
+                label="Outline thickness"
+                value={P.str}
+                min={0.03}
+                max={0.3}
+                step={0.01}
+                format={pct}
+                onChange={set("str")}
+                inactive={P.mode === "plein"}
+              />
+              <label className="flex items-center gap-2 text-xs font-medium">
+                Show grid & path
+                <PanelSwitch checked={P.grid} onCheckedChange={set("grid")} />
+              </label>
+            </PanelSection>
+          )}
 
-              <FieldSeparator />
-
-              <ExportPanel params={P} legendClassName={SECTION_LABEL} />
-            </FieldGroup>
-          </CardContent>
-        </Card>
+          <ExportPanel params={P} />
+        </aside>
       </section>
     </>
   )

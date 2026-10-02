@@ -1,25 +1,21 @@
 "use client"
 
 import { useState } from "react"
-import { Download, Heart } from "lucide-react"
+import { Heart } from "lucide-react"
 import { toast } from "sonner"
 
-import { Button } from "@/components/ui/button"
-import {
-  Field,
-  FieldDescription,
-  FieldLabel,
-  FieldLegend,
-  FieldSet,
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
 import { SUPPORT_URL } from "@/lib/fonderie/config"
 import type { Params } from "@/lib/fonderie/params"
 
-type ExportPanelProps = { params: Params; legendClassName?: string }
+import { PanelSection, Pill, PILL } from "./panel-ui"
 
-export function ExportPanel({ params, legendClassName }: ExportPanelProps) {
-  const [name, setName] = useState("Fonderie Modulaire")
+type ExportPanelProps = { params: Params }
+
+// Section Download du panneau (maquette Figma « Generator ») :
+// nom de la police, bouton de téléchargement de la version d'essai, petite mention.
+// id="download" : cible des liens « #download » vers cette section.
+export function ExportPanel({ params }: ExportPanelProps) {
+  const [name, setName] = useState("Fonderie modulaire")
   const [busy, setBusy] = useState(false)
 
   async function download() {
@@ -40,36 +36,45 @@ export function ExportPanel({ params, legendClassName }: ExportPanelProps) {
   }
 
   return (
-    // id="download" : cible du bouton « Trial ↓ » du menu
-    <FieldSet id="download" className="scroll-mt-6 gap-3.5">
-      <FieldLegend className={legendClassName}>Download</FieldLegend>
-      <Field>
-        <FieldLabel htmlFor="font-name">Font name</FieldLabel>
-        <Input
+    <div id="download" className="scroll-mt-6">
+      <PanelSection title="Download">
+        <label
+          htmlFor="font-name"
+          className="text-xs leading-normal font-medium"
+        >
+          Font name
+        </label>
+        <input
           id="font-name"
           value={name}
           maxLength={40}
           onChange={(e) => setName(e.target.value)}
+          className="w-full rounded-full bg-field px-[7px] py-[2px] text-xs leading-normal font-medium text-field-foreground outline-none placeholder:text-field-foreground focus:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
+          placeholder="Fonderie modulaire"
         />
-      </Field>
-      <Button type="button" onClick={download} disabled={busy}>
-        <Download data-icon="inline-start" />
-        Download free trial (.otf)
-      </Button>
-      <FieldDescription>
-        The trial includes uppercase A–Z and figures 0–9, kerning included.
-        {params.mode === "contour" &&
-          " The file is always solid: outline mode only exists on screen."}
-      </FieldDescription>
-      {/* Prix libre : caché tant que le lien de paiement n'est pas renseigné (lib/fonderie/config.ts) */}
-      {SUPPORT_URL && (
-        <Button asChild variant="outline">
-          <a href={SUPPORT_URL} target="_blank" rel="noopener noreferrer">
-            <Heart data-icon="inline-start" />
+        <div>
+          <Pill active onClick={download} disabled={busy}>
+            Download free trial (.otf)
+          </Pill>
+        </div>
+        <p className="text-[10px] leading-normal font-medium">
+          The trial includes uppercase A–Z and figures 0–9, kerning included.
+          {params.mode === "contour" &&
+            " The file is always solid: outline mode only exists on screen."}
+        </p>
+        {/* Prix libre : caché tant que le lien de paiement n'est pas renseigné (lib/fonderie/config.ts) */}
+        {SUPPORT_URL && (
+          <a
+            href={SUPPORT_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`${PILL} w-fit gap-1`}
+          >
+            <Heart className="size-3" />
             Pay what you want
           </a>
-        </Button>
-      )}
-    </FieldSet>
+        )}
+      </PanelSection>
+    </div>
   )
 }

@@ -1,5 +1,7 @@
 "use client"
 
+import { useState } from "react"
+
 import { useCanvas } from "@/hooks/use-canvas"
 import type { Params } from "@/lib/fonderie/params"
 import { renderStep } from "@/lib/fonderie/render"
@@ -18,6 +20,8 @@ type TextCanvasProps = {
   alive?: boolean
   center?: boolean
   morph?: boolean
+  // si présent : on tape directement dans l'aperçu (champ invisible + curseur clignotant)
+  onTextChange?: (text: string) => void
   className?: string
 }
 
@@ -31,8 +35,15 @@ export function TextCanvas({
   alive,
   center,
   morph,
+  onTextChange,
   className,
 }: TextCanvasProps) {
+  const [caret, setCaret] = useState<{
+    x: number
+    top: number
+    height: number
+  } | null>(null)
+  const [focused, setFocused] = useState(false)
   const ref = useAnimatedText({
     text,
     params,
@@ -42,13 +53,58 @@ export function TextCanvas({
     alive,
     center,
     morph,
+    // on ne met à jour le curseur que s'il a bougé (évite un rendu à chaque image)
+    onEnd: onTextChange
+      ? (e) =>
+          setCaret((c) =>
+            c && c.x === e.x && c.top === e.top && c.height === e.height ? c : e
+          )
+      : undefined,
   })
-  return (
+  const canvas = (
     <canvas
       ref={ref}
       aria-label={label}
       className={cn("block w-full", className)}
     />
+  )
+  if (!onTextChange) return canvas
+
+  // Aperçu éditable : un champ invisible recouvre le dessin et capte la frappe (clavier mobile compris).
+  // On écrit et on efface en fin de texte ; le curseur dessiné suit la dernière lettre.
+  return (
+    <div className="relative cursor-text">
+      {canvas}
+      <textarea
+        value={text}
+        onChange={(e) => onTextChange(e.target.value)}
+        // le point d'insertion reste toujours en fin de texte
+        onSelect={(e) => {
+          const t = e.currentTarget
+          if (t.selectionStart !== t.value.length)
+            t.setSelectionRange(t.value.length, t.value.length)
+        }}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        spellCheck={false}
+        autoCapitalize="off"
+        autoCorrect="off"
+        aria-label="Type your text"
+        className="absolute inset-0 size-full cursor-text resize-none bg-transparent text-transparent caret-transparent opacity-0 outline-none"
+      />
+      {focused && caret && (
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute w-0.5 animate-caret-blink bg-foreground"
+          style={{ left: caret.x, top: caret.top, height: caret.height }}
+        />
+      )}
+      {!text && (
+        <span className="pointer-events-none absolute top-0 left-0 text-sm text-muted-foreground">
+          Type something…
+        </span>
+      )}
+    </div>
   )
 }
 
