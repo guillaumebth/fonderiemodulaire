@@ -36,6 +36,7 @@ import {
   PanelSection,
   PanelSlider,
   PanelSwitch,
+  PieceContext,
   Pill,
   PILL,
   PillChoice,
@@ -269,349 +270,352 @@ export function FontEditor() {
         </Tabs>
 
         {/* ---------- Réglages (maquette Figma « Generator ») ---------- */}
-        <aside aria-label="Settings" className="grid content-start gap-6">
-          {/* Reset / Randomize, à droite */}
-          <div className="flex justify-end gap-1.5">
-            <Pill
-              muted
-              onClick={() =>
-                replace({
-                  ...DEFAULT_PARAMS,
-                  grid: P.grid,
-                  mode: P.mode,
-                  layout: P.layout,
-                })
-              }
-            >
-              Reset
-            </Pill>
-            <Pill active onClick={() => replace(randomParams(P))}>
-              Randomize
-            </Pill>
-          </div>
-
-          {/* Undo / Redo (chevrons) et « Show all settings » */}
-          <div className="-mt-2 flex items-center justify-between gap-4">
-            <div className="flex gap-4">
-              <HistoryButton
-                label="Undo"
-                shortcut="⌘Z"
-                disabled={!history.canUndo}
-                onClick={history.undo}
-                flip
-              />
-              <HistoryButton
-                label="Redo"
-                shortcut="⇧⌘Z"
-                disabled={!history.canRedo}
-                onClick={history.redo}
-              />
+        {/* Les poignées des curseurs sont dessinées avec la pièce choisie */}
+        <PieceContext value={P}>
+          <aside aria-label="Settings" className="grid content-start gap-6">
+            {/* Reset / Randomize, à droite */}
+            <div className="flex justify-end gap-1.5">
+              <Pill
+                muted
+                onClick={() =>
+                  replace({
+                    ...DEFAULT_PARAMS,
+                    grid: P.grid,
+                    mode: P.mode,
+                    layout: P.layout,
+                  })
+                }
+              >
+                Reset
+              </Pill>
+              <Pill active onClick={() => replace(randomParams(P))}>
+                Randomize
+              </Pill>
             </div>
-            <label className="flex items-center gap-2 text-xs font-medium">
-              Show all settings
-              <PanelSwitch
-                checked={advanced}
-                onCheckedChange={toggleAdvanced}
-              />
-            </label>
-          </div>
 
-          <PanelSection title="Construction">
-            <PillChoice
-              label="How letters are built"
-              value={P.layout}
-              onChange={(v: Layout) => set("layout")(v)}
-              options={[
-                { id: "grille", label: "Grid" },
-                { id: "trace", label: "Along the path" },
-              ]}
-            />
-            {P.layout === "trace" && (
-              <div className="mt-2 grid gap-2">
-                <PanelSlider
-                  id="spacing"
-                  label="Piece spacing"
-                  value={P.spacing}
-                  min={0.15}
-                  max={2.5}
-                  step={0.01}
-                  format={cells}
-                  onChange={set("spacing")}
+            {/* Undo / Redo (chevrons) et « Show all settings » */}
+            <div className="-mt-2 flex items-center justify-between gap-4">
+              <div className="flex gap-4">
+                <HistoryButton
+                  label="Undo"
+                  shortcut="⌘Z"
+                  disabled={!history.canUndo}
+                  onClick={history.undo}
+                  flip
                 />
-                <PanelSlider
-                  id="lanes"
-                  label="Parallel rows"
-                  value={P.lanes}
-                  min={1}
-                  max={2}
-                  step={1}
-                  format={String}
-                  onChange={set("lanes")}
+                <HistoryButton
+                  label="Redo"
+                  shortcut="⇧⌘Z"
+                  disabled={!history.canRedo}
+                  onClick={history.redo}
                 />
-                {advanced && (
-                  <PanelSlider
-                    id="laneGap"
-                    label="Row spacing"
-                    value={P.laneGap}
-                    min={0.5}
-                    max={3}
-                    step={0.01}
-                    format={(v) => v.toFixed(2) + "×"}
-                    onChange={set("laneGap")}
-                    inactive={P.lanes === 1}
-                  />
-                )}
-                {/* Sans effet sur les formes rondes (rond, anneau, cible) : grisé */}
-                <label
-                  className={cn(
-                    "flex items-center gap-2 text-xs font-medium",
-                    !USES_ROTATION.includes(P.shape) && "opacity-40"
-                  )}
-                >
-                  Rotate pieces
-                  <PanelSwitch
-                    checked={P.orient}
-                    onCheckedChange={set("orient")}
-                    disabled={!USES_ROTATION.includes(P.shape)}
-                  />
-                </label>
               </div>
-            )}
-          </PanelSection>
+              <label className="flex items-center gap-2 text-xs font-medium">
+                Show all settings
+                <PanelSwitch
+                  checked={advanced}
+                  onCheckedChange={toggleAdvanced}
+                />
+              </label>
+            </div>
 
-          <PanelSection title="Grid & letters">
-            <PanelSlider
-              id="cols"
-              label="Columns"
-              value={P.cols}
-              min={3}
-              max={12}
-              step={1}
-              format={String}
-              onChange={set("cols")}
-            />
-            <PanelSlider
-              id="rows"
-              label="Rows"
-              value={P.rows}
-              min={5}
-              max={15}
-              step={1}
-              format={String}
-              onChange={set("rows")}
-            />
-            <PanelSlider
-              id="wt"
-              label="Weight"
-              value={P.wt}
-              min={0.45}
-              max={1.8}
-              step={0.05}
-              format={cells}
-              onChange={set("wt")}
-            />
-            <PanelSlider
-              id="leading"
-              label="Line height"
-              value={P.leading}
-              min={-0.3}
-              max={1.5}
-              step={0.01}
-              format={(v) => Math.round((1 + v) * 100) + "%"}
-              onChange={set("leading")}
-            />
-            {advanced && (
-              <>
+            <PanelSection title="Construction">
+              <PillChoice
+                label="How letters are built"
+                value={P.layout}
+                onChange={(v: Layout) => set("layout")(v)}
+                options={[
+                  { id: "grille", label: "Grid" },
+                  { id: "trace", label: "Along the path" },
+                ]}
+              />
+              {P.layout === "trace" && (
+                <div className="mt-2 grid gap-2">
+                  <PanelSlider
+                    id="spacing"
+                    label="Piece spacing"
+                    value={P.spacing}
+                    min={0.15}
+                    max={2.5}
+                    step={0.01}
+                    format={cells}
+                    onChange={set("spacing")}
+                  />
+                  <PanelSlider
+                    id="lanes"
+                    label="Parallel rows"
+                    value={P.lanes}
+                    min={1}
+                    max={2}
+                    step={1}
+                    format={String}
+                    onChange={set("lanes")}
+                  />
+                  {advanced && (
+                    <PanelSlider
+                      id="laneGap"
+                      label="Row spacing"
+                      value={P.laneGap}
+                      min={0.5}
+                      max={3}
+                      step={0.01}
+                      format={(v) => v.toFixed(2) + "×"}
+                      onChange={set("laneGap")}
+                      inactive={P.lanes === 1}
+                    />
+                  )}
+                  {/* Sans effet sur les formes rondes (rond, anneau, cible) : grisé */}
+                  <label
+                    className={cn(
+                      "flex items-center gap-2 text-xs font-medium",
+                      !USES_ROTATION.includes(P.shape) && "opacity-40"
+                    )}
+                  >
+                    Rotate pieces
+                    <PanelSwitch
+                      checked={P.orient}
+                      onCheckedChange={set("orient")}
+                      disabled={!USES_ROTATION.includes(P.shape)}
+                    />
+                  </label>
+                </div>
+              )}
+            </PanelSection>
+
+            <PanelSection title="Grid & letters">
+              <PanelSlider
+                id="cols"
+                label="Columns"
+                value={P.cols}
+                min={3}
+                max={12}
+                step={1}
+                format={String}
+                onChange={set("cols")}
+              />
+              <PanelSlider
+                id="rows"
+                label="Rows"
+                value={P.rows}
+                min={5}
+                max={15}
+                step={1}
+                format={String}
+                onChange={set("rows")}
+              />
+              <PanelSlider
+                id="wt"
+                label="Weight"
+                value={P.wt}
+                min={0.45}
+                max={1.8}
+                step={0.05}
+                format={cells}
+                onChange={set("wt")}
+              />
+              <PanelSlider
+                id="leading"
+                label="Line height"
+                value={P.leading}
+                min={-0.3}
+                max={1.5}
+                step={0.01}
+                format={(v) => Math.round((1 + v) * 100) + "%"}
+                onChange={set("leading")}
+              />
+              {advanced && (
+                <>
+                  <PanelSlider
+                    id="xh"
+                    label="x-height"
+                    value={P.xh}
+                    min={0.4}
+                    max={0.85}
+                    step={0.01}
+                    format={pct}
+                    onChange={set("xh")}
+                  />
+                  <PanelSlider
+                    id="desc"
+                    label="Descenders"
+                    value={P.desc}
+                    min={0.15}
+                    max={0.5}
+                    step={0.01}
+                    format={pct}
+                    onChange={set("desc")}
+                  />
+                  <PanelSlider
+                    id="rnd"
+                    label="Roundness"
+                    value={P.rnd}
+                    min={0}
+                    max={1}
+                    step={0.01}
+                    format={pct}
+                    onChange={set("rnd")}
+                  />
+                  <PanelSlider
+                    id="smo"
+                    label="Corner dots"
+                    value={P.smo}
+                    min={0}
+                    max={0.6}
+                    step={0.01}
+                    format={(v) => (v ? pct(v) : "none")}
+                    onChange={set("smo")}
+                    inactive={P.layout === "trace"}
+                  />
+                </>
+              )}
+              <div className="mt-4">
                 <PanelSlider
-                  id="xh"
-                  label="x-height"
-                  value={P.xh}
-                  min={0.4}
-                  max={0.85}
-                  step={0.01}
-                  format={pct}
-                  onChange={set("xh")}
-                />
-                <PanelSlider
-                  id="desc"
-                  label="Descenders"
-                  value={P.desc}
-                  min={0.15}
-                  max={0.5}
-                  step={0.01}
-                  format={pct}
-                  onChange={set("desc")}
-                />
-                <PanelSlider
-                  id="rnd"
-                  label="Roundness"
-                  value={P.rnd}
+                  id="org"
+                  label="Organic variation"
+                  value={P.org}
                   min={0}
                   max={1}
                   step={0.01}
+                  format={(v) => (v ? pct(v) : "none")}
+                  onChange={set("org")}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <label className="flex items-center gap-2 text-xs font-medium">
+                  Alive
+                  <PanelSwitch
+                    checked={alive}
+                    onCheckedChange={(on) => {
+                      setAlive(on)
+                      // Sans variation organique, il n'y a rien à faire onduler
+                      if (on && !P.org) set("org")(0.35)
+                    }}
+                  />
+                </label>
+                <Pill
+                  active
+                  disabled={!P.org}
+                  onClick={() => set("seed")(P.seed + 1)}
+                >
+                  Reshuffle
+                </Pill>
+              </div>
+            </PanelSection>
+
+            <PanelSection title="Pieces">
+              <PillChoice
+                label="Pieces"
+                value={P.shape}
+                onChange={(v: ShapeKind) => set("shape")(v)}
+                options={SHAPES}
+              />
+              <PanelSlider
+                id="gap"
+                label="Piece gap"
+                value={P.gap}
+                min={-1}
+                max={0.9}
+                step={0.01}
+                format={(v) =>
+                  v < 0 ? `merge ${Math.round(-v * 100)}%` : pct(v)
+                }
+                onChange={set("gap")}
+              />
+              {advanced && (
+                <>
+                  <PanelSlider
+                    id="thk"
+                    label="Shape thickness"
+                    value={P.thk}
+                    min={0.08}
+                    max={0.4}
+                    step={0.01}
+                    format={pct}
+                    onChange={set("thk")}
+                    inactive={!USES_THICKNESS.includes(P.shape)}
+                  />
+                  <PanelSlider
+                    id="rad"
+                    label="Corner radius"
+                    value={P.rad}
+                    min={0}
+                    max={0.5}
+                    step={0.01}
+                    format={(v) => Math.round(v * 200) + "%"}
+                    onChange={set("rad")}
+                    inactive={!USES_RADIUS.includes(P.shape)}
+                  />
+                </>
+              )}
+            </PanelSection>
+
+            {advanced && (
+              <PanelSection title="Rendering">
+                <PanelSlider
+                  id="wid"
+                  label="Width"
+                  value={P.wid}
+                  min={0.55}
+                  max={1.7}
+                  step={0.01}
                   format={pct}
-                  onChange={set("rnd")}
+                  onChange={set("wid")}
                 />
                 <PanelSlider
-                  id="smo"
-                  label="Corner dots"
-                  value={P.smo}
+                  id="kern"
+                  label="Auto kerning"
+                  value={P.kern}
                   min={0}
-                  max={0.6}
+                  max={1}
                   step={0.01}
                   format={(v) => (v ? pct(v) : "none")}
-                  onChange={set("smo")}
-                  inactive={P.layout === "trace"}
+                  onChange={set("kern")}
                 />
-              </>
-            )}
-            <div className="mt-4">
-              <PanelSlider
-                id="org"
-                label="Organic variation"
-                value={P.org}
-                min={0}
-                max={1}
-                step={0.01}
-                format={(v) => (v ? pct(v) : "none")}
-                onChange={set("org")}
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <label className="flex items-center gap-2 text-xs font-medium">
-                Alive
-                <PanelSwitch
-                  checked={alive}
-                  onCheckedChange={(on) => {
-                    setAlive(on)
-                    // Sans variation organique, il n'y a rien à faire onduler
-                    if (on && !P.org) set("org")(0.35)
-                  }}
-                />
-              </label>
-              <Pill
-                active
-                disabled={!P.org}
-                onClick={() => set("seed")(P.seed + 1)}
-              >
-                Reshuffle
-              </Pill>
-            </div>
-          </PanelSection>
-
-          <PanelSection title="Pieces">
-            <PillChoice
-              label="Pieces"
-              value={P.shape}
-              onChange={(v: ShapeKind) => set("shape")(v)}
-              options={SHAPES}
-            />
-            <PanelSlider
-              id="gap"
-              label="Piece gap"
-              value={P.gap}
-              min={-1}
-              max={0.9}
-              step={0.01}
-              format={(v) =>
-                v < 0 ? `merge ${Math.round(-v * 100)}%` : pct(v)
-              }
-              onChange={set("gap")}
-            />
-            {advanced && (
-              <>
                 <PanelSlider
-                  id="thk"
-                  label="Shape thickness"
-                  value={P.thk}
-                  min={0.08}
-                  max={0.4}
+                  id="sla"
+                  label="Slant"
+                  value={P.sla}
+                  min={0}
+                  max={20}
+                  step={1}
+                  format={(v) => v + "°"}
+                  onChange={set("sla")}
+                />
+                <PillChoice
+                  label="Solid or outline"
+                  value={P.mode}
+                  onChange={(v: RenderMode) => set("mode")(v)}
+                  options={[
+                    { id: "plein", label: "Solid" },
+                    { id: "contour", label: "Outline" },
+                  ]}
+                />
+                <PanelSlider
+                  id="str"
+                  label="Outline thickness"
+                  value={P.str}
+                  min={0.03}
+                  max={0.3}
                   step={0.01}
                   format={pct}
-                  onChange={set("thk")}
-                  inactive={!USES_THICKNESS.includes(P.shape)}
+                  onChange={set("str")}
+                  inactive={P.mode === "plein"}
                 />
-                <PanelSlider
-                  id="rad"
-                  label="Corner radius"
-                  value={P.rad}
-                  min={0}
-                  max={0.5}
-                  step={0.01}
-                  format={(v) => Math.round(v * 200) + "%"}
-                  onChange={set("rad")}
-                  inactive={!USES_RADIUS.includes(P.shape)}
-                />
-              </>
+                <label className="flex items-center gap-2 text-xs font-medium">
+                  Show grid & path
+                  <PanelSwitch checked={P.grid} onCheckedChange={set("grid")} />
+                </label>
+              </PanelSection>
             )}
-          </PanelSection>
 
-          {advanced && (
-            <PanelSection title="Rendering">
-              <PanelSlider
-                id="wid"
-                label="Width"
-                value={P.wid}
-                min={0.55}
-                max={1.7}
-                step={0.01}
-                format={pct}
-                onChange={set("wid")}
-              />
-              <PanelSlider
-                id="kern"
-                label="Auto kerning"
-                value={P.kern}
-                min={0}
-                max={1}
-                step={0.01}
-                format={(v) => (v ? pct(v) : "none")}
-                onChange={set("kern")}
-              />
-              <PanelSlider
-                id="sla"
-                label="Slant"
-                value={P.sla}
-                min={0}
-                max={20}
-                step={1}
-                format={(v) => v + "°"}
-                onChange={set("sla")}
-              />
-              <PillChoice
-                label="Solid or outline"
-                value={P.mode}
-                onChange={(v: RenderMode) => set("mode")(v)}
-                options={[
-                  { id: "plein", label: "Solid" },
-                  { id: "contour", label: "Outline" },
-                ]}
-              />
-              <PanelSlider
-                id="str"
-                label="Outline thickness"
-                value={P.str}
-                min={0.03}
-                max={0.3}
-                step={0.01}
-                format={pct}
-                onChange={set("str")}
-                inactive={P.mode === "plein"}
-              />
-              <label className="flex items-center gap-2 text-xs font-medium">
-                Show grid & path
-                <PanelSwitch checked={P.grid} onCheckedChange={set("grid")} />
-              </label>
-            </PanelSection>
-          )}
-
-          <ExportPanel
-            params={P}
-            onExportImage={exportImage}
-            look={look}
-            onLookChange={setLook}
-          />
-        </aside>
+            <ExportPanel
+              params={P}
+              onExportImage={exportImage}
+              look={look}
+              onLookChange={setLook}
+            />
+          </aside>
+        </PieceContext>
       </section>
     </>
   )

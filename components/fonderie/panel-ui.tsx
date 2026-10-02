@@ -1,11 +1,15 @@
 "use client"
 
-import { useId, useRef, useState } from "react"
+import { createContext, use, useId, useRef, useState } from "react"
 import { useGSAP } from "@gsap/react"
 import gsap from "gsap"
 import { Slider as SliderPrimitive, Switch as SwitchPrimitive } from "radix-ui"
 
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
+import { ContourRecorder } from "@/lib/fonderie/contours"
+import { pathData } from "@/lib/fonderie/image-export"
+import { DEFAULT_PARAMS, type Params } from "@/lib/fonderie/params"
+import { shape, type Piece } from "@/lib/fonderie/shapes"
 import { cn } from "@/lib/utils"
 
 import { DashOutline } from "./dash-outline"
@@ -257,7 +261,41 @@ export function PanelSwitch({
   )
 }
 
-// ---------- Curseur : libellé, valeur, piste grise (4 px), partie remplie noire (2 px), rond noir (8 px) ----------
+// ---------- Curseur ----------
+// Libellé et valeur ; piste grise (4 px) et partie remplie noire (2 px) ;
+// dessous, une règle graduée (un trait par valeur pour les petits nombres entiers, sinon 10 intervalles) ;
+// la poignée est dessinée avec la pièce choisie (rond, anneau, vis…), comme une perle sur le fil ;
+// Pièce de la poignée : fournie par PieceContext (les réglages de la police), rond par défaut.
+export const PieceContext = createContext<Params | null>(null)
+
+const MIX: Piece[] = ["rond", "anneau", "vis", "cible"]
+const THUMB = 14 // taille de la poignée, en px
+
+function PieceIcon({ P, seed }: { P: Params | null; seed: number }) {
+  const params = P ?? DEFAULT_PARAMS
+  // « Mix » : chaque curseur montre une pièce différente du mélange
+  const kind: Piece =
+    params.shape === "melange" ? MIX[seed % MIX.length] : params.shape
+  const rec = new ContourRecorder()
+  shape(rec, kind, THUMB / 2, THUMB / 2, THUMB, THUMB, params)
+  return (
+    <svg
+      viewBox={`0 0 ${THUMB} ${THUMB}`}
+      aria-hidden="true"
+      className="block size-full overflow-visible"
+    >
+      <path d={pathData(rec.done())} fill="currentColor" fillRule="evenodd" />
+    </svg>
+  )
+}
+
+// Positions des traits de la règle, en % de la course
+function ticks(min: number, max: number, step: number) {
+  const span = max - min
+  const n = step >= 1 && span / step <= 20 ? Math.round(span / step) : 10
+  return Array.from({ length: n + 1 }, (_, i) => (i / n) * 100)
+}
+
 export function PanelSlider({
   id,
   label,
@@ -279,6 +317,9 @@ export function PanelSlider({
   onChange: (v: number) => void
   inactive?: boolean // grisé quand le réglage n'a pas d'effet
 }) {
+  const P = use(PieceContext)
+  const seed = [...id].reduce((a, c) => a + c.charCodeAt(0), 0)
+
   return (
     <div
       className={cn(
@@ -292,23 +333,37 @@ export function PanelSlider({
           {format(value)}
         </output>
       </div>
-      <SliderPrimitive.Root
-        id={id}
-        value={[value]}
-        min={min}
-        max={max}
-        step={step}
-        onValueChange={([v]) => onChange(v)}
-        className="relative flex h-2 w-full cursor-pointer touch-none items-center select-none"
-      >
-        <SliderPrimitive.Track className="relative h-1 grow bg-track">
-          <SliderPrimitive.Range className="absolute top-1/2 h-0.5 -translate-y-1/2 bg-foreground" />
-        </SliderPrimitive.Track>
-        <SliderPrimitive.Thumb
-          aria-label={label}
-          className="block size-2 rounded-full bg-foreground outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-        />
-      </SliderPrimitive.Root>
+      <div>
+        <SliderPrimitive.Root
+          id={id}
+          value={[value]}
+          min={min}
+          max={max}
+          step={step}
+          onValueChange={([v]) => onChange(v)}
+          className="relative flex h-3.5 w-full cursor-pointer touch-none items-center select-none"
+        >
+          <SliderPrimitive.Track className="relative h-1 grow bg-track">
+            <SliderPrimitive.Range className="absolute top-1/2 h-0.5 -translate-y-1/2 bg-foreground" />
+          </SliderPrimitive.Track>
+          <SliderPrimitive.Thumb
+            aria-label={label}
+            className="block size-3.5 rounded-full text-foreground transition-[scale] outline-none hover:scale-125 focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-125"
+          >
+            <PieceIcon P={P} seed={seed} />
+          </SliderPrimitive.Thumb>
+        </SliderPrimitive.Root>
+        {/* Règle graduée, alignée sur la course du centre de la poignée */}
+        <div aria-hidden="true" className="relative mx-[7px] h-[3px]">
+          {ticks(min, max, step).map((x) => (
+            <span
+              key={x}
+              className="absolute top-0 h-full w-px -translate-x-1/2 bg-foreground/30"
+              style={{ left: `${x}%` }}
+            />
+          ))}
+        </div>
+      </div>
     </div>
   )
 }

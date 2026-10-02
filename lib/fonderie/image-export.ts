@@ -11,7 +11,7 @@ import { skeleton } from "./skeleton"
 
 const n = (v: number) => +v.toFixed(2)
 
-function pathData(contours: Contour[]) {
+export function pathData(contours: Contour[]) {
   return contours
     .map(
       (c) =>
