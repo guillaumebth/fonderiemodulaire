@@ -5,7 +5,7 @@ import { HowItWorks } from "@/components/fonderie/how-it-works"
 import { PAGE, PageIntro } from "@/components/fonderie/page-intro"
 import { PanelSection } from "@/components/fonderie/panel-ui"
 import { pillLink } from "@/components/fonderie/pill-styles"
-import { CHECKOUT_URL, MIN_PRICE } from "@/lib/fonderie/config"
+import { CHECKOUT_URL, PRICE } from "@/lib/fonderie/config"
 
 export const metadata: Metadata = {
   title: "About · Fonderie modulaire",
@@ -22,7 +22,7 @@ const FAQ = [
     q: "Is it free?",
     // la réponse dépend de la version payante : ouverte seulement quand le lien de paiement est renseigné
     a: CHECKOUT_URL
-      ? `The trial is free: uppercase A–Z and figures 0–9. The full version adds lowercase, accents, punctuation and a commercial license. Pay what you want, from ${MIN_PRICE}: you get a license key, paste it in the atelier once, and every download is complete.`
+      ? `The trial is free: uppercase A–Z and figures 0–9. The full version adds lowercase, accents, punctuation and a commercial license, for ${PRICE}. After paying you get a license key, paste it in the atelier once, and every download is complete.`
       : "Yes. The download is a free trial of your font, with uppercase A–Z and figures 0–9.",
   },
   {

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
 
-import { CHECKOUT_URL, MIN_PRICE } from "@/lib/fonderie/config"
+import { CHECKOUT_URL, PRICE } from "@/lib/fonderie/config"
 import {
   rememberFontBeforeCheckout,
   savedLicense,
@@ -32,7 +32,7 @@ const FIELD =
 
 // Sections Download et Image of the preview du panneau (maquette Figma « Generator »).
 // Download : nom de la police, essai gratuit (A–Z, 0–9) et version complète.
-// Version complète : on paie ce qu'on veut sur Stripe (à partir de MIN_PRICE). Au retour, l'adresse
+// Version complète : on paie sur Stripe (PRICE). Au retour, l'adresse
 // contient l'identifiant du paiement (?session_id=cs_…) : il est vérifié, sert de clé de licence et le
 // bouton télécharge alors tous les caractères, sans « Trial ». La police en cours est mémorisée avant
 // de partir payer et retrouvée au retour. Sur un autre ordinateur, on colle la clé à la main.
@@ -142,7 +142,7 @@ export function ExportPanel({
           <>
             <p className="pt-2 text-xs leading-normal font-medium">
               Full version: lowercase, accents, punctuation and a commercial
-              license. Pay what you want, from {MIN_PRICE}.
+              license, for {PRICE}.
             </p>
             <div>
               <a
