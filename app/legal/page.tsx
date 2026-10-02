@@ -30,8 +30,9 @@ export default function LegalPage() {
           <PanelSection title="Mentions légales">
             <p className={P}>
               <b className="font-medium">Éditeur du site</b> : {LEGAL.name},{" "}
-              {LEGAL.status}. SIRET : {todo(LEGAL.siret)}. Adresse :{" "}
-              {todo(LEGAL.address)}. E-mail : {email}. {LEGAL.vat}.
+              {LEGAL.status}. SIREN : {todo(LEGAL.siren)}.{" "}
+              {LEGAL.address && `Adresse : ${LEGAL.address}. `}E-mail : {email}.{" "}
+              {LEGAL.vat}.
             </p>
             <p className={P}>
               <b className="font-medium">Directeur de la publication</b> :{" "}

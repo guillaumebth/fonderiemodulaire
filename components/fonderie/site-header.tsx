@@ -22,7 +22,12 @@ export function SiteHeader() {
   const pathname = usePathname()
 
   return (
-    <header className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 px-5 pt-8 md:px-10">
+    // Collé en haut de l'écran au défilement, sans fond : il s'affiche en « différence » (comme le
+    // curseur rond de la home), donc il inverse ce qui passe dessous et reste lisible partout
+    // (noir sur fond clair, blanc sur le panneau noir ou une photo).
+    // Pour ça, ses couleurs sont inversées : blanc (qui apparaît noir sur le fond clair),
+    // et fond des pastilles noir (qui ne change rien, donc transparent).
+    <header className="sticky top-0 z-40 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 px-5 pt-8 pb-3 text-foreground mix-blend-difference [--background:oklch(0_0_0)] [--foreground:oklch(1_0_0)] [--surface:oklch(0_0_0)] md:px-10">
       <LogoLink />
       <nav aria-label="Main" className="flex flex-wrap items-center gap-1">
         {NAV.map((item) => {

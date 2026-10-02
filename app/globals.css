@@ -287,3 +287,9 @@ html.inverted body {
   background: var(--path);
   color: oklch(1 0 0);
 }
+
+/* L'en-tête reste collé en haut : les liens vers une ancre (#download, #how-it-works…)
+   s'arrêtent sous lui au lieu de se cacher derrière */
+html {
+  scroll-padding-top: 6rem;
+}

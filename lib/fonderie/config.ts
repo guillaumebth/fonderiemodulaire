@@ -23,8 +23,8 @@ export const SCREEN_URL = "https://www.amazon.com/s?k=external+monitor"
 export const LEGAL = {
   name: "Guillaume Berthonneau",
   status: "Entrepreneur individuel (micro-entreprise)",
-  siret: "", // ex. "123 456 789 00012"
-  address: "", // adresse de l'entreprise (ou de domiciliation)
+  siren: "820 170 124",
+  address: "", // adresse de l'entreprise (ou de domiciliation) ; vide = pas affichée
   vat: "TVA non applicable, article 293 B du CGI", // mention de la franchise de TVA
   // Médiateur de la consommation (obligatoire pour vendre à des particuliers) : nom et site
   mediator: { name: "", url: "" },
