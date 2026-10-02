@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { PAGE, PageIntro } from "@/components/fonderie/page-intro"
+import { PAGE } from "@/components/fonderie/page-intro"
 import { ACTION_BUTTON, ACTION_COLORS } from "@/components/fonderie/pill-styles"
 import { ShakeLink } from "@/components/fonderie/shake-link"
 import { SubmitBanner } from "@/components/fonderie/submit-banner"
@@ -14,12 +14,8 @@ export const metadata: Metadata = {
 export default function TemplatesPage() {
   return (
     <main className={PAGE}>
-      <PageIntro title="Templates">
-        <p>
-          Ready-made starting points. Each one is a single set of settings: open
-          it, change one slider, and make it yours.
-        </p>
-      </PageIntro>
+      {/* Pas d'introduction visible (le menu et les cartes suffisent) ; titre gardé pour l'accessibilité et Google */}
+      <h1 className="sr-only">Templates</h1>
       {/* Bandeau communauté (cliquable en entier) : envoyer sa police depuis l'atelier */}
       <SubmitBanner />
       <TemplateGrid />
