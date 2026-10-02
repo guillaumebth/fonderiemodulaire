@@ -52,7 +52,9 @@ class ContourRecorder implements PathSink {
     else this.moveTo(start.x, start.y)
     if (r <= 0) return
     let sweep = ccw ? a0 - a1 : a1 - a0
-    sweep = sweep >= TAU ? TAU : ((sweep % TAU) + TAU) % TAU
+    // Tour complet, à une erreur d'arrondi près : (2π + a) − a peut valoir 2π − 0,000000000000001,
+    // et le modulo ci-dessous le ramènerait à ~0 (le cercle disparaîtrait). Les navigateurs tolèrent cet écart.
+    sweep = sweep >= TAU - 1e-9 ? TAU : ((sweep % TAU) + TAU) % TAU
     if (sweep < 1e-9) return
     const n = Math.ceil(sweep / (Math.PI / 2) - 1e-9)
     const step = ((ccw ? -1 : 1) * sweep) / n
