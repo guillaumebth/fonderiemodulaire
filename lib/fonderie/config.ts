@@ -18,3 +18,14 @@ export const TWITTER_URL = "https://x.com/guillaumebth"
 export const CONTACT_URL = "mailto:guillaumebth@gmail.com"
 // Bouton « Buy a screen » de l'atelier sur mobile (l'outil ne s'utilise que sur ordinateur)
 export const SCREEN_URL = "https://www.amazon.com/s?k=external+monitor"
+
+// Page /legal (mentions légales, CGV, confidentialité). Champs vides = « [à compléter] » sur la page.
+export const LEGAL = {
+  name: "Guillaume Berthonneau",
+  status: "Entrepreneur individuel (micro-entreprise)",
+  siret: "", // ex. "123 456 789 00012"
+  address: "", // adresse de l'entreprise (ou de domiciliation)
+  vat: "TVA non applicable, article 293 B du CGI", // mention de la franchise de TVA
+  // Médiateur de la consommation (obligatoire pour vendre à des particuliers) : nom et site
+  mediator: { name: "", url: "" },
+}

@@ -1,3 +1,5 @@
+import Link from "next/link"
+
 import { AUTHOR_URL, CONTACT_URL, TWITTER_URL } from "@/lib/fonderie/config"
 
 import { InvertToggle } from "./invert-toggle"
@@ -15,6 +17,13 @@ function FooterLink({
 }) {
   if (!href) return <span>{children}</span>
   const external = href.startsWith("http")
+  // page du site (ex. /legal) : lien interne de Next
+  if (href.startsWith("/"))
+    return (
+      <Link href={href} className="hover:underline hover:underline-offset-2">
+        {children}
+      </Link>
+    )
   return (
     <a
       href={href}
@@ -39,6 +48,7 @@ export function SiteFooter() {
         <div className="flex flex-wrap items-baseline gap-x-6 gap-y-2 md:flex-nowrap md:whitespace-nowrap">
           <FooterLink href={TWITTER_URL}>X (Twitter)</FooterLink>
           <FooterLink href={CONTACT_URL}>Contact</FooterLink>
+          <FooterLink href="/legal">Legal</FooterLink>
           <p>
             © 2026 <b className="font-bold">Fonderie Modulaire</b> All rights
             reserved

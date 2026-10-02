@@ -11,10 +11,12 @@ import {
   unlockLicense,
 } from "@/lib/fonderie/license"
 import type { Params } from "@/lib/fonderie/params"
+import { cn } from "@/lib/utils"
 
-import { DashOutline } from "./dash-outline"
-import { PanelSection, Pill, PillChoice, pillLink } from "./panel-ui"
+import { PanelSection, Pill, PillChoice } from "./panel-ui"
+import { ACTION_COLORS, PILL } from "./pill-styles"
 import { PurchaseDialog, type Purchase } from "./purchase-dialog"
+import { ShakeLink } from "./shake-link"
 
 // Rendu de l'image : tel qu'à l'écran, ou vue de conception (grille, tracé rouge, contour)
 export type ImageLook = "shown" | "blueprint"
@@ -194,15 +196,19 @@ export function ExportPanel({
               license, for {PRICE}.
             </p>
             <div>
-              <a
+              {/* Bleu d'action, à la taille d'une pastille ; tremble et clignote au survol, comme sur la home */}
+              <ShakeLink
                 href={CHECKOUT_URL}
                 // la police en cours est retrouvée au retour du paiement
                 onClick={() => rememberFontBeforeCheckout(name)}
-                className={pillLink()}
+                colors={ACTION_COLORS}
+                className={cn(
+                  PILL,
+                  "bg-action text-action-foreground hover:bg-action"
+                )}
               >
-                <DashOutline />
                 Get the full font
-              </a>
+              </ShakeLink>
             </div>
             <form onSubmit={unlock} className="grid gap-2 pt-2">
               <label
