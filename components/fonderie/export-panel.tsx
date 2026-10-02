@@ -7,14 +7,29 @@ import { toast } from "sonner"
 import { SUPPORT_URL } from "@/lib/fonderie/config"
 import type { Params } from "@/lib/fonderie/params"
 
-import { PanelSection, Pill, PILL } from "./panel-ui"
+import { PanelSection, Pill, PILL, PillChoice } from "./panel-ui"
 
-type ExportPanelProps = { params: Params }
+// Rendu de l'image : tel qu'à l'écran, ou vue de conception (grille, tracé rouge, contour)
+export type ImageLook = "shown" | "blueprint"
 
-// Section Download du panneau (maquette Figma « Generator ») :
+type ExportPanelProps = {
+  params: Params
+  // export image de l'aperçu (SVG vectoriel ou PNG), fourni par l'éditeur qui connaît le texte et sa mise en page
+  onExportImage?: (format: "svg" | "png") => void
+  // rendu choisi pour l'image ; l'aperçu de l'éditeur l'affiche en direct
+  look?: ImageLook
+  onLookChange?: (look: ImageLook) => void
+}
+
+// Sections Download et Image of the preview du panneau (maquette Figma « Generator ») :
 // nom de la police, bouton de téléchargement de la version d'essai, petite mention.
 // id="download" : cible des liens « #download » vers cette section.
-export function ExportPanel({ params }: ExportPanelProps) {
+export function ExportPanel({
+  params,
+  onExportImage,
+  look = "shown",
+  onLookChange,
+}: ExportPanelProps) {
   const [name, setName] = useState("Fonderie modulaire")
   const [busy, setBusy] = useState(false)
 
@@ -36,8 +51,8 @@ export function ExportPanel({ params }: ExportPanelProps) {
   }
 
   return (
-    <div id="download" className="scroll-mt-6">
-      <PanelSection title="Download">
+    <div id="download" className="grid scroll-mt-6 gap-6">
+      <PanelSection title="Download" collapsible>
         <label
           htmlFor="font-name"
           className="text-xs leading-normal font-medium"
@@ -75,6 +90,33 @@ export function ExportPanel({ params }: ExportPanelProps) {
           </a>
         )}
       </PanelSection>
+      {onExportImage && (
+        <PanelSection title="Image of the preview" collapsible>
+          <PillChoice
+            label="Image style"
+            value={look}
+            onChange={(v) => onLookChange?.(v)}
+            options={[
+              { id: "shown", label: "As shown" },
+              { id: "blueprint", label: "Blueprint" },
+            ]}
+          />
+          <div className="flex gap-1">
+            <Pill active onClick={() => onExportImage("svg")}>
+              SVG
+            </Pill>
+            <Pill active onClick={() => onExportImage("png")}>
+              PNG
+            </Pill>
+          </div>
+          <p className="text-[10px] leading-normal font-medium">
+            {look === "shown"
+              ? "Exactly as on screen, on a transparent background."
+              : "Your font as a construction drawing: grid, red path and outlined pieces."}{" "}
+            The SVG opens in Figma.
+          </p>
+        </PanelSection>
+      )}
     </div>
   )
 }

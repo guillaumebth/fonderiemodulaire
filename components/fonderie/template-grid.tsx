@@ -1,15 +1,16 @@
 "use client"
 
 import Link from "next/link"
-import { ArrowUpRight } from "lucide-react"
 
 import { generatorHref } from "@/lib/fonderie/presets"
 import { TEMPLATES } from "@/lib/fonderie/templates"
 import { cn } from "@/lib/utils"
 
 import { TextCanvas } from "./font-canvas"
+import { PILL } from "./panel-ui"
 
-// Chaque template est une petite affiche colorée ; un clic ouvre le générateur avec ses réglages
+// Chaque template est une petite affiche monochrome (noir, blanc ou gris) ;
+// un clic ouvre le générateur avec ses réglages.
 export function TemplateGrid() {
   return (
     <ul className="grid gap-4 md:grid-cols-2">
@@ -19,7 +20,7 @@ export function TemplateGrid() {
             href={generatorHref(s.params, s.text)}
             className={cn(
               `palette-${s.palette}`,
-              "group grid h-full gap-6 rounded-md p-5 outline-none focus-visible:ring-3 focus-visible:ring-ring/50 md:p-7"
+              "group grid h-full gap-6 p-5 outline-none focus-visible:ring-3 focus-visible:ring-ring/50 md:p-7"
             )}
           >
             <TextCanvas
@@ -30,12 +31,17 @@ export function TemplateGrid() {
               label={`${s.text.replace(/\n/g, " ")}, ${s.caption}`}
             />
             <div className="flex items-end justify-between gap-3 self-end">
-              <span className="font-mono text-xs text-muted-foreground">
+              <span className="text-[10px] leading-normal font-medium text-muted-foreground">
                 {s.caption}
               </span>
-              <span className="flex shrink-0 items-center gap-1 text-sm font-medium opacity-70 transition-opacity group-hover:opacity-100">
+              {/* Pastille qui se remplit au survol de l'affiche */}
+              <span
+                className={cn(
+                  PILL,
+                  "border-current bg-transparent group-hover:bg-foreground group-hover:text-background"
+                )}
+              >
                 Use this template
-                <ArrowUpRight className="size-4" />
               </span>
             </div>
           </Link>

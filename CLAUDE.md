@@ -66,6 +66,19 @@ Tout le moteur reçoit les réglages en paramètre (`P: Params`) : plus de varia
 4. ~~**Mode « le long du tracé »**~~ : fait (`lib/fonderie/trace.ts`, interrupteur « Construction : Grille / Le long du tracé »). Pièces à intervalles réguliers, une pièce sur chaque angle vif, option pour orienter les pièces selon le trait, rangées parallèles. Jonctions : l'extrémité qui arrive sur un trait s'arrête à son bord ; aux croisements, le dernier tracé passe dessous.
 5. **Identité du site** : nom, branding, page d'accueil. La réf. `proto/refs/05-marketing-couches.png` sert d'inspiration **pour les visuels marketing** (couches de couleurs, rendu « fusion », lettres faites de lettres). Ce n'est pas une fonctionnalité de l'outil pour l'instant.
 
+## Direction artistique (à respecter sur toutes les pages)
+
+Brutalisme doux : la structure est visible, l'interface s'efface derrière la police de l'utilisateur.
+
+- **Rien de décoratif** : traits fins, contours, noir et gris. Pas d'ombres, pas de dégradés, pas de cartes arrondies ni de composants shadcn « par défaut » (ombres, gris bleutés, coins de cartes). Fond `#f1f1f1`.
+- **La structure se montre** : sections séparées par un filet noir de 1 px avec un petit trait vertical de 12 px à gauche (le « coin »), pastilles à contour pointillé, curseurs réduits à une ligne et un point. Composants : `components/fonderie/panel-ui.tsx` (`PanelSection`, `Pill`, `PillChoice`, `PanelSlider`, `PanelSwitch`).
+- **Une seule voix typographique** : Inter, petite et medium — 10 px (mentions), 12 px (libellés, pastilles), 14 px (titres de section). Seuls la police générée et le bouton d'action sont grands.
+- **Le noir comme seul accent d'état** : actif = rempli en noir, inactif = pointillés sur blanc. Pas de couleur pour « sélectionné ».
+- **La couleur est rare et réservée aux moments forts** : bleu vif `#08f` du bouton d'action, couleurs « punch » au survol, rouge vif (`--path`) pour le tracé des lettres dans la vue technique. Aucune autre couleur d'interface.
+- **De l'humour dans les interactions, pas dans le visuel** : bouton qui tremble, logo qui défile, curseur rond en invert, interrupteur Invert. Animations avec GSAP, toujours désactivées si « réduire les animations ».
+- **Des réglages, pas des thèmes** : on donne des curseurs plutôt que des styles prédéfinis (les templates ne sont que des points de départ).
+- **Pas d'icônes décoratives** : chevrons bruts (assets de la maquette), texte plutôt qu'icône.
+
 ## Notes
 
 - Une police installable n'a qu'une couleur. Les visuels multicouches se feront à part (Figma ou export image), pas dans le .otf.
@@ -73,7 +86,7 @@ Tout le moteur reçoit les réglages en paramètre (`P: Params`) : plus de varia
 - Modèle économique (test) : le téléchargement est une version Trial gratuite (A–Z + 0–9, « Trial » dans le nom, `TRIAL_CHARSET` dans `export.ts`) + bouton « Pay what you want ». Tout étant généré dans le navigateur, la limite est contournable : une vraie version payante devra être générée côté serveur après paiement (Lemon Squeezy ou Paddle conseillés pour la TVA).
 - L'interface du site est en anglais (libellés, messages, accessibilité). Le code, ses commentaires et cette doc restent en français.
 - Maquette Figma de la home : https://www.figma.com/design/uIaxWJkNlPTJVDcIgQac3n/Untitled?node-id=42-75 (fond #f1f1f1, police Inter, pastilles pointillées, bouton bleu #08f « Make your font » — renommé depuis « Test now »). L'en-tête est commun à toutes les pages (`app/layout.tsx`).
-- Identité visuelle reprise du proto (en partie remplacée par la maquette) : fond vert-gris, encre presque noire, accent bleu (`--brand`), polices Familjen Grotesk + JetBrains Mono. Tout est dans `app/globals.css`.
+- Couleurs : noir pur, gris neutres (`#f1f1f1`, `#d9d9d9`, `#c2c2c2`, `#e4e4e4`, `#8f8f8f`), bleu `#08f` réservé au bouton d'action. Police Inter. Tout est dans `app/globals.css` (voir « Direction artistique »).
 
 ---
 

@@ -10,8 +10,8 @@ import { TextCanvas } from "./font-canvas"
 
 const CYCLE_MS = 160 // une nouvelle police toutes les 160 ms pendant le survol
 
-// Les polices du défilement, sans ondulation (à cette taille, elle brouillerait la lecture)
-const STYLES = HERO_STYLES.map((s) => ({ ...s.params, org: 0 }))
+// Les polices du défilement, sans ondulation ni grille (à cette taille, elles brouilleraient la lecture)
+const STYLES = HERO_STYLES.map((s) => ({ ...s.params, org: 0, grid: false }))
 
 // Logo « Fonderie Modulaire » : au survol (ou au focus clavier), il s'écrit dans les polices
 // de l'outil et les fait défiler très vite, d'un coup (sans transition entre les polices).

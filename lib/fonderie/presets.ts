@@ -97,7 +97,7 @@ export const HERO_STYLES: { name: string; params: Params }[] = [
     name: p.name,
     params: alive(p.params),
   })),
-  ...TEMPLATES.filter((t) => /Signal|Moon/.test(t.text)).map((t) => ({
+  ...TEMPLATES.filter((t) => /Signal|Moon|Blue/.test(t.text)).map((t) => ({
     name: t.text.replace(/\n/g, " "),
     params: alive(t.params),
   })),

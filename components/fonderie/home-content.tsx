@@ -6,6 +6,7 @@ import { HERO_STYLES } from "@/lib/fonderie/presets"
 
 import { ArrowCursor } from "./arrow-cursor"
 import { TextCanvas } from "./font-canvas"
+import { ACTION_BUTTON, ACTION_COLORS } from "./pill-styles"
 import { ShakeLink } from "./shake-link"
 
 // Maquette Figma « HomePage » : un grand panneau noir avec le titre animé,
@@ -17,8 +18,6 @@ import { ShakeLink } from "./shake-link"
 // un clic recule ou avance ; au clavier, flèches ← →. Défilement automatique toutes les 2 s,
 // en pause pendant le survol ou le focus.
 // Les pièces glissent d'une police à l'autre (transitions du moteur d'animation).
-// Couleurs du bouton « Make your font » au survol (définies dans globals.css)
-const PUNCH = [1, 2, 3, 4, 5].map((n) => `var(--punch-${n})`)
 
 // Défilement automatique des polices du panneau
 const AUTOPLAY_MS = 2000
@@ -106,8 +105,8 @@ export function HomeContent() {
 
       <ShakeLink
         href="/generator"
-        colors={PUNCH}
-        className="mt-8 rounded-full bg-action px-6 text-[40px] leading-normal font-medium text-action-foreground transition-opacity outline-none hover:opacity-90 focus-visible:ring-3 focus-visible:ring-ring/50 md:text-[60px]"
+        colors={ACTION_COLORS}
+        className={`mt-8 ${ACTION_BUTTON}`}
       >
         Make your font
       </ShakeLink>

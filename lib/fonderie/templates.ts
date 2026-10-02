@@ -3,7 +3,7 @@
 
 import { DEFAULT_PARAMS, type Params } from "./params"
 
-export type Palette = "ink" | "blue" | "paper" | "coral" | "mint"
+export type Palette = "black" | "white" | "grey"
 
 export type Template = {
   text: string
@@ -17,9 +17,23 @@ const p = (x: Partial<Params>): Params => ({ ...DEFAULT_PARAMS, ...x })
 
 export const TEMPLATES: Template[] = [
   {
+    text: "Blue\nprint",
+    caption: "Grid · Dot · merged · outline · grid & path shown",
+    palette: "white",
+    wide: true,
+    params: p({
+      shape: "rond",
+      mode: "contour",
+      grid: true,
+      gap: -0.4,
+      str: 0.06,
+      rnd: 0.8,
+    }),
+  },
+  {
     text: "Hand\nstitched",
     caption: "Along the path · Cross · 2 rows · rotated",
-    palette: "blue",
+    palette: "black",
     wide: true,
     params: p({
       layout: "trace",
@@ -35,19 +49,19 @@ export const TEMPLATES: Template[] = [
   {
     text: "Open\n24/7",
     caption: "Grid · Dot · 5 × 7",
-    palette: "ink",
+    palette: "white",
     params: p({}),
   },
   {
     text: "Melt",
     caption: "Grid · Dot · merged",
-    palette: "coral",
+    palette: "grey",
     params: p({ gap: -0.7, rows: 9, cols: 6 }),
   },
   {
     text: "Rivets\n& bolts",
     caption: "Along the path · Screw · rotated",
-    palette: "paper",
+    palette: "white",
     params: p({
       layout: "trace",
       shape: "vis",
@@ -59,7 +73,7 @@ export const TEMPLATES: Template[] = [
   {
     text: "Grow\nslow",
     caption: "Grid · Square · organic",
-    palette: "mint",
+    palette: "grey",
     params: p({
       shape: "carre",
       org: 0.7,
@@ -73,7 +87,7 @@ export const TEMPLATES: Template[] = [
   {
     text: "Signal 26",
     caption: "Grid · Target · wide · slanted",
-    palette: "ink",
+    palette: "black",
     wide: true,
     params: p({
       shape: "cible",
@@ -87,7 +101,7 @@ export const TEMPLATES: Template[] = [
   {
     text: "Chain",
     caption: "Along the path · Ring · 2 rails",
-    palette: "paper",
+    palette: "white",
     params: p({
       layout: "trace",
       shape: "anneau",
@@ -102,7 +116,7 @@ export const TEMPLATES: Template[] = [
   {
     text: "Moon\nbase",
     caption: "Grid · Frame · outline",
-    palette: "blue",
+    palette: "grey",
     params: p({
       shape: "carrevide",
       mode: "contour",

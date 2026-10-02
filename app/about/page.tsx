@@ -2,6 +2,9 @@ import type { Metadata } from "next"
 import Link from "next/link"
 
 import { HowItWorks } from "@/components/fonderie/how-it-works"
+import { PAGE, PageIntro } from "@/components/fonderie/page-intro"
+import { PanelSection } from "@/components/fonderie/panel-ui"
+import { pillLink } from "@/components/fonderie/pill-styles"
 
 export const metadata: Metadata = {
   title: "About — Fonderie modulaire",
@@ -38,11 +41,8 @@ const FAQ = [
 
 export default function AboutPage() {
   return (
-    <main className="mx-auto grid w-full max-w-[1180px] gap-10 px-5 pt-7 pb-16">
-      <section className="grid max-w-[62ch] gap-4">
-        <h1 className="text-[32px] leading-tight font-bold text-balance">
-          A font generator made of pieces
-        </h1>
+    <main className={PAGE}>
+      <PageIntro title="About">
         <p>
           Fonderie modulaire lets anyone build a modular typeface with a few
           sliders, then download it as a real font file.
@@ -53,34 +53,27 @@ export default function AboutPage() {
           it. Change the grid, the weight or the pieces, and the whole alphabet
           rebuilds itself. No letter is ever redrawn by hand.
         </p>
-        <p>
-          <Link
-            href="/generator"
-            className="font-medium underline underline-offset-4"
-          >
-            Open the generator →
+        <div>
+          <Link href="/generator" className={pillLink(true)}>
+            Open the generator
           </Link>
-        </p>
-      </section>
+        </div>
+      </PageIntro>
 
       <HowItWorks />
 
-      <section
-        className="grid max-w-[62ch] gap-6 border-t pt-8"
-        aria-labelledby="faq"
-      >
-        <h2 id="faq" className="text-[22px] leading-tight font-bold">
-          FAQ
-        </h2>
-        <dl className="grid gap-5">
-          {FAQ.map(({ q, a }) => (
-            <div key={q} className="grid gap-1.5">
-              <dt className="font-medium">{q}</dt>
-              <dd className="text-muted-foreground">{a}</dd>
-            </div>
-          ))}
-        </dl>
-      </section>
+      <div className="max-w-[470px]">
+        <PanelSection title="FAQ">
+          <dl className="grid gap-4 text-xs leading-normal">
+            {FAQ.map(({ q, a }) => (
+              <div key={q} className="grid gap-1">
+                <dt className="font-medium">{q}</dt>
+                <dd>{a}</dd>
+              </div>
+            ))}
+          </dl>
+        </PanelSection>
+      </div>
     </main>
   )
 }

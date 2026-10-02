@@ -1,8 +1,8 @@
 import type { Metadata } from "next"
-import Link from "next/link"
-
+import { PAGE, PageIntro } from "@/components/fonderie/page-intro"
+import { ACTION_BUTTON, ACTION_COLORS } from "@/components/fonderie/pill-styles"
+import { ShakeLink } from "@/components/fonderie/shake-link"
 import { TemplateGrid } from "@/components/fonderie/template-grid"
-import { Button } from "@/components/ui/button"
 
 export const metadata: Metadata = {
   title: "Templates — Fonderie modulaire",
@@ -12,21 +12,23 @@ export const metadata: Metadata = {
 
 export default function TemplatesPage() {
   return (
-    <main className="mx-auto grid w-full max-w-[1180px] gap-10 px-5 pt-7 pb-16">
-      <section className="grid max-w-[62ch] gap-4">
-        <h1 className="text-[32px] leading-tight font-bold text-balance">
-          Templates
-        </h1>
+    <main className={PAGE}>
+      <PageIntro title="Templates">
         <p>
           Ready-made starting points. Each one is a single set of settings —
           open it, change one slider, and make it yours.
         </p>
-      </section>
+      </PageIntro>
       <TemplateGrid />
-      <div>
-        <Button asChild>
-          <Link href="/generator">Start from scratch</Link>
-        </Button>
+      {/* Le gros bouton d'action de la home (tremble et clignote au survol) */}
+      <div className="flex justify-center">
+        <ShakeLink
+          href="/generator"
+          colors={ACTION_COLORS}
+          className={ACTION_BUTTON}
+        >
+          Start from scratch
+        </ShakeLink>
       </div>
     </main>
   )

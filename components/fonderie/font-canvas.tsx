@@ -100,7 +100,7 @@ export function TextCanvas({
         />
       )}
       {!text && (
-        <span className="pointer-events-none absolute top-0 left-0 text-sm text-muted-foreground">
+        <span className="pointer-events-none absolute top-0 left-0 text-xs font-medium text-muted-foreground">
           Type something…
         </span>
       )}

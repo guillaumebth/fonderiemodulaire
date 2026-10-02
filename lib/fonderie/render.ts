@@ -8,7 +8,13 @@ import { center, glyphGrid } from "./grid"
 import { kerning } from "./kerning"
 import { bitmap, glyphCols, skeleton, vMetrics } from "./skeleton"
 
-export type Colors = { bg: string; fg: string; accent: string; line: string }
+export type Colors = {
+  bg: string
+  fg: string
+  accent: string
+  line: string
+  path: string // tracé de la vue technique (rouge vif)
+}
 
 // Les couleurs viennent des variables CSS de globals.css (et suivent donc le mode sombre).
 // On les lit sur le canvas lui-même : un bloc parent peut les redéfinir (cartes colorées du Showcase).
@@ -19,6 +25,7 @@ export function readColors(el: Element = document.documentElement): Colors {
     bg: g("--background"),
     fg: g("--foreground"),
     accent: g("--brand"),
+    path: g("--path"),
     line: g("--border"),
   }
 }
@@ -122,7 +129,8 @@ export function drawGrid(
         ys[i + 1] - ys[i] - 1
       )
   if (withSkeleton) {
-    ctx.globalAlpha = 0.9
+    ctx.strokeStyle = col.path
+    ctx.globalAlpha = 1
     ctx.lineWidth = Math.max(1.5, U * 0.08)
     ctx.lineCap = "round"
     ctx.lineJoin = "round"
@@ -318,8 +326,13 @@ export function layoutText(
 }
 
 // Ne redimensionne le canvas que si sa taille change (sinon on l'efface simplement)
-function prepareCanvas(cv: HTMLCanvasElement, cssW: number, cssH: number) {
-  const dpr = window.devicePixelRatio || 1
+function prepareCanvas(
+  cv: HTMLCanvasElement,
+  cssW: number,
+  cssH: number,
+  scale?: number
+) {
+  const dpr = scale ?? (window.devicePixelRatio || 1)
   const w = Math.round(cssW * dpr)
   const h = Math.round(cssH * dpr)
   if (cv.width !== w || cv.height !== h) {
@@ -339,9 +352,10 @@ export function drawText(
   L: TextLayout,
   pieces: TextPiece[],
   P: Params,
-  col: Colors
+  col: Colors,
+  scale?: number // résolution forcée (export PNG) ; sinon celle de l'écran
 ) {
-  const { ctx, dpr } = prepareCanvas(cv, L.W, L.H)
+  const { ctx, dpr } = prepareCanvas(cv, L.W, L.H, scale)
   // Inclinaison autour de la ligne de base de chaque pièce
   const frame = (base: number) =>
     ctx.setTransform(dpr, 0, -L.slant * dpr, dpr, L.slant * base * dpr, 0)
@@ -402,7 +416,7 @@ export function renderStep(
   if (step === 2 && P.layout === "trace") {
     // Le tracé, avec un point à chaque endroit où une pièce sera posée
     drawGrid(ctx, c, ox, oy, U, P, col)
-    ctx.fillStyle = col.fg
+    ctx.fillStyle = col.path
     for (const p of tracePositions(c, P)) {
       ctx.beginPath()
       ctx.arc(ox + p.x * U, oy + p.y * U, Math.max(2, U * 0.14), 0, Math.PI * 2)

@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from "react"
 import Image from "next/image"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import {
   Tooltip,
   TooltipContent,
@@ -21,14 +20,16 @@ import {
   USES_ROTATION,
   USES_THICKNESS,
   type Layout,
+  type Params,
   type RenderMode,
   type ShapeKind,
 } from "@/lib/fonderie/params"
+import { layoutText, readColors } from "@/lib/fonderie/render"
 import { decodeShare, encodeShare } from "@/lib/fonderie/share"
 import { cn } from "@/lib/utils"
 import chevron from "@/public/images/chevron-24.svg"
 
-import { ExportPanel } from "./export-panel"
+import { ExportPanel, type ImageLook } from "./export-panel"
 import { TextCanvas } from "./font-canvas"
 import {
   PanelSection,
@@ -52,14 +53,16 @@ const ALPHABET = [
   .join("\n")
 // Cascade de tailles dans la vue Text (hauteur des capitales en px), comme le « Typewriter » de Metaflop
 const WATERFALL = [16, 28, 48]
-const PRESSED =
-  "data-[state=on]:border-foreground data-[state=on]:bg-foreground data-[state=on]:text-background"
 const ADVANCED_KEY = "fonderie:advanced"
+// Hauteur des capitales de l'aperçu selon la largeur : [< 420 px, < 640 px, au-delà]
+const PREVIEW_SIZES: [number, number, number] = [44, 56, 72]
+// Sélecteur de lettre de la vue Glyph
+const GLYPH_OPTIONS = CHARSET.map((c) => ({ id: c, label: c }))
 // Onglets Text / Glyph / Charset en pastilles (charte du menu et du panneau) : actif en noir
 const TAB_LIST = "h-auto gap-1 rounded-none bg-transparent p-0"
 const TAB = cn(
   PILL,
-  "h-auto flex-none text-foreground shadow-none after:hidden group-data-[variant=default]/tabs-list:data-active:shadow-none hover:text-foreground data-[state=active]:bg-foreground data-[state=active]:text-background data-active:bg-foreground data-active:text-background dark:data-active:bg-foreground"
+  "h-auto flex-none text-foreground shadow-none after:hidden hover:text-foreground data-[state=active]:bg-foreground data-[state=active]:text-background data-active:bg-foreground data-active:text-background group-data-[variant=default]/tabs-list:data-active:shadow-none dark:data-active:bg-foreground"
 )
 
 // Undo / Redo : chevrons de la maquette (‹ ›) avec info-bulle et raccourci
@@ -96,7 +99,7 @@ function HistoryButton({
         </button>
       </TooltipTrigger>
       <TooltipContent>
-        {label} <kbd className="ml-1 font-mono opacity-70">{shortcut}</kbd>
+        {label} <kbd className="ml-1 opacity-70">{shortcut}</kbd>
       </TooltipContent>
     </Tooltip>
   )
@@ -110,6 +113,14 @@ export function FontEditor() {
   const [advanced, setAdvanced] = useState(false) // tous les réglages, ou seulement l'essentiel
   const [glyph, setGlyph] = useState("R") // lettre affichée dans la vue Glyph
   const skipUrlWrite = useRef(true)
+  const previewRef = useRef<HTMLDivElement>(null) // aperçu du texte (pour l'export image)
+  // Rendu de l'export image ; « Blueprint » s'affiche aussi en direct dans les aperçus.
+  // C'est une vue : les réglages de la police (et le .otf) ne changent pas.
+  const [look, setLook] = useState<ImageLook>("shown")
+  const PI: Params =
+    look === "blueprint"
+      ? { ...P, grid: true, mode: "contour", str: Math.min(P.str, 0.06) }
+      : P
 
   // Au chargement : réglages et texte depuis l'adresse (lien partagé, ou style choisi sur la home),
   // et préférence Simple / Advanced
@@ -143,6 +154,25 @@ export function FontEditor() {
     return () => clearTimeout(id)
   }, [P, text])
 
+  // Export image de l'aperçu : même largeur et même taille que l'écran, donc même mise en page
+  async function exportImage(format: "svg" | "png") {
+    const W = previewRef.current?.clientWidth || 800
+    const capH =
+      W < 420 ? PREVIEW_SIZES[0] : W < 640 ? PREVIEW_SIZES[1] : PREVIEW_SIZES[2]
+    const L = layoutText(W, text || " ", capH, P.leading, PI)
+    const col = readColors()
+    const { layoutToSvg, layoutToPng, downloadBlob } =
+      await import("@/lib/fonderie/image-export")
+    const blob =
+      format === "svg"
+        ? new Blob([layoutToSvg(L, PI, col)], { type: "image/svg+xml" })
+        : await layoutToPng(L, PI, col)
+    downloadBlob(
+      blob,
+      `fonderie-modulaire${look === "blueprint" ? "-blueprint" : ""}.${format}`
+    )
+  }
+
   function toggleAdvanced(on: boolean) {
     setAdvanced(on)
     try {
@@ -168,15 +198,17 @@ export function FontEditor() {
           </TabsList>
 
           <TabsContent value="text" className="grid gap-5">
-            <TextCanvas
-              text={text}
-              params={P}
-              sizes={[44, 56, 72]}
-              lineGap={P.leading}
-              alive={alive}
-              label="Preview of your text in the modular font"
-              onTextChange={setText}
-            />
+            <div ref={previewRef}>
+              <TextCanvas
+                text={text}
+                params={PI}
+                sizes={PREVIEW_SIZES}
+                lineGap={P.leading}
+                alive={alive}
+                label="Preview of your text in the modular font"
+                onTextChange={setText}
+              />
+            </div>
             {/* Même filet et mêmes typos que les sections du panneau */}
             <PanelSection title="Sizes">
               <div className="grid gap-4">
@@ -190,7 +222,7 @@ export function FontEditor() {
                     </span>
                     <TextCanvas
                       text={text.replace(/\n/g, " ")}
-                      params={P}
+                      params={PI}
                       sizes={[size, size, size]}
                       lineGap={0.3}
                       alive={alive}
@@ -202,30 +234,16 @@ export function FontEditor() {
             </PanelSection>
           </TabsContent>
 
-          <TabsContent value="glyph" className="grid gap-4">
-            <ToggleGroup
-              type="single"
+          <TabsContent value="glyph" className="grid gap-8">
+            <PillChoice
+              label="Choose a character"
               value={glyph}
-              onValueChange={(v) => v && setGlyph(v)}
-              variant="outline"
-              size="sm"
-              spacing={1}
-              className="flex-wrap"
-              aria-label="Choose a character"
-            >
-              {CHARSET.map((c) => (
-                <ToggleGroupItem
-                  key={c}
-                  value={c}
-                  className={`min-w-7 font-mono ${PRESSED}`}
-                >
-                  {c}
-                </ToggleGroupItem>
-              ))}
-            </ToggleGroup>
+              onChange={setGlyph}
+              options={GLYPH_OPTIONS}
+            />
             <TextCanvas
               text={glyph}
-              params={{ ...P, grid: true }}
+              params={{ ...PI, grid: true }}
               sizes={[220, 320, 380]}
               lineGap={0}
               alive={alive}
@@ -236,7 +254,7 @@ export function FontEditor() {
           <TabsContent value="charset">
             <TextCanvas
               text={ALPHABET}
-              params={P}
+              params={PI}
               sizes={[34, 52, 52]}
               lineGap={0.5}
               alive={alive}
@@ -582,7 +600,12 @@ export function FontEditor() {
             </PanelSection>
           )}
 
-          <ExportPanel params={P} />
+          <ExportPanel
+            params={P}
+            onExportImage={exportImage}
+            look={look}
+            onLookChange={setLook}
+          />
         </aside>
       </section>
     </>

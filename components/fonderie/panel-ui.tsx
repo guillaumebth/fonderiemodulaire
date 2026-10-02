@@ -1,21 +1,23 @@
 "use client"
 
+import { useId, useRef, useState } from "react"
+import { useGSAP } from "@gsap/react"
+import gsap from "gsap"
 import { Slider as SliderPrimitive, Switch as SwitchPrimitive } from "radix-ui"
 
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { cn } from "@/lib/utils"
 
+import { PILL, PILL_ACTIVE, PILL_MUTED } from "./pill-styles"
+
+gsap.registerPlugin(useGSAP)
+
+export { PILL, PILL_ACTIVE, PILL_MUTED, pillLink } from "./pill-styles"
+
 // Briques du panneau de réglages, d'après la maquette Figma « Generator ».
 // Construites sur les primitives Radix (accessibles au clavier) avec le style de la maquette.
 
 // ---------- Pastilles ----------
-// Noire = active / action principale ; blanche pointillée = option ; grise = action secondaire
-export const PILL =
-  "inline-flex items-center justify-center rounded-full border border-dashed border-foreground bg-surface px-[7px] py-[2px] text-xs leading-normal font-medium whitespace-nowrap transition-colors outline-none hover:bg-foreground/10 focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-40"
-export const PILL_ACTIVE =
-  "bg-foreground text-background hover:bg-foreground/85"
-export const PILL_MUTED =
-  "border-transparent bg-pill-muted hover:bg-pill-muted/70"
 
 export function Pill({
   active,
@@ -75,17 +77,137 @@ export function PillChoice<T extends string>({
 }
 
 // ---------- Section : filet noir avec un petit trait vertical à gauche (le coin), titre ----------
+const SECTION =
+  "relative grid border-t border-foreground pt-2 before:absolute before:top-0 before:left-0 before:h-3 before:w-px before:bg-foreground before:content-['']"
+
 export function PanelSection({
   title,
   children,
+  collapsible,
+  defaultOpen = false,
 }: {
   title: string
   children: React.ReactNode
+  // repliable : on ne voit que le titre et un « + » ; un clic sur la ligne déplie la section
+  collapsible?: boolean
+  defaultOpen?: boolean
 }) {
+  if (collapsible)
+    return (
+      <CollapsibleSection title={title} defaultOpen={defaultOpen}>
+        {children}
+      </CollapsibleSection>
+    )
   return (
-    <section className="relative grid gap-2 border-t border-foreground pt-2 before:absolute before:top-0 before:left-0 before:h-3 before:w-px before:bg-foreground before:content-['']">
+    <section className={SECTION}>
       <h3 className="pl-2 text-sm leading-normal font-medium">{title}</h3>
-      <div className="grid gap-2 pr-2 pl-2">{children}</div>
+      <div className="grid gap-2 pt-2 pr-2 pl-2">{children}</div>
+    </section>
+  )
+}
+
+// Section repliable animée avec GSAP :
+// - la hauteur s'ouvre / se ferme en douceur ;
+// - à l'ouverture, les éléments arrivent l'un après l'autre (glissement + fondu) ;
+// - le « + » devient « − » : son trait vertical pivote de 90° et se couche sur l'horizontal.
+// Sans animation si le système demande de réduire les animations.
+function CollapsibleSection({
+  title,
+  children,
+  defaultOpen,
+}: {
+  title: string
+  children: React.ReactNode
+  defaultOpen: boolean
+}) {
+  const [open, setOpen] = useState(defaultOpen)
+  const id = useId()
+  const root = useRef<HTMLElement>(null)
+  const body = useRef<HTMLDivElement>(null)
+  const bar = useRef<HTMLSpanElement>(null) // trait vertical du « + »
+
+  const { contextSafe } = useGSAP(
+    () => {
+      gsap.set(body.current, { height: defaultOpen ? "auto" : 0 })
+      gsap.set(bar.current, { rotation: defaultOpen ? 90 : 0 })
+    },
+    { scope: root }
+  )
+
+  const toggle = contextSafe(() => {
+    const next = !open
+    setOpen(next)
+    const k = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      ? 0
+      : 1
+    const items = body.current?.firstElementChild?.children ?? []
+    gsap.killTweensOf([body.current, bar.current, ...Array.from(items)])
+    gsap.to(bar.current, {
+      rotation: next ? 90 : 0,
+      duration: 0.5 * k,
+      ease: "back.out(2.5)",
+    })
+    if (next) {
+      gsap.fromTo(
+        body.current,
+        { height: 0 },
+        { height: "auto", duration: 0.55 * k, ease: "expo.out" }
+      )
+      gsap.fromTo(
+        items,
+        { y: 10, autoAlpha: 0 },
+        {
+          y: 0,
+          autoAlpha: 1,
+          duration: 0.45 * k,
+          ease: "power3.out",
+          stagger: 0.05 * k,
+          delay: 0.05 * k,
+          clearProps: "transform,opacity,visibility",
+        }
+      )
+    } else {
+      gsap.to(items, { autoAlpha: 0, duration: 0.15 * k, ease: "power1.in" })
+      gsap.to(body.current, {
+        height: 0,
+        duration: 0.4 * k,
+        ease: "power3.inOut",
+        onComplete: () => gsap.set(items, { clearProps: "opacity,visibility" }),
+      })
+    }
+  })
+
+  return (
+    <section ref={root} className={SECTION}>
+      <h3>
+        <button
+          type="button"
+          aria-expanded={open}
+          aria-controls={id}
+          onClick={toggle}
+          className="group flex w-full items-center justify-between px-2 text-left text-sm leading-normal font-medium outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+        >
+          {title}
+          {/* « + » dessiné : deux traits de 10 px ; le vertical pivote pour former « − » */}
+          <span aria-hidden="true" className="relative size-2.5">
+            <span className="absolute top-1/2 left-0 h-px w-full -translate-y-1/2 bg-foreground" />
+            <span
+              ref={bar}
+              className="absolute top-0 left-1/2 h-full w-px -translate-x-1/2 bg-foreground"
+            />
+          </span>
+        </button>
+      </h3>
+      {/* hauteur fermée dès le premier affichage (pas de flash ouvert avant le script) */}
+      <div
+        id={id}
+        ref={body}
+        className="overflow-hidden"
+        style={defaultOpen ? undefined : { height: 0 }}
+        inert={!open}
+      >
+        <div className="grid gap-2 pt-2 pr-2 pl-2">{children}</div>
+      </div>
     </section>
   )
 }
