@@ -293,3 +293,26 @@ html.inverted body {
 html {
   scroll-padding-top: 6rem;
 }
+
+/* Main au survol de tout ce qui se clique : boutons, liens, pastilles, onglets, interrupteurs,
+   curseurs (Tailwind v4 ne le met plus par défaut sur les boutons). Les curseurs spéciaux
+   (flèche ronde de la home, bouton-curseur d'About, texte de l'aperçu) restent prioritaires. */
+@layer base {
+  a[href],
+  button,
+  summary,
+  label[for],
+  [role="button"],
+  [role="tab"],
+  [role="switch"],
+  [role="slider"],
+  [role="radio"],
+  [role="checkbox"] {
+    cursor: pointer;
+  }
+  button:disabled,
+  [aria-disabled="true"],
+  [data-disabled] {
+    cursor: default;
+  }
+}

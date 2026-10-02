@@ -299,7 +299,7 @@ export function PanelSlider({
         max={max}
         step={step}
         onValueChange={([v]) => onChange(v)}
-        className="relative flex h-2 w-full touch-none items-center select-none"
+        className="relative flex h-2 w-full cursor-pointer touch-none items-center select-none"
       >
         <SliderPrimitive.Track className="relative h-1 grow bg-track">
           <SliderPrimitive.Range className="absolute top-1/2 h-0.5 -translate-y-1/2 bg-foreground" />
