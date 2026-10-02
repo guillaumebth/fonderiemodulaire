@@ -17,7 +17,8 @@ import { ShakeLink } from "./shake-link"
 // Sur téléphone : panneau plus haut (4/3) et titre plus gros, pour qu'il occupe la largeur.
 // Le panneau fait défiler les polices : le curseur devient une flèche (← à gauche, → à droite),
 // un clic recule ou avance ; au clavier, flèches ← →. Défilement automatique toutes les 2 s,
-// en pause pendant le survol ou le focus.
+// même au survol (le panneau est grand, la souris s'y pose souvent : une pause au survol
+// donnait l'impression que le défilement était cassé). En pause seulement au focus clavier.
 // Les pièces glissent d'une police à l'autre (transitions du moteur d'animation).
 
 // Défilement automatique des polices du panneau
@@ -28,7 +29,7 @@ export function HomeContent() {
   const style = HERO_STYLES[index]
   const go = (step: number) =>
     setIndex((i) => (i + step + HERO_STYLES.length) % HERO_STYLES.length)
-  // En pause quand la souris est sur le panneau ou qu'il a le focus (on navigue soi-même)
+  // En pause quand le panneau a le focus clavier (on navigue soi-même avec les flèches)
   const [paused, setPaused] = useState(false)
 
   // Une nouvelle police toutes les 2 s. Le compte repart à chaque changement (clic compris).
@@ -50,8 +51,6 @@ export function HomeContent() {
         aria-roledescription="carousel"
         aria-label="Fonderie modulaire in different fonts"
         tabIndex={0}
-        onPointerEnter={() => setPaused(true)}
-        onPointerLeave={() => setPaused(false)}
         // Pause au focus clavier seulement : un clic donne aussi le focus, et bloquait le défilement
         onFocus={(e) => {
           if (e.currentTarget.matches(":focus-visible")) setPaused(true)

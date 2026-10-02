@@ -1,6 +1,7 @@
 // Version complète : la « clé de licence » est l'identifiant du paiement Stripe (cs_…), vérifiée par
 // functions/api/license.ts, puis retenue dans le navigateur. Au retour du paiement, Stripe la met dans
-// l'adresse (?session_id=…) : le déblocage est automatique. Sur un autre ordinateur, on la colle à la main.
+// l'adresse (?session_id=…) : le déblocage est automatique. Sur un autre ordinateur, on tape l'e-mail
+// utilisé pour payer (le serveur retrouve le paiement et renvoie sa clé), ou on colle la clé.
 // Rappel : tout le moteur tourne dans le navigateur, donc ce verrou n'est pas inviolable.
 // Ce qu'on vend vraiment, c'est la licence d'usage et le confort d'un clic.
 
@@ -42,7 +43,8 @@ export function forgetLicense() {
   } catch {}
 }
 
-// Renvoie null si la clé est bonne (et la retient), sinon le message d'erreur à afficher
+// key : clé de licence (cs_…) ou e-mail du paiement.
+// Renvoie null si c'est bon (et retient la clé renvoyée par le serveur), sinon le message d'erreur
 export async function unlockLicense(key: string): Promise<string | null> {
   try {
     const res = await fetch("/api/license", {
@@ -50,10 +52,14 @@ export async function unlockLicense(key: string): Promise<string | null> {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ key: key.trim() }),
     })
-    const data = (await res.json()) as { valid?: boolean; error?: string }
+    const data = (await res.json()) as {
+      valid?: boolean
+      key?: string
+      error?: string
+    }
     if (!data.valid) return data.error ?? "This key doesn't look valid."
     try {
-      localStorage.setItem(STORAGE_KEY, key.trim())
+      localStorage.setItem(STORAGE_KEY, data.key ?? key.trim())
     } catch {}
     return null
   } catch {

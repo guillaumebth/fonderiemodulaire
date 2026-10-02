@@ -2,9 +2,10 @@ import type { Metadata } from "next"
 import Link from "next/link"
 
 import { HowItWorks } from "@/components/fonderie/how-it-works"
-import { PAGE, PageIntro } from "@/components/fonderie/page-intro"
+import { CursorLink } from "@/components/fonderie/cursor-link"
+import { PAGE } from "@/components/fonderie/page-intro"
 import { PanelSection } from "@/components/fonderie/panel-ui"
-import { pillLink } from "@/components/fonderie/pill-styles"
+import { ACTION_COLORS, pillLink } from "@/components/fonderie/pill-styles"
 import { CHECKOUT_URL, PRICE } from "@/lib/fonderie/config"
 
 export const metadata: Metadata = {
@@ -46,23 +47,37 @@ const FAQ = [
 export default function AboutPage() {
   return (
     <main className={PAGE}>
-      <PageIntro title="About">
-        <p>
-          Fonderie modulaire lets anyone build a modular typeface with a few
-          sliders, then download it as a real font file.
-        </p>
-        <p>
-          Every letter is described once, as a path. That path is laid on a grid
-          you control, and pieces (dots, rings, screws, crosses) are placed on
-          it. Change the grid, the weight or the pieces, and the whole alphabet
-          rebuilds itself. No letter is ever redrawn by hand.
-        </p>
-        <div>
+      {/* Présentation en grand (60 px sur ordinateur) : c'est le manifeste du projet */}
+      <header className="grid gap-6">
+        <h1 className="text-sm leading-normal font-medium">About</h1>
+        {/* Au survol du grand texte, le curseur devient le gros bouton bleu « Open the atelier »
+            qui clignote comme celui de la home ; un clic l'ouvre */}
+        <CursorLink
+          href="/atelier"
+          label="Open the atelier"
+          colors={ACTION_COLORS}
+          className="grid max-w-[1200px] gap-6 text-[28px] leading-[1.1] font-medium tracking-tight md:text-[44px] lg:text-[60px]"
+        >
+          <p>
+            Fonderie modulaire lets anyone build a modular typeface with a few
+            sliders, then download it as a real font file.
+          </p>
+          <p>
+            Every letter is described once, as a path. That path is laid on a
+            grid you control, and pieces (dots, rings, screws, crosses) are
+            placed on it. Change the grid, the weight or the pieces, and the
+            whole alphabet rebuilds itself. You never redraw a letter: move a
+            slider and all 125 characters follow.
+          </p>
+        </CursorLink>
+        {/* Le vrai lien : visible sur écran tactile ; avec une souris il devient le curseur
+            ci-dessus, et ne réapparaît qu'au clavier (Tab) */}
+        <div className="pointer-fine:sr-only pointer-fine:focus-within:not-sr-only">
           <Link href="/atelier" className={pillLink(true)}>
             Open the atelier
           </Link>
         </div>
-      </PageIntro>
+      </header>
 
       <HowItWorks />
 

@@ -61,7 +61,7 @@ export function ExportPanel({
     const problem = await unlockLicense(candidate)
     setChecking(false)
     if (problem) return setError(problem)
-    setLicense(candidate.trim())
+    setLicense(savedLicense() ?? candidate.trim())
     toast.success("Full version unlocked", {
       description: "Every character is now in your download. Thank you!",
     })
@@ -181,7 +181,8 @@ export function ExportPanel({
         </p>
         {license && (
           <p className="text-[10px] leading-normal font-medium">
-            Your license key, to unlock the full version on another computer:{" "}
+            On another computer, unlock the full version with the email you paid
+            with, or this license key:{" "}
             <span className="break-all select-all">{license}</span>
           </p>
         )}
@@ -208,7 +209,7 @@ export function ExportPanel({
                 htmlFor="license-key"
                 className="text-xs leading-normal font-medium"
               >
-                Already paid? Paste your license key
+                Already paid? Enter the email you paid with
               </label>
               <div className="flex gap-1">
                 <input
@@ -218,7 +219,9 @@ export function ExportPanel({
                   autoComplete="off"
                   spellCheck={false}
                   className={FIELD}
-                  placeholder="cs_live_…"
+                  type="text"
+                  inputMode="email"
+                  placeholder="you@email.com, or your license key"
                 />
                 <Pill muted type="submit" disabled={checking || !key.trim()}>
                   {checking ? "Checking…" : "Unlock"}

@@ -89,11 +89,10 @@ export function PurchaseDialog({
                   </Pill>
                 </div>
                 <p className="text-[10px] leading-normal font-medium">
-                  Keep it somewhere safe (a note, your password manager). This
-                  browser remembers it, but on another computer or browser you
-                  will need to paste it in the atelier, under Download, to
-                  unlock the full version again. It works for every font you
-                  make.
+                  This browser remembers it, and it works for every font you
+                  make. On another computer, unlock the full version again in
+                  the atelier, under Download, with the email you paid with
+                  (it&apos;s on your Stripe receipt) or this key.
                 </p>
               </div>
             </>

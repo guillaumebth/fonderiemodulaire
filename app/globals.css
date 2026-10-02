@@ -281,3 +281,9 @@ html.inverted body {
     animation: none !important;
   }
 }
+
+/* Texte surligné : rouge vif du tracé (--path), lettres blanches */
+::selection {
+  background: var(--path);
+  color: oklch(1 0 0);
+}
