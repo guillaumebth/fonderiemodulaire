@@ -1,6 +1,11 @@
 import Link from "next/link"
 
-import { AUTHOR_URL, CONTACT_URL, TWITTER_URL } from "@/lib/fonderie/config"
+import {
+  AUTHOR_URL,
+  CONTACT_URL,
+  INSTAGRAM_URL,
+  TWITTER_URL,
+} from "@/lib/fonderie/config"
 
 import { InvertToggle } from "./invert-toggle"
 
@@ -47,6 +52,7 @@ export function SiteFooter() {
         </p>
         <div className="flex flex-wrap items-baseline gap-x-6 gap-y-2 md:flex-nowrap md:whitespace-nowrap">
           <FooterLink href={TWITTER_URL}>X (Twitter)</FooterLink>
+          <FooterLink href={INSTAGRAM_URL}>Instagram</FooterLink>
           <FooterLink href={CONTACT_URL}>Contact</FooterLink>
           <FooterLink href="/legal">Legal</FooterLink>
           <p>
