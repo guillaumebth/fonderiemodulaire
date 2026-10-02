@@ -240,13 +240,19 @@ export function PanelSwitch({
   onCheckedChange,
   disabled,
   label,
+  size = "default",
+  className,
 }: {
   id?: string
   checked: boolean
   onCheckedChange: (v: boolean) => void
   disabled?: boolean
   label?: string
+  // « sm » : version réduite (footer, à côté d'un texte de 10 px)
+  size?: "default" | "sm"
+  className?: string
 }) {
+  const sm = size === "sm"
   return (
     <SwitchPrimitive.Root
       id={id}
@@ -254,9 +260,20 @@ export function PanelSwitch({
       onCheckedChange={onCheckedChange}
       disabled={disabled}
       aria-label={label}
-      className="relative inline-flex h-[21px] w-9 shrink-0 items-center rounded-full bg-track transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-40 data-[state=checked]:bg-foreground"
+      className={cn(
+        "relative inline-flex shrink-0 items-center rounded-full bg-track transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-40 data-[state=checked]:bg-foreground",
+        sm ? "h-[15px] w-[26px]" : "h-[21px] w-9",
+        className
+      )}
     >
-      <SwitchPrimitive.Thumb className="block size-[15px] translate-x-[3px] rounded-full bg-foreground transition-transform data-[state=checked]:translate-x-[18px] data-[state=checked]:bg-background" />
+      <SwitchPrimitive.Thumb
+        className={cn(
+          "block translate-x-[2px] rounded-full bg-foreground transition-transform data-[state=checked]:bg-background",
+          sm
+            ? "size-[11px] data-[state=checked]:translate-x-[13px]"
+            : "size-[15px] translate-x-[3px] data-[state=checked]:translate-x-[18px]"
+        )}
+      />
     </SwitchPrimitive.Root>
   )
 }

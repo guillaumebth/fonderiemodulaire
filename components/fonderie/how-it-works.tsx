@@ -63,48 +63,40 @@ export function HowItWorks() {
 
   return (
     <div id="how-it-works" className="grid scroll-mt-6 gap-10">
-      {MODES.map((mode) => (
-        <PanelSection key={mode.title} title={mode.title}>
-          <div className="grid max-w-[900px] gap-4">
-            <p className="max-w-[470px] text-xs leading-normal">{mode.intro}</p>
-            <div className="grid grid-cols-3 gap-2">
-              {mode.steps.map(([step, title, desc]) => (
-                <button
-                  key={step}
-                  type="button"
-                  onClick={next}
-                  aria-label={`${title}, ${desc}. Show another letter`}
-                  className="grid content-start gap-3 bg-surface p-3 text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/50 md:p-4"
-                >
-                  <span className="flex items-baseline justify-between text-xs leading-normal font-medium">
-                    {title}
-                    <span className="text-[10px] text-muted-foreground tabular-nums">
-                      {char}
+      {/* Les deux méthodes côte à côte (Grid à gauche, Along the path à droite) pour les comparer */}
+      <div className="grid gap-10 md:grid-cols-2">
+        {MODES.map((mode) => (
+          <PanelSection key={mode.title} title={mode.title}>
+            <div className="grid gap-4">
+              <p className="max-w-[430px] text-xs leading-normal">
+                {mode.intro}
+              </p>
+              <div className="grid grid-cols-3 gap-2">
+                {mode.steps.map(([step, title, desc]) => (
+                  <button
+                    key={step}
+                    type="button"
+                    onClick={next}
+                    aria-label={`${title}, ${desc}. Show another letter`}
+                    className="grid content-start gap-3 bg-surface p-3 text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/50 md:p-4"
+                  >
+                    <StepCanvas
+                      step={step}
+                      char={char}
+                      params={mode.params}
+                      label={`${mode.title}, step ${title}, letter ${char}`}
+                    />
+                    {/* Titre et description ensemble, en bas de la carte */}
+                    <span className="grid gap-0.5 leading-normal">
+                      <b className="text-xs font-medium">{title}</b>
+                      <span className="text-[10px]">{desc}</span>
                     </span>
-                  </span>
-                  <StepCanvas
-                    step={step}
-                    char={char}
-                    params={mode.params}
-                    label={`${mode.title}, step ${title}, letter ${char}`}
-                  />
-                  <span className="text-[10px] leading-normal">{desc}</span>
-                </button>
-              ))}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
-        </PanelSection>
-      ))}
-      <div className="max-w-[470px]">
-        <PanelSection title="The rest">
-          <p className="text-xs leading-normal">
-            Weight decides how far the stroke spills into neighbouring cells, or
-            how big the pieces are along the path. Roundness softens the
-            corners. Organic variation makes some columns and rows wider than
-            others. Kerning is computed automatically and written into the font
-            file.
-          </p>
-        </PanelSection>
+          </PanelSection>
+        ))}
       </div>
     </div>
   )

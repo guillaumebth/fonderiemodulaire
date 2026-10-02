@@ -49,7 +49,7 @@ export default function AboutPage() {
     <main className={PAGE}>
       {/* Présentation en grand (60 px sur ordinateur) : c'est le manifeste du projet */}
       <header className="grid gap-6">
-        <h1 className="text-sm leading-normal font-medium">About</h1>
+        <h1 className="sr-only">About</h1>
         {/* Au survol du grand texte, le curseur devient le gros bouton bleu « Open the atelier »
             qui clignote comme celui de la home ; un clic l'ouvre */}
         <CursorLink
@@ -82,9 +82,10 @@ export default function AboutPage() {
 
       <HowItWorks />
 
-      <div className="max-w-[470px]">
+      {/* FAQ sur deux colonnes, alignées sur Grid / Along the path */}
+      <div>
         <PanelSection title="FAQ">
-          <dl className="grid gap-4 text-xs leading-normal">
+          <dl className="grid content-start gap-x-10 gap-y-5 text-xs leading-normal md:grid-cols-2">
             {FAQ.map(({ q, a }) => (
               <div key={q} className="grid gap-1">
                 <dt className="font-medium">{q}</dt>

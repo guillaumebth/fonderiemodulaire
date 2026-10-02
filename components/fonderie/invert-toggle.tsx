@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 
-import { Switch } from "@/components/ui/switch"
+import { PanelSwitch } from "./panel-ui"
 
 // Interrupteur « Invert » du footer : inverse toutes les couleurs du site, comme un négatif
 // (ce n'est pas un mode sombre : les couleurs sont retournées, le bleu devient orange…).
@@ -26,11 +26,12 @@ export function InvertToggle() {
   }
 
   return (
-    <Switch
+    // Même interrupteur que les réglages de l'atelier (piste grise, rond noir), en petit
+    <PanelSwitch
       size="sm"
       checked={on}
       onCheckedChange={toggle}
-      aria-label="Invert colors"
+      label="Invert colors"
       className="self-center"
     />
   )
