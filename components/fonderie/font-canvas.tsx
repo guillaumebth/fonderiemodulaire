@@ -44,6 +44,7 @@ export function TextCanvas({
     top: number
     height: number
   } | null>(null)
+  const [selected, setSelected] = useState(false) // tout le texte est sélectionné
   const ref = useAnimatedText({
     text,
     params,
@@ -74,36 +75,49 @@ export function TextCanvas({
 
   // Aperçu éditable : un champ invisible recouvre le dessin et capte la frappe (clavier mobile compris).
   // On écrit et on efface en fin de texte ; le curseur dessiné suit la dernière lettre.
+  // Sélection (⌘A, ou glisser) : c'est tout le texte qui est sélectionné, et l'aperçu se teinte de rouge ;
+  // effacer le vide, taper le remplace.
   return (
     <div className="relative cursor-text">
       {canvas}
       <textarea
         value={text}
         onChange={(e) => onTextChange(e.target.value)}
-        // le point d'insertion reste toujours en fin de texte
         onSelect={(e) => {
           const t = e.currentTarget
-          if (t.selectionStart !== t.value.length)
-            t.setSelectionRange(t.value.length, t.value.length)
+          const end = t.value.length
+          if (t.selectionStart !== t.selectionEnd) {
+            // une sélection devient « tout le texte » (on ne peut pas dessiner une sélection partielle)
+            if (t.selectionStart !== 0 || t.selectionEnd !== end)
+              t.setSelectionRange(0, end)
+            setSelected(end > 0)
+          } else {
+            // sinon, le point d'insertion reste toujours en fin de texte
+            if (t.selectionStart !== end) t.setSelectionRange(end, end)
+            setSelected(false)
+          }
         }}
+        onBlur={() => setSelected(false)}
         spellCheck={false}
         autoCapitalize="off"
         autoCorrect="off"
         aria-label="Type your text"
         className="absolute inset-0 size-full cursor-text resize-none bg-transparent text-transparent caret-transparent opacity-0 outline-none"
       />
+      {/* Tout le texte sélectionné : voile rouge, comme le texte surligné du site */}
+      {selected && (
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-path/20"
+        />
+      )}
       {/* Curseur clignotant toujours visible, pour montrer qu'on peut écrire dans l'aperçu */}
-      {caret && (
+      {caret && !selected && (
         <span
           aria-hidden="true"
           className="pointer-events-none absolute w-0.5 animate-caret-blink bg-foreground"
           style={{ left: caret.x, top: caret.top, height: caret.height }}
         />
-      )}
-      {!text && (
-        <span className="pointer-events-none absolute top-0 left-0 text-xs font-medium text-muted-foreground">
-          Type something…
-        </span>
       )}
     </div>
   )

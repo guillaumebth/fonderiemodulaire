@@ -38,13 +38,13 @@ const MODES: { title: string; intro: string; params: Params; steps: Step[] }[] =
     },
   ]
 
-// Lettres qui défilent dans les schémas : droites, courbes, diagonales, chiffre, minuscule
-const LETTERS = ["R", "A", "G", "S", "K", "8", "Q", "e", "&"]
-const CYCLE_MS = 2000
+// Lettres qui défilent dans les schémas : droites, courbes, diagonales, chiffres, minuscules, signes
+const LETTERS = [..."RAGSKQ8MWeZ3B&gXO5ya?NJ2fH@"]
+const CYCLE_MS = 700
 
 // Section de la page About (ancre #how-it-works, visée par le bouton de la home).
 // Chaque mode : un texte, puis ses 3 étapes dans des cartes blanches (sans ombre ni coins arrondis).
-// La lettre change toute seule toutes les 2 s (même lettre dans toutes les cartes), ou au clic sur une carte.
+// La lettre change toute seule toutes les 0,7 s (même lettre dans toutes les cartes), ou au clic sur une carte.
 // Pas de défilement automatique si le système demande de réduire les animations.
 export function HowItWorks() {
   const [index, setIndex] = useState(0)
