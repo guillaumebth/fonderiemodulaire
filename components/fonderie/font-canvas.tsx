@@ -44,7 +44,6 @@ export function TextCanvas({
     top: number
     height: number
   } | null>(null)
-  const [focused, setFocused] = useState(false)
   const ref = useAnimatedText({
     text,
     params,
@@ -87,15 +86,14 @@ export function TextCanvas({
           if (t.selectionStart !== t.value.length)
             t.setSelectionRange(t.value.length, t.value.length)
         }}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
         spellCheck={false}
         autoCapitalize="off"
         autoCorrect="off"
         aria-label="Type your text"
         className="absolute inset-0 size-full cursor-text resize-none bg-transparent text-transparent caret-transparent opacity-0 outline-none"
       />
-      {focused && caret && (
+      {/* Curseur clignotant toujours visible, pour montrer qu'on peut écrire dans l'aperçu */}
+      {caret && (
         <span
           aria-hidden="true"
           className="pointer-events-none absolute w-0.5 animate-caret-blink bg-foreground"
