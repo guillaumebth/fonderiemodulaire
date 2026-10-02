@@ -25,6 +25,7 @@ export default function TemplatesPage() {
         <ShakeLink
           href="/atelier"
           colors={ACTION_COLORS}
+          sound
           className={ACTION_BUTTON}
         >
           Start from scratch

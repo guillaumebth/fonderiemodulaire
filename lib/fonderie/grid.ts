@@ -58,3 +58,19 @@ export function glyphGrid(c: string, U: number, P: Params) {
     ys: edges(vMetrics(P).total, U, P.org, P.seed * 31 + 0.5, P.phase * 0.8),
   }
 }
+
+// Jusqu'où le haut des lettres peut monter dans les lignes des accents (au-dessus des capitales) :
+// - avec une graisse forte, les cases de la ligne juste au-dessus sont remplies (row < above) ;
+// - avec la variation organique, si ces lignes rétrécissent, la lettre monte d'autant.
+// row : première ligne de la grille occupée par une pièce. Pire cas sur toute l'ondulation (mode vivant),
+// pour que la hauteur de l'aperçu ne bouge pas pendant l'animation.
+export function capTopLift(U: number, P: Params, row = vMetrics(P).above) {
+  const { above, total } = vMetrics(P)
+  if (!P.org) return Math.max(0, (above - row) * U)
+  let lift = 0
+  for (let i = 0; i < 48; i++) {
+    const ys = edges(total, U, P.org, P.seed * 31 + 0.5, (i / 48) * Math.PI * 2)
+    lift = Math.max(lift, above * U - ys[row])
+  }
+  return lift
+}

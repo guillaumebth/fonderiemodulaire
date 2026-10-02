@@ -1,9 +1,9 @@
 import type { Metadata } from "next"
-import Link from "next/link"
 
 import { HowItWorks } from "@/components/fonderie/how-it-works"
 import { CursorLink } from "@/components/fonderie/cursor-link"
 import { PAGE } from "@/components/fonderie/page-intro"
+import { SoundLink } from "@/components/fonderie/sound-link"
 import { PanelSection } from "@/components/fonderie/panel-ui"
 import { ACTION_COLORS, pillLink } from "@/components/fonderie/pill-styles"
 import { CHECKOUT_URL, PRICE } from "@/lib/fonderie/config"
@@ -56,6 +56,7 @@ export default function AboutPage() {
           href="/atelier"
           label="Open the atelier"
           colors={ACTION_COLORS}
+          sound
           className="grid max-w-[1200px] gap-6 text-[28px] leading-[1.1] font-medium tracking-tight md:text-[44px] lg:text-[60px]"
         >
           <p>
@@ -73,9 +74,9 @@ export default function AboutPage() {
         {/* Le vrai lien : visible sur écran tactile ; avec une souris il devient le curseur
             ci-dessus, et ne réapparaît qu'au clavier (Tab) */}
         <div className="pointer-fine:sr-only pointer-fine:focus-within:not-sr-only">
-          <Link href="/atelier" className={pillLink(true)}>
+          <SoundLink href="/atelier" className={pillLink(true)}>
             Open the atelier
-          </Link>
+          </SoundLink>
         </div>
       </header>
 

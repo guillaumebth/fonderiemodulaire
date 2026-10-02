@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { useGSAP } from "@gsap/react"
 import gsap from "gsap"
 
+import { playStamp } from "@/lib/fonderie/sound"
 import { cn } from "@/lib/utils"
 
 gsap.registerPlugin(useGSAP)
@@ -20,6 +21,7 @@ export function CursorLink({
   href,
   label,
   colors = [],
+  sound,
   children,
   className,
 }: {
@@ -27,6 +29,8 @@ export function CursorLink({
   label: string
   // couleurs de fond qui défilent tant que la pastille est visible (valeurs CSS, ex. "var(--punch-1)")
   colors?: string[]
+  // joue le « clac » de fonderie au clic
+  sound?: boolean
   children: React.ReactNode
   className?: string
 }) {
@@ -128,6 +132,7 @@ export function CursorLink({
           const click = contextSafe(() => {
             if (going) return
             going = true
+            if (sound) playStamp()
             gsap
               .timeline({ onComplete: () => router.push(href) })
               .to(dot, {

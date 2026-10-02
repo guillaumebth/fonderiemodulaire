@@ -187,7 +187,12 @@ export function FontEditor() {
     <>
       <section className="grid items-start gap-8 md:grid-cols-[minmax(0,1fr)_350px] lg:gap-12">
         {/* ---------- Aperçu : trois vues ---------- */}
-        <Tabs defaultValue="text" className="min-w-0 gap-10">
+        {/* Sur ordinateur, l'aperçu reste à l'écran pendant qu'on fait défiler les réglages à droite.
+            S'il est plus haut que l'écran (tailles dépliées…), il défile à l'intérieur de sa colonne. */}
+        <Tabs
+          defaultValue="text"
+          className="min-w-0 gap-10 md:sticky md:top-6 md:max-h-[calc(100dvh-3rem)] md:overflow-y-auto md:[scrollbar-width:thin]"
+        >
           <TabsList aria-label="Preview" className={TAB_LIST}>
             <TabsTrigger value="text" className={TAB}>
               <DashOutline />

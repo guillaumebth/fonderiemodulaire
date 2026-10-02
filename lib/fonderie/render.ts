@@ -4,7 +4,7 @@ import { CAP_ACCENTED, GLYPHS } from "./glyphs"
 import type { Params } from "./params"
 import { pieceKind, rotated, shape, type Piece } from "./shapes"
 import { traceHalfWidth, tracePositions, traceSize } from "./trace"
-import { center, glyphGrid } from "./grid"
+import { capTopLift, center, glyphGrid } from "./grid"
 import { kerning } from "./kerning"
 import { bitmap, glyphCols, skeleton, vMetrics } from "./skeleton"
 
@@ -253,6 +253,20 @@ export type TextLayout = {
 
 // Met le texte en page et calcule toutes ses pièces.
 // capH = hauteur des capitales en pixels ; la taille des cases s'en déduit
+// Première ligne de la grille occupée par une pièce dans ce texte : avec une graisse forte,
+// les lettres débordent au-dessus des capitales (mode grille ; le mode tracé est couvert par bleed)
+function firstRow(text: string, P: Params) {
+  const { above } = vMetrics(P)
+  if (P.layout !== "grille") return above
+  let first = above
+  for (const c of new Set(cleanText(text)))
+    if (GLYPHS[c]) {
+      const i = bitmap(c, P).findIndex((row) => row.some((v) => v > 0))
+      if (i >= 0) first = Math.min(first, i)
+    }
+  return first
+}
+
 export function layoutText(
   W: number,
   text: string,
@@ -276,9 +290,12 @@ export function layoutText(
   const padLeft = pad + slant * m.desc * U
   const descH = m.desc * U // place des jambages sous la ligne de base
   const aboveH = m.above * U // lignes des accents des capitales, au-dessus du haut des capitales
-  // On ne réserve cette place que si elle sert : capitale accentuée dans le texte, ou grille affichée
+  // On ne réserve cette place que si elle sert : capitale accentuée dans le texte, ou grille affichée.
+  // Sinon, juste ce dont le haut des lettres peut remonter avec la variation organique.
   const reserve =
-    P.grid || [...cleanText(text)].some((c) => CAP_ACCENTED.has(c)) ? aboveH : 0
+    P.grid || [...cleanText(text)].some((c) => CAP_ACCENTED.has(c))
+      ? aboveH
+      : capTopLift(U, P, firstRow(text, P))
   const lines = layout(text, U, W - capH * extra() - 2, P)
   const lh = capH * (1 + lineGap) + descH + 2 * pad + reserve
   const H = (lines.length - 1) * lh + reserve + capH + descH + 2 * pad + 4

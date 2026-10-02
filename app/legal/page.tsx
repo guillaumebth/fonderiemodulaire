@@ -54,9 +54,9 @@ export default function LegalPage() {
           <PanelSection title="Confidentialité">
             <p className={P}>
               <b className="font-medium">Ce que nous ne faisons pas</b> : pas de
-              compte, pas de cookies publicitaires ni de mesure d&apos;audience.
-              Les polices sont fabriquées dans votre navigateur : vos réglages
-              et vos textes ne sont pas envoyés sur un serveur.
+              compte, pas de cookies, ni publicitaires ni de suivi. Les polices
+              sont fabriquées dans votre navigateur : vos réglages et vos textes
+              ne sont pas envoyés sur un serveur.
             </p>
             <p className={P}>
               <b className="font-medium">Dans votre navigateur</b> : quelques
@@ -76,6 +76,12 @@ export default function LegalPage() {
               l&apos;e-mail saisi dans l&apos;atelier sert uniquement à
               retrouver votre paiement chez Stripe. Il n&apos;est pas
               enregistré.
+            </p>
+            <p className={P}>
+              <b className="font-medium">Mesure d&apos;audience</b> : Cloudflare
+              Web Analytics compte les visites de façon anonyme, sans cookies et
+              sans vous suivre d&apos;un site à l&apos;autre (pages vues, pays,
+              type d&apos;appareil).
             </p>
             <p className={P}>
               <b className="font-medium">Hébergement</b> : Cloudflare traite des

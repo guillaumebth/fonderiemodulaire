@@ -107,6 +107,7 @@ export function HomeContent() {
       <ShakeLink
         href="/atelier"
         colors={ACTION_COLORS}
+        sound
         className={`mt-8 ${ACTION_BUTTON}`}
       >
         Make your font

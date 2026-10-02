@@ -11,6 +11,7 @@ import {
   unlockLicense,
 } from "@/lib/fonderie/license"
 import type { Params } from "@/lib/fonderie/params"
+import { playDownload } from "@/lib/fonderie/sound"
 import { cn } from "@/lib/utils"
 
 import { PanelSection, Pill, PillChoice } from "./panel-ui"
@@ -108,6 +109,7 @@ export function ExportPanel({
   }, [])
 
   async function download() {
+    playDownload()
     setBusy(true)
     try {
       // Le module d'export (et opentype.js) ne se charge qu'au premier clic : la page reste légère
@@ -199,9 +201,17 @@ export function ExportPanel({
               {/* Bleu d'action, à la taille d'une pastille ; tremble et clignote au survol, comme sur la home */}
               <ShakeLink
                 href={CHECKOUT_URL}
-                // la police en cours est retrouvée au retour du paiement
-                onClick={() => rememberFontBeforeCheckout(name)}
                 colors={ACTION_COLORS}
+                sound
+                onClick={(e) => {
+                  // la police en cours est retrouvée au retour du paiement
+                  rememberFontBeforeCheckout(name)
+                  // Stripe s'ouvre dans la page : on attend un quart de seconde pour entendre le « clac »
+                  // (sauf ⌘/Ctrl-clic, qui ouvre un nouvel onglet)
+                  if (e.metaKey || e.ctrlKey || e.shiftKey) return
+                  e.preventDefault()
+                  setTimeout(() => window.location.assign(CHECKOUT_URL), 250)
+                }}
                 className={cn(
                   PILL,
                   "bg-action text-action-foreground hover:bg-action"

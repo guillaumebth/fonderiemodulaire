@@ -5,17 +5,26 @@ import Link from "next/link"
 import { useGSAP } from "@gsap/react"
 import gsap from "gsap"
 
+import { playStamp } from "@/lib/fonderie/sound"
+
 gsap.registerPlugin(useGSAP)
 
 type ShakeLinkProps = React.ComponentProps<typeof Link> & {
   // couleurs de fond qui défilent pendant le survol (valeurs CSS, ex. "var(--punch-1)")
   colors?: string[]
+  // joue le « clac » de fonderie au clic
+  sound?: boolean
 }
 
 // Lien qui tremble tant qu'on le survole (petites secousses en rotation et en position),
 // et fait clignoter son fond entre plusieurs couleurs vives, puis revient en place en douceur.
 // Aussi au focus clavier. Rien si le système demande de réduire les animations.
-export function ShakeLink({ colors = [], ...props }: ShakeLinkProps) {
+export function ShakeLink({
+  colors = [],
+  sound,
+  onClick,
+  ...props
+}: ShakeLinkProps) {
   const ref = useRef<HTMLAnchorElement>(null)
 
   useGSAP(
@@ -90,5 +99,14 @@ export function ShakeLink({ colors = [], ...props }: ShakeLinkProps) {
     { scope: ref }
   )
 
-  return <Link ref={ref} {...props} />
+  return (
+    <Link
+      ref={ref}
+      onClick={(e) => {
+        if (sound) playStamp()
+        onClick?.(e)
+      }}
+      {...props}
+    />
+  )
 }
