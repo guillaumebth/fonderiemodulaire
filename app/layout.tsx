@@ -39,6 +39,14 @@ export default function RootLayout({
       )}
     >
       {/* Colonne pleine hauteur : le footer se cale en bas de l'écran */}
+      <head>
+        {/* Applique « Invert » avant l'affichage s'il était activé (pas de flash) */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{if(localStorage.getItem("fonderie:invert")==="1")document.documentElement.classList.add("inverted")}catch(e){}`,
+          }}
+        />
+      </head>
       <body className="flex min-h-dvh flex-col">
         {/* La maquette est en clair uniquement : on force le mode clair (les couleurs sombres restent prêtes dans globals.css) */}
         <ThemeProvider forcedTheme="light">

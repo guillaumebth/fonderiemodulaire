@@ -205,3 +205,13 @@
     --muted-foreground: oklch(0.42 0.05 160);
   }
 }
+
+/* Interrupteur « Invert » du footer : toute la page en négatif (pas un mode sombre).
+   Le filtre s'applique au <body> ; le fond du <html> prend la couleur inversée du fond
+   (#f1f1f1 → #0e0e0e) pour que rien ne reste clair autour, même en tirant la page. */
+html.inverted {
+  background: oklch(0.16 0 0);
+}
+html.inverted body {
+  filter: invert(1);
+}
