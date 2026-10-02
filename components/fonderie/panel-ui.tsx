@@ -134,7 +134,10 @@ function CollapsibleSection({
 
   const { contextSafe } = useGSAP(
     () => {
-      gsap.set(body.current, { height: defaultOpen ? "auto" : 0 })
+      gsap.set(body.current, {
+        height: defaultOpen ? "auto" : 0,
+        overflow: defaultOpen ? "visible" : "hidden",
+      })
       gsap.set(bar.current, { rotation: defaultOpen ? 90 : 0 })
     },
     { scope: root }
@@ -153,11 +156,19 @@ function CollapsibleSection({
       duration: 0.5 * k,
       ease: "back.out(2.5)",
     })
+    // Le contenu est rogné pendant l'animation, puis libéré une fois ouvert
+    // (sinon le contour des champs et des pastilles au focus est coupé sur les bords)
+    gsap.set(body.current, { overflow: "hidden" })
     if (next) {
       gsap.fromTo(
         body.current,
         { height: 0 },
-        { height: "auto", duration: 0.55 * k, ease: "expo.out" }
+        {
+          height: "auto",
+          duration: 0.55 * k,
+          ease: "expo.out",
+          onComplete: () => gsap.set(body.current, { overflow: "visible" }),
+        }
       )
       gsap.fromTo(
         items,
