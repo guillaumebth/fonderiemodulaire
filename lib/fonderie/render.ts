@@ -1,6 +1,6 @@
 // Dessin sur canvas : lettres, grille, mise en page du texte, étapes de construction.
 
-import { GLYPHS } from "./glyphs"
+import { CAP_ACCENTED, GLYPHS } from "./glyphs"
 import type { Params } from "./params"
 import { pieceKind, rotated, shape, type Piece } from "./shapes"
 import { traceHalfWidth, tracePositions, traceSize } from "./trace"
@@ -159,13 +159,14 @@ export function advance(c: string, U: number, P: Params) {
   return GLYPHS[c] ? glyphCols(c, P) * U * P.wid + tracking(U, P) : 0
 }
 
-// Enlève les accents (en attendant les lettres accentuées) et ramène les apostrophes et guillemets typographiques
+// Ramène les apostrophes et guillemets typographiques, et remplace une lettre accentuée que la police
+// n'a pas encore (ex. « ō ») par sa lettre de base ; les accents dessinés (é, à, ç…) sont gardés.
 export function cleanText(s: string) {
-  return s
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[‘’]/g, "'")
-    .replace(/[“”]/g, '"')
+  return [...s.normalize("NFC").replace(/[‘’]/g, "'").replace(/[“”]/g, '"')]
+    .map((c) =>
+      GLYPHS[c] ? c : c.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    )
+    .join("")
 }
 
 // Largeur d'un mot : avances des lettres + crénage entre chaque paire
@@ -274,17 +275,21 @@ export function layoutText(
   const pad = bleed(P) * U // marge tout autour pour les pièces qui débordent
   const padLeft = pad + slant * m.desc * U
   const descH = m.desc * U // place des jambages sous la ligne de base
+  const aboveH = m.above * U // lignes des accents des capitales, au-dessus du haut des capitales
+  // On ne réserve cette place que si elle sert : capitale accentuée dans le texte, ou grille affichée
+  const reserve =
+    P.grid || [...cleanText(text)].some((c) => CAP_ACCENTED.has(c)) ? aboveH : 0
   const lines = layout(text, U, W - capH * extra() - 2, P)
-  const lh = capH * (1 + lineGap) + descH + 2 * pad
-  const H = (lines.length - 1) * lh + capH + descH + 2 * pad + 4
+  const lh = capH * (1 + lineGap) + descH + 2 * pad + reserve
+  const H = (lines.length - 1) * lh + reserve + capH + descH + 2 * pad + 4
 
   const pieces: TextPiece[] = []
   const glyphs: TextLayout["glyphs"] = []
   let index = 0 // n° du caractère dans le texte, pour reconnaître les pièces d'un réglage à l'autre
-  let end = { x: padLeft, top: pad, base: pad + capH }
+  let end = { x: padLeft, top: pad + reserve, base: pad + reserve + capH }
   lines.forEach((line, li) => {
-    const base = pad + li * lh + capH
-    const top = base - capH
+    const base = pad + reserve + li * lh + capH
+    const top = base - capH - aboveH // haut de la grille (au-dessus : rien)
     const chars = [...line]
     // Largeur de la ligne (sans l'espace qui suit la dernière lettre), pour la centrer
     const lineW = center
@@ -320,7 +325,11 @@ export function layoutText(
     })
     index++ // l'espace ou le retour à la ligne qui sépare les lignes
     // le curseur se place au milieu de l'espace qui suit la dernière lettre
-    end = { x: chars.length ? x - tracking(U, P) / 2 : x, top, base }
+    end = {
+      x: chars.length ? x - tracking(U, P) / 2 : x,
+      top: base - capH,
+      base,
+    }
   })
   return { W, H, U, slant, pieces, glyphs, end }
 }

@@ -3,7 +3,7 @@ import type { Metadata } from "next"
 import { FontEditor } from "@/components/fonderie/font-editor"
 
 export const metadata: Metadata = {
-  title: "Generator — Fonderie modulaire",
+  title: "Generator · Fonderie modulaire",
   description:
     "Tune the grid, the weight and the pieces, then download your font.",
 }

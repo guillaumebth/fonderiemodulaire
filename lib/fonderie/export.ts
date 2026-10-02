@@ -8,7 +8,7 @@
 
 import { Font, Glyph, Path } from "opentype.js"
 
-import { CHARSET } from "./glyphs"
+import { ACCENT_NAMES, CHARSET } from "./glyphs"
 import type { Params } from "./params"
 import { kerning } from "./kerning"
 import { advance, bleed, forEachPiece, tracking } from "./render"
@@ -142,7 +142,8 @@ function buildGlyph(c: string, P: Params) {
   const lsb = tracking(U, P) / 2
   // Canvas (y vers le bas, origine en haut de la grille) → police (y vers le haut, origine sur la ligne de base)
   const toFont = (p: Pt): Pt => {
-    const y = CAP - p.y
+    // la grille commence « above » lignes au-dessus du haut des capitales
+    const y = CAP + vMetrics(P).above * U - p.y
     return { x: r(lsb + p.x + slant * y), y: r(y) }
   }
   const path = new Path()
@@ -160,7 +161,7 @@ function buildGlyph(c: string, P: Params) {
     }
   })
   return new Glyph({
-    name: NAMES[c] ?? c,
+    name: NAMES[c] ?? ACCENT_NAMES[c] ?? c,
     // Les apostrophes et guillemets typographiques (’ ‘ “ ”) utilisent le même dessin
     unicodes: [c.charCodeAt(0), ...(EXTRA_UNICODES[c] ?? [])],
     advanceWidth: Math.round(advance(c, U, P)),
@@ -196,7 +197,7 @@ export function buildFont(
     styleName: "Regular",
     unitsPerEm: UPM,
     // Les pièces du haut et du bas débordent d'une demi-case au plus : on garde un peu de marge
-    ascender: Math.round(CAP + U * (1 + bleed(P))),
+    ascender: Math.round(CAP + U * (vMetrics(P).above + 1 + bleed(P))),
     descender: -Math.round((vMetrics(P).desc + 1 + bleed(P)) * U),
     glyphs,
   })
@@ -212,15 +213,26 @@ export function fileName(familyName: string) {
 }
 
 // Paires de crénage, en index de glyphes (0 = .notdef, 1 = espace, puis les caractères dans l'ordre)
+// Une table « kern » (format 0) ne peut pas dépasser 65 535 octets, soit 10 920 paires :
+// au-delà, Windows, Word ou InDesign peuvent ignorer le crénage, voire la police.
+const MAX_KERN_PAIRS = 10920
+const MIN_KERN = 5 // en unités (1/1000 em) : en dessous, l'ajustement ne se voit pas
+
 function kernPairs(P: Params, chars: string[]): KernPair[] {
   const U = CAP / P.rows
   const pairs: KernPair[] = []
   chars.forEach((a, i) =>
     chars.forEach((b, j) => {
       const value = Math.round(kerning(a, b, U, P))
-      if (value) pairs.push({ left: i + 2, right: j + 2, value })
+      if (Math.abs(value) >= MIN_KERN)
+        pairs.push({ left: i + 2, right: j + 2, value })
     })
   )
+  // Trop de paires : on garde les ajustements les plus forts (les plus visibles)
+  if (pairs.length > MAX_KERN_PAIRS) {
+    pairs.sort((p, q) => Math.abs(q.value) - Math.abs(p.value))
+    pairs.length = MAX_KERN_PAIRS
+  }
   return pairs
 }
 

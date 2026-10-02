@@ -7,7 +7,7 @@ import { PanelSection } from "@/components/fonderie/panel-ui"
 import { pillLink } from "@/components/fonderie/pill-styles"
 
 export const metadata: Metadata = {
-  title: "About — Fonderie modulaire",
+  title: "About · Fonderie modulaire",
   description:
     "What Fonderie modulaire is, how it works, and answers to common questions.",
 }
@@ -22,8 +22,8 @@ const FAQ = [
     a: "Yes. The download is a free trial of your font, with uppercase A–Z and figures 0–9. If you like what you made, you can support the project and pay what you want.",
   },
   {
-    q: "Which characters does the generator draw?",
-    a: "On screen: uppercase A–Z, lowercase a–z, figures 0–9 and the punctuation . , ; : ! ? - ' \" ( ) / & @ # € %. Accented letters are coming next.",
+    q: "Which characters are included?",
+    a: "Uppercase A–Z, lowercase a–z, French accented letters (é è ê ë à â ä ç î ï ô ö ù û ü ÿ œ æ, plus á í ó ú ñ, in capitals too), figures 0–9 and the punctuation . , ; : ! ? - ' \" ( ) / & @ # € %.",
   },
   {
     q: "What’s the difference between Grid and Along the path?",
@@ -49,7 +49,7 @@ export default function AboutPage() {
         </p>
         <p>
           Every letter is described once, as a path. That path is laid on a grid
-          you control, and pieces — dots, rings, screws, crosses — are placed on
+          you control, and pieces (dots, rings, screws, crosses) are placed on
           it. Change the grid, the weight or the pieces, and the whole alphabet
           rebuilds itself. No letter is ever redrawn by hand.
         </p>

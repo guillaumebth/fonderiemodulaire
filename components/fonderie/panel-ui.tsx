@@ -8,6 +8,7 @@ import { Slider as SliderPrimitive, Switch as SwitchPrimitive } from "radix-ui"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { cn } from "@/lib/utils"
 
+import { DashOutline } from "./dash-outline"
 import { PILL, PILL_ACTIVE, PILL_MUTED } from "./pill-styles"
 
 gsap.registerPlugin(useGSAP)
@@ -23,6 +24,7 @@ export function Pill({
   active,
   muted,
   className,
+  children,
   ...props
 }: React.ComponentProps<"button"> & { active?: boolean; muted?: boolean }) {
   return (
@@ -35,7 +37,10 @@ export function Pill({
         className
       )}
       {...props}
-    />
+    >
+      {!active && !muted && <DashOutline />}
+      {children}
+    </button>
   )
 }
 
@@ -69,6 +74,7 @@ export function PillChoice<T extends string>({
             "h-auto min-w-0 data-[state=on]:bg-foreground data-[state=on]:text-background"
           )}
         >
+          <DashOutline />
           {o.label}
         </ToggleGroupItem>
       ))}

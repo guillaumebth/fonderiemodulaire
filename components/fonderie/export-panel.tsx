@@ -7,6 +7,7 @@ import { toast } from "sonner"
 import { SUPPORT_URL } from "@/lib/fonderie/config"
 import type { Params } from "@/lib/fonderie/params"
 
+import { DashOutline } from "./dash-outline"
 import { PanelSection, Pill, PILL, PillChoice } from "./panel-ui"
 
 // Rendu de l'image : tel qu'à l'écran, ou vue de conception (grille, tracé rouge, contour)
@@ -85,6 +86,7 @@ export function ExportPanel({
             rel="noopener noreferrer"
             className={`${PILL} w-fit gap-1`}
           >
+            <DashOutline />
             <Heart className="size-3" />
             Pay what you want
           </a>

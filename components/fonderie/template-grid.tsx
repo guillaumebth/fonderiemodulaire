@@ -7,6 +7,7 @@ import { TEMPLATES } from "@/lib/fonderie/templates"
 import { cn } from "@/lib/utils"
 
 import { TextCanvas } from "./font-canvas"
+import { DashOutline } from "./dash-outline"
 import { PILL } from "./panel-ui"
 
 // Chaque template est une petite affiche monochrome (noir, blanc ou gris) ;
@@ -38,9 +39,10 @@ export function TemplateGrid() {
               <span
                 className={cn(
                   PILL,
-                  "border-current bg-transparent group-hover:bg-foreground group-hover:text-background"
+                  "bg-transparent group-hover:bg-foreground group-hover:text-background"
                 )}
               >
+                <DashOutline />
                 Use this template
               </span>
             </div>

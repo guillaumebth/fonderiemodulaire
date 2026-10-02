@@ -91,14 +91,26 @@ const alive = (params: Params): Params => ({
   org: Math.max(params.org, ALIVE_MIN),
 })
 
+// Vue de conception : ronds fusionnés en contour, grille et tracé rouge visibles
+const BLUEPRINT: Params = {
+  ...DEFAULT_PARAMS,
+  shape: "rond",
+  mode: "contour",
+  grid: true,
+  gap: -0.4,
+  str: 0.06,
+  rnd: 0.8,
+}
+
 export const HERO_STYLES: { name: string; params: Params }[] = [
   { name: "Stitch", params: alive(HERO_PARAMS) },
   ...PRESETS.filter((p) => p.name !== "Stitch").map((p) => ({
     name: p.name,
     params: alive(p.params),
   })),
-  ...TEMPLATES.filter((t) => /Signal|Moon|Blue/.test(t.text)).map((t) => ({
+  ...TEMPLATES.filter((t) => /Signal|Moon/.test(t.text)).map((t) => ({
     name: t.text.replace(/\n/g, " "),
     params: alive(t.params),
   })),
+  { name: "Blueprint", params: alive(BLUEPRINT) },
 ]

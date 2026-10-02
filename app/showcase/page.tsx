@@ -3,10 +3,11 @@ import Link from "next/link"
 
 import { PAGE, PageIntro } from "@/components/fonderie/page-intro"
 import { PanelSection } from "@/components/fonderie/panel-ui"
+import { DashOutline } from "@/components/fonderie/dash-outline"
 import { pillLink } from "@/components/fonderie/pill-styles"
 
 export const metadata: Metadata = {
-  title: "Showcase — Fonderie modulaire",
+  title: "Showcase · Fonderie modulaire",
   description: "Projects made with fonts from Fonderie modulaire.",
 }
 
@@ -20,7 +21,7 @@ export default function ShowcasePage() {
         </p>
       </PageIntro>
       <div className="max-w-[470px]">
-        <PanelSection title="Nothing here yet — yours could be the first.">
+        <PanelSection title="Nothing here yet. Yours could be the first.">
           <p className="text-xs leading-normal">
             Made something with a font from the generator? The first projects
             will be featured on this page.
@@ -30,6 +31,7 @@ export default function ShowcasePage() {
               Make a font
             </Link>
             <Link href="/templates" className={pillLink()}>
+              <DashOutline />
               Browse templates
             </Link>
           </div>

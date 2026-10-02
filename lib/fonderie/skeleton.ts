@@ -13,17 +13,26 @@ export function glyphCols(c: string, P: Params) {
 
 // Repères verticaux de la grille, en numéros de ligne.
 // Toutes les lettres partagent la même grille : capitales en haut, jambages en dessous de la ligne de base.
+// Toutes les lettres partagent la même grille, de haut en bas :
+//   - « above » lignes au-dessus des capitales, pour les accents des capitales (É, À…) ;
+//   - les capitales (P.rows lignes, de la ligne « above » jusqu'à la ligne de base) ;
+//   - « desc » lignes sous la ligne de base, pour les jambages (g, p…) et la cédille.
+// Les numéros de ligne (base, xhRow) sont comptés depuis le haut des capitales ; ajouter « above ».
 export function vMetrics(P: Params) {
   const base = P.rows - 1 // ligne de base
   const xhRow = Math.round((1 - P.xh) * base) // haut des minuscules
   const desc = Math.max(1, Math.round(P.desc * base)) // nombre de lignes sous la ligne de base
-  return { base, xhRow, desc, total: P.rows + desc }
+  const above = Math.max(1, Math.round(0.25 * base)) // lignes réservées aux accents des capitales
+  return { base, xhRow, desc, above, total: above + P.rows + desc }
 }
 
-// Coordonnée y d'un tracé → numéro de ligne (voir les conventions dans glyphs.ts)
+// Coordonnée y d'un tracé → numéro de ligne dans la grille (voir les conventions dans glyphs.ts)
 function rowOf(y: number, lower: boolean, m: ReturnType<typeof vMetrics>) {
+  return m.above + rowFromCapTop(y, lower, m)
+}
+function rowFromCapTop(y: number, lower: boolean, m: ReturnType<typeof vMetrics>) {
   if (y > 1) return m.base + (y - 1) * m.desc
-  if (!lower) return y * m.base
+  if (!lower) return y < 0 ? y * m.above : y * m.base // y < 0 : zone des accents des capitales
   if (y < 0) return m.xhRow + y * m.xhRow
   return m.xhRow + y * (m.base - m.xhRow)
 }

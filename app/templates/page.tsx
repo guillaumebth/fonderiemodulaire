@@ -5,7 +5,7 @@ import { ShakeLink } from "@/components/fonderie/shake-link"
 import { TemplateGrid } from "@/components/fonderie/template-grid"
 
 export const metadata: Metadata = {
-  title: "Templates — Fonderie modulaire",
+  title: "Templates · Fonderie modulaire",
   description:
     "Ready-made starting points. Open any of them in the generator and make it yours.",
 }
@@ -15,8 +15,8 @@ export default function TemplatesPage() {
     <main className={PAGE}>
       <PageIntro title="Templates">
         <p>
-          Ready-made starting points. Each one is a single set of settings —
-          open it, change one slider, and make it yours.
+          Ready-made starting points. Each one is a single set of settings: open
+          it, change one slider, and make it yours.
         </p>
       </PageIntro>
       <TemplateGrid />

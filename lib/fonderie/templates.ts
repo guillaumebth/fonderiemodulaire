@@ -17,20 +17,6 @@ const p = (x: Partial<Params>): Params => ({ ...DEFAULT_PARAMS, ...x })
 
 export const TEMPLATES: Template[] = [
   {
-    text: "Blue\nprint",
-    caption: "Grid · Dot · merged · outline · grid & path shown",
-    palette: "white",
-    wide: true,
-    params: p({
-      shape: "rond",
-      mode: "contour",
-      grid: true,
-      gap: -0.4,
-      str: 0.06,
-      rnd: 0.8,
-    }),
-  },
-  {
     text: "Hand\nstitched",
     caption: "Along the path · Cross · 2 rows · rotated",
     palette: "black",

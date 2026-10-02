@@ -225,3 +225,31 @@ html.inverted body {
     opacity: 0;
   }
 }
+
+/* Contour pointillé des pastilles (DashOutline) : les pointillés défilent au survol */
+.dash-outline rect {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1;
+  stroke-dasharray: 3 2;
+}
+.pill:hover .dash-outline rect,
+.pill:focus-visible .dash-outline rect,
+.group:hover .pill .dash-outline rect {
+  animation: dash-march 0.6s linear infinite;
+}
+/* pastille sélectionnée (remplie en noir) : pas de pointillé */
+[data-state=on] > .dash-outline,
+[data-state=active] > .dash-outline {
+  display: none;
+}
+@keyframes dash-march {
+  to {
+    stroke-dashoffset: -10;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dash-outline rect {
+    animation: none !important;
+  }
+}

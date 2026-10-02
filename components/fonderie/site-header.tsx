@@ -5,7 +5,9 @@ import { usePathname } from "next/navigation"
 
 import { cn } from "@/lib/utils"
 
+import { DashOutline } from "./dash-outline"
 import { LogoLink } from "./logo-link"
+import { PILL, PILL_ACTIVE } from "./pill-styles"
 
 // Maquette Figma « HomePage » : logo à gauche, pastilles à droite.
 // Pastilles : contour noir en pointillés, fond blanc ; la page active est remplie en noir.
@@ -15,9 +17,6 @@ const NAV = [
   { href: "/showcase", label: "Showcase" },
   { href: "/about", label: "About" },
 ]
-
-export const PILL =
-  "inline-flex items-center justify-center rounded-full border border-dashed border-foreground bg-surface px-[7px] py-[2px] text-xs font-medium whitespace-nowrap transition-colors outline-none hover:bg-foreground/10 focus-visible:ring-3 focus-visible:ring-ring/50"
 
 export function SiteHeader() {
   const pathname = usePathname()
@@ -35,9 +34,10 @@ export function SiteHeader() {
               aria-current={active ? "page" : undefined}
               className={cn(
                 PILL,
-                active && "bg-foreground text-background hover:bg-foreground/90"
+                active && PILL_ACTIVE
               )}
             >
+              {!active && <DashOutline />}
               {item.label}
             </Link>
           )

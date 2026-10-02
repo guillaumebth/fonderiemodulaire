@@ -2,9 +2,10 @@
 import { cn } from "@/lib/utils"
 
 // ---------- Pastilles ----------
-// Noire = active / action principale ; blanche pointillée = option ; grise = action secondaire
+// Noire = active / action principale ; blanche pointillée = option ; grise = action secondaire.
+// Le pointillé n'est pas une bordure CSS mais un <DashOutline /> à mettre dans la pastille (il s'anime au survol).
 export const PILL =
-  "inline-flex items-center justify-center rounded-full border border-dashed border-foreground bg-surface px-[7px] py-[2px] text-xs leading-normal font-medium whitespace-nowrap transition-colors outline-none hover:bg-foreground/10 focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-40"
+  "pill relative inline-flex items-center justify-center rounded-full border border-transparent bg-surface px-[7px] py-[2px] text-xs leading-normal font-medium whitespace-nowrap transition-colors outline-none hover:bg-foreground/10 focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-40"
 export const PILL_ACTIVE =
   "bg-foreground text-background hover:bg-foreground/85"
 export const PILL_MUTED =

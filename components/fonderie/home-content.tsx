@@ -113,7 +113,7 @@ export function HomeContent() {
 
       <p className="mt-7 max-w-[470px] text-center text-[10px]">
         Build your own modular typeface with a few sliders. Every letter is a
-        path; pieces — dots, rings, screws, crosses — are laid on it. Change the
+        path; pieces (dots, rings, screws, crosses) are laid on it. Change the
         grid and the whole alphabet rebuilds itself. Then download a real font
         file.
       </p>

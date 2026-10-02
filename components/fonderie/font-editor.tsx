@@ -11,7 +11,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { useParamsHistory } from "@/hooks/use-params-history"
-import { CHARSET, isLower } from "@/lib/fonderie/glyphs"
+import { ACCENTED_CHARS, CHARSET } from "@/lib/fonderie/glyphs"
 import {
   DEFAULT_PARAMS,
   randomParams,
@@ -29,6 +29,7 @@ import { decodeShare, encodeShare } from "@/lib/fonderie/share"
 import { cn } from "@/lib/utils"
 import chevron from "@/public/images/chevron-24.svg"
 
+import { DashOutline } from "./dash-outline"
 import { ExportPanel, type ImageLook } from "./export-panel"
 import { TextCanvas } from "./font-canvas"
 import {
@@ -46,8 +47,9 @@ const cells = (v: number) => v.toFixed(2) + " cell"
 // Une ligne par famille : capitales, minuscules, chiffres et ponctuation
 const ALPHABET = [
   CHARSET.filter((c) => /[A-Z]/.test(c)),
-  CHARSET.filter(isLower),
-  CHARSET.filter((c) => !/[A-Z]/.test(c) && !isLower(c)),
+  CHARSET.filter((c) => /[a-z]/.test(c)),
+  ACCENTED_CHARS,
+  CHARSET.filter((c) => !/[A-Za-z]/.test(c) && !ACCENTED_CHARS.includes(c)),
 ]
   .map((g) => g.join(" "))
   .join("\n")
@@ -187,12 +189,15 @@ export function FontEditor() {
         <Tabs defaultValue="text" className="min-w-0 gap-10">
           <TabsList aria-label="Preview" className={TAB_LIST}>
             <TabsTrigger value="text" className={TAB}>
+              <DashOutline />
               Text
             </TabsTrigger>
             <TabsTrigger value="glyph" className={TAB}>
+              <DashOutline />
               Glyph
             </TabsTrigger>
             <TabsTrigger value="charset" className={TAB}>
+              <DashOutline />
               Charset
             </TabsTrigger>
           </TabsList>
