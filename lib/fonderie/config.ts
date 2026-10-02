@@ -1,5 +1,8 @@
 // Réglages du site à remplir à la main.
 
+// Adresse du site (plan du site, robots, liens absolus)
+export const SITE_URL = "https://fonderiemodulaire.com"
+
 // Version complète : lien de paiement Stripe (Payment Link du produit à prix fixe).
 // Dans Stripe, régler « After payment » → rediriger vers
 //   https://fonderiemodulaire.com/atelier?session_id={CHECKOUT_SESSION_ID}

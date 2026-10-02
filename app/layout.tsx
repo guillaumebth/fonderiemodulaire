@@ -4,6 +4,8 @@ import { Inter, JetBrains_Mono } from "next/font/google"
 import "./globals.css"
 import { Toaster } from "sonner"
 
+import { SITE_URL } from "@/lib/fonderie/config"
+
 import { SiteFooter } from "@/components/fonderie/site-footer"
 import { SiteHeader } from "@/components/fonderie/site-header"
 import { ThemeProvider } from "@/components/theme-provider"
@@ -17,6 +19,8 @@ const fontSans = Inter({
 const fontMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" })
 
 export const metadata: Metadata = {
+  // adresse de base des liens absolus (aperçus de partage, adresse canonique)
+  metadataBase: new URL(SITE_URL),
   title: "Fonderie modulaire · Hand-cast modular typefaces",
   description:
     "Build your own modular typeface with sliders, then download it.",
