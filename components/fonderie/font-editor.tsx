@@ -24,7 +24,8 @@ import {
   type RenderMode,
   type ShapeKind,
 } from "@/lib/fonderie/params"
-import { layoutText, readColors } from "@/lib/fonderie/render"
+import { bleed, layoutText, readColors } from "@/lib/fonderie/render"
+import { vMetrics } from "@/lib/fonderie/skeleton"
 import { decodeShare, encodeShare } from "@/lib/fonderie/share"
 import { cn } from "@/lib/utils"
 import chevron from "@/public/images/chevron-24.svg"
@@ -256,6 +257,14 @@ export function FontEditor() {
               text={glyph}
               params={{ ...PI, grid: true }}
               sizes={[220, 320, 380]}
+              // taille qui tient dans l'écran : lignes des accents, jambages et débordement des pièces compris
+              fluid={(W) => {
+                const m = vMetrics(PI)
+                const extra = (m.above + m.desc + 2 * bleed(PI)) / PI.rows
+                const max = W < 420 ? 220 : W < 640 ? 320 : 380
+                const fit = (window.innerHeight * 0.55) / (1 + extra)
+                return Math.min(max, fit) / W
+              }}
               lineGap={0}
               alive={alive}
               label={`The character ${glyph}, with its grid and path`}
@@ -266,8 +275,8 @@ export function FontEditor() {
             <TextCanvas
               text={ALPHABET}
               params={PI}
-              sizes={[34, 52, 52]}
-              lineGap={0.5}
+              sizes={[26, 36, 36]}
+              lineGap={0.4}
               alive={alive}
               label="Every letter and figure in the font"
             />
