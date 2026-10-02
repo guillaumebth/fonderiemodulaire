@@ -29,6 +29,7 @@ Changer la grille, la graisse ou la forme recalcule tout l'alphabet. Aucune lett
 | `lib/fonderie/sfnt.ts` | Ajout de la table `kern` dans le fichier .otf |
 | `lib/fonderie/export.ts` | Export .otf (opentype.js) : arcs → Bézier, orientation des trous, coordonnées entières |
 | `lib/fonderie/font-package.ts` | Contenu du zip téléchargé (`downloadFont` dans `export.ts`, avec fflate) : `LICENSE.txt` (essai : usage personnel ; complète : usage commercial, pas de revente du fichier ; en tête, LICENSE dessiné en caractères avec la grille de la police) et `README.txt` (installation, lien pour rouvrir la police dans l'atelier) |
+| `components/fonderie/specimen.tsx` | Onglet « Specimen » de l'atelier : planche A4 imprimable de la police (nom, caractères, tailles, texte), en SVG vectoriel, tailles réduites automatiquement pour tenir sur une page ; « Print or save as PDF » n'imprime que la feuille (copie dans `<body>`, règle `.specimen-print` dans globals.css) |
 | `hooks/use-canvas.ts` | Redessine un canvas (resize, thème, polices) — utilisé par les étapes de construction |
 | `hooks/use-animated-text.ts` | Texte animé : transitions entre réglages et mode « vivant » (pas d'animation d'apparition : retirée, jugée trop chargée) (respecte « réduire les animations ») |
 | `components/fonderie/` | Interface : éditeur (vues Text / Glyph / Charset, réglages Simple / Advanced), curseurs, canvas, barre de navigation |

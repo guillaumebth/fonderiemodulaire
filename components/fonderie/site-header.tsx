@@ -30,7 +30,7 @@ export function SiteHeader() {
     // Sauf dans l'atelier : le menu reste en haut de la page et ne suit pas (place à l'outil)
     <header
       className={cn(
-        "z-40 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 px-5 pt-8 pb-3 text-foreground mix-blend-difference [--background:oklch(0_0_0)] [--foreground:oklch(1_0_0)] [--surface:oklch(0_0_0)] md:px-10",
+        "z-40 flex flex-wrap print:hidden items-center justify-between gap-x-6 gap-y-3 px-5 pt-8 pb-3 text-foreground mix-blend-difference [--background:oklch(0_0_0)] [--foreground:oklch(1_0_0)] [--surface:oklch(0_0_0)] md:px-10",
         pathname.startsWith("/atelier") ? "relative" : "sticky top-0"
       )}
     >

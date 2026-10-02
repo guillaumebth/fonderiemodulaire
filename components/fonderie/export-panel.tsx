@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils"
 
 import { PanelSection, Pill, PillChoice } from "./panel-ui"
 import { DashOutline } from "./dash-outline"
-import { ACTION_COLORS, PILL } from "./pill-styles"
+import { ACTION_COLORS, PILL, PILL_ACTIVE } from "./pill-styles"
 import { PurchaseDialog, type Purchase } from "./purchase-dialog"
 import { ShakeLink } from "./shake-link"
 
@@ -25,6 +25,9 @@ export type ImageLook = "shown" | "blueprint"
 
 type ExportPanelProps = {
   params: Params
+  // nom de la police : partagé avec l'éditeur (la planche Specimen l'affiche)
+  name: string
+  onNameChange: (name: string) => void
   // export image de l'aperçu (SVG vectoriel ou PNG), fourni par l'éditeur qui connaît le texte et sa mise en page
   onExportImage?: (format: "svg" | "png") => void
   // rendu choisi pour l'image ; l'aperçu de l'éditeur l'affiche en direct
@@ -60,11 +63,12 @@ function submitHref(name: string) {
 // id="download" : cible des liens « #download » vers cette section.
 export function ExportPanel({
   params,
+  name,
+  onNameChange: setName,
   onExportImage,
   look = "shown",
   onLookChange,
 }: ExportPanelProps) {
-  const [name, setName] = useState("Fonderie modulaire")
   const [busy, setBusy] = useState(false)
   // version complète débloquée : la clé validée sur ce navigateur
   const [license, setLicense] = useState<string | null>(null)

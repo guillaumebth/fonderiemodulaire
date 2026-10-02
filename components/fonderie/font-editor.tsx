@@ -32,6 +32,7 @@ import chevron from "@/public/images/chevron-24.svg"
 
 import { DashOutline } from "./dash-outline"
 import { ExportPanel, type ImageLook } from "./export-panel"
+import { SpecimenTab } from "./specimen"
 import { TextCanvas } from "./font-canvas"
 import {
   PanelSection,
@@ -116,6 +117,7 @@ export function FontEditor() {
   const [alive, setAlive] = useState(false) // la variation organique ondule en boucle
   const [advanced, setAdvanced] = useState(false) // tous les réglages, ou seulement l'essentiel
   const [glyph, setGlyph] = useState("R") // lettre affichée dans la vue Glyph
+  const [name, setName] = useState("Fonderie modulaire") // nom de la police (téléchargement, Specimen)
   const skipUrlWrite = useRef(true)
   const previewRef = useRef<HTMLDivElement>(null) // aperçu du texte (pour l'export image)
   // Rendu de l'export image ; « Blueprint » s'affiche aussi en direct dans les aperçus.
@@ -192,7 +194,7 @@ export function FontEditor() {
             S'il est plus haut que l'écran (tailles dépliées…), il défile à l'intérieur de sa colonne. */}
         <Tabs
           defaultValue="text"
-          className="min-w-0 gap-10 md:sticky md:top-6 md:max-h-[calc(100dvh-3rem)] md:overflow-y-auto md:[scrollbar-width:thin]"
+          className="min-w-0 gap-10 md:sticky md:top-6 md:max-h-[calc(100dvh-3rem)] md:[scrollbar-width:thin] md:overflow-y-auto"
         >
           <TabsList aria-label="Preview" className={TAB_LIST}>
             <TabsTrigger value="text" className={TAB}>
@@ -206,6 +208,10 @@ export function FontEditor() {
             <TabsTrigger value="charset" className={TAB}>
               <DashOutline />
               Charset
+            </TabsTrigger>
+            <TabsTrigger value="specimen" className={TAB}>
+              <DashOutline />
+              Specimen
             </TabsTrigger>
           </TabsList>
 
@@ -269,6 +275,11 @@ export function FontEditor() {
               alive={alive}
               label={`The character ${glyph}, with its grid and path`}
             />
+          </TabsContent>
+
+          {/* Planche imprimable (A4) de la police, en direct ; impression / PDF de la feuille seule */}
+          <TabsContent value="specimen">
+            <SpecimenTab P={P} name={name} text={text} />
           </TabsContent>
 
           <TabsContent value="charset">
@@ -625,6 +636,8 @@ export function FontEditor() {
 
             <ExportPanel
               params={P}
+              name={name}
+              onNameChange={setName}
               onExportImage={exportImage}
               look={look}
               onLookChange={setLook}

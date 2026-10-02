@@ -282,6 +282,23 @@ html.inverted body {
   }
 }
 
+/* Impression (planche Specimen) : feuille A4 sans marges, fond blanc, pas d'inversion */
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+  html,
+  body {
+    background: white !important;
+    filter: none !important;
+  }
+  /* Quand la planche Specimen est là, on n'imprime qu'elle (sa copie est posée dans <body>) */
+  body:has(> .specimen-print) > :not(.specimen-print) {
+    display: none !important;
+  }
+}
+
 /* Texte surligné : rouge vif du tracé (--path), lettres blanches */
 ::selection {
   background: var(--path);
