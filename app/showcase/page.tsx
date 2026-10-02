@@ -23,11 +23,11 @@ export default function ShowcasePage() {
       <div className="max-w-[470px]">
         <PanelSection title="Nothing here yet. Yours could be the first.">
           <p className="text-xs leading-normal">
-            Made something with a font from the generator? The first projects
+            Made something with a font from the atelier? The first projects
             will be featured on this page.
           </p>
           <div className="flex flex-wrap gap-1">
-            <Link href="/generator" className={pillLink(true)}>
+            <Link href="/atelier" className={pillLink(true)}>
               Make a font
             </Link>
             <Link href="/templates" className={pillLink()}>

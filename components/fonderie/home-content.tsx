@@ -14,6 +14,7 @@ import { ShakeLink } from "./shake-link"
 // (960 px sur une maquette de 1440 px) et garde ses proportions ; le titre grandit avec lui.
 // Sa taille est aussi limitée par la hauteur de l'écran (385 px = en-tête, bouton, texte, footer et marges) :
 // la home tient toujours dans l'écran, sans scroll.
+// Sur téléphone : panneau plus haut (4/3) et titre plus gros, pour qu'il occupe la largeur.
 // Le panneau fait défiler les polices : le curseur devient une flèche (← à gauche, → à droite),
 // un clic recule ou avance ; au clavier, flèches ← →. Défilement automatique toutes les 2 s,
 // en pause pendant le survol ou le focus.
@@ -62,13 +63,14 @@ export function HomeContent() {
           else return
           e.preventDefault()
         }}
-        className="group palette-black relative flex w-full cursor-pointer items-center justify-center overflow-hidden p-6 outline-none select-none focus-visible:ring-3 focus-visible:ring-ring/50 md:aspect-[960/463] md:w-[min(66.667vw,calc((100dvh-385px)*960/463))] md:p-[4%]"
+        className="group palette-black relative flex w-full cursor-pointer items-center justify-center aspect-[4/3] overflow-hidden p-4 outline-none select-none focus-visible:ring-3 focus-visible:ring-ring/50 sm:aspect-[960/463] sm:p-6 md:aspect-[960/463] md:w-[min(66.667vw,calc((100dvh-385px)*960/463))] md:p-[4%]"
       >
         <TextCanvas
           text={"Fonderie\nmodulaire"}
           params={style.params}
           sizes={[40, 64, 104]}
-          fluid={0.12}
+          // titre plus gros sur téléphone (le moteur le réduit s'il déborde)
+          fluid={(W) => (W < 500 ? 0.16 : 0.12)}
           lineGap={0}
           alive
           center
@@ -104,7 +106,7 @@ export function HomeContent() {
       </div>
 
       <ShakeLink
-        href="/generator"
+        href="/atelier"
         colors={ACTION_COLORS}
         className={`mt-8 ${ACTION_BUTTON}`}
       >

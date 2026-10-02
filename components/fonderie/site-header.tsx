@@ -12,7 +12,7 @@ import { PILL, PILL_ACTIVE } from "./pill-styles"
 // Maquette Figma « HomePage » : logo à gauche, pastilles à droite.
 // Pastilles : contour noir en pointillés, fond blanc ; la page active est remplie en noir.
 const NAV = [
-  { href: "/generator", label: "Generator" },
+  { href: "/atelier", label: "Atelier" },
   { href: "/templates", label: "Template" },
   { href: "/showcase", label: "Showcase" },
   { href: "/about", label: "About" },

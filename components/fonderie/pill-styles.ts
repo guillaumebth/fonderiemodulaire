@@ -19,6 +19,6 @@ export function pillLink(active?: boolean) {
 // ---------- Gros bouton d'action (bleu vif #08f) : home, page Templates ----------
 // À utiliser avec ShakeLink et ACTION_COLORS (il tremble et clignote au survol)
 export const ACTION_BUTTON =
-  "rounded-full bg-action px-6 text-[40px] leading-normal font-medium text-action-foreground transition-opacity outline-none hover:opacity-90 focus-visible:ring-3 focus-visible:ring-ring/50 md:text-[60px]"
+  "rounded-full bg-action px-6 text-[40px] leading-normal font-medium whitespace-nowrap text-action-foreground transition-opacity outline-none hover:opacity-90 focus-visible:ring-3 focus-visible:ring-ring/50 max-sm:text-[32px] md:text-[60px]"
 // Couleurs « punch » qui défilent au survol (définies dans globals.css)
 export const ACTION_COLORS = [1, 2, 3, 4, 5].map((n) => `var(--punch-${n})`)

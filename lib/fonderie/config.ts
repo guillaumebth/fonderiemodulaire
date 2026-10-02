@@ -11,3 +11,5 @@ export const AUTHOR_URL = "https://bguillaume.info"
 export const TWITTER_URL = "https://x.com/guillaumebth"
 // Lien « Contact » — exemple : "mailto:hello@bguillaume.info" ou une page de contact
 export const CONTACT_URL = "mailto:guillaumebth@gmail.com"
+// Bouton « Buy a screen » de l'atelier sur mobile (l'outil ne s'utilise que sur ordinateur)
+export const SCREEN_URL = "https://www.amazon.com/s?k=external+monitor"

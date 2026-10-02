@@ -34,7 +34,7 @@ Changer la grille, la graisse ou la forme recalcule tout l'alphabet. Aucune lett
 | `hooks/use-params-history.ts` | Réglages avec Undo / Redo (⌘Z, ⇧⌘Z) |
 | `lib/fonderie/share.ts` | Lien de partage : réglages + texte dans l'adresse (#…) |
 | `app/page.tsx` | Home (titre animé, styles d'exemple) — le logo y ramène |
-| `app/generator/page.tsx` | L'outil |
+| `app/atelier/page.tsx` | L'outil, appelé « Atelier » (pas « Generator », jugé trop « outil web » : vocabulaire de l'atelier, du fait main) ; `/generator` y redirige |
 | `app/templates/page.tsx` | Templates : affiches colorées qui ouvrent le générateur réglé (`lib/fonderie/templates.ts`, palettes `.palette-*` dans globals.css) |
 | `app/showcase/page.tsx` | Showcase : vrais projets d'utilisateurs — vide pour l'instant (état d'attente), pas de faux projets |
 | `app/about/page.tsx` | About : présentation, section How it works (#how-it-works), FAQ ; `/how-it-works` y redirige |

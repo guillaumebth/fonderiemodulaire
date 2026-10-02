@@ -17,7 +17,7 @@ const fontSans = Inter({
 const fontMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" })
 
 export const metadata: Metadata = {
-  title: "Fonderie modulaire · Modular font generator",
+  title: "Fonderie modulaire · Hand-cast modular typefaces",
   description:
     "Build your own modular typeface with sliders, then download it.",
 }

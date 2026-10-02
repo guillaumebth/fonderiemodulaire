@@ -76,7 +76,7 @@ export const HERO_PARAMS: Params = {
 
 // Adresse du générateur ouvert avec ces réglages et ce texte
 export function generatorHref(params: Params, text: string) {
-  return `/generator#${encodeShare(params, text, "")}`
+  return `/atelier#${encodeShare(params, text, "")}`
 }
 
 // Adresse du générateur ouvert avec ce style (le nom du style sert de texte)

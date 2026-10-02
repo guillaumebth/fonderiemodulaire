@@ -13,8 +13,9 @@ type TextCanvasProps = {
   params: Params
   // hauteur des capitales selon la largeur dispo : [< 420px, < 640px, au-delà]
   sizes: [number, number, number]
-  // ou bien : hauteur des capitales proportionnelle à la largeur (ex. 0.12 = 12 % de la largeur)
-  fluid?: number
+  // ou bien : hauteur des capitales proportionnelle à la largeur (ex. 0.12 = 12 % de la largeur),
+  // ou une fonction qui donne cette proportion selon la largeur
+  fluid?: number | ((width: number) => number)
   lineGap: number
   label: string
   alive?: boolean
@@ -48,7 +49,9 @@ export function TextCanvas({
     text,
     params,
     capH: (W) =>
-      fluid ? W * fluid : W < 420 ? sizes[0] : W < 640 ? sizes[1] : sizes[2],
+      fluid
+        ? W * (typeof fluid === "function" ? fluid(W) : fluid)
+        : W < 420 ? sizes[0] : W < 640 ? sizes[1] : sizes[2],
     lineGap,
     alive,
     center,

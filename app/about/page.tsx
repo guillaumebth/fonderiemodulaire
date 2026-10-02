@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 const FAQ = [
   {
     q: "How do I install my font?",
-    a: "Click “Download free trial (.otf)” in the generator, then double-click the file and choose Install. It works in Figma, Word, InDesign and any app that reads OpenType fonts.",
+    a: "Click “Download free trial (.otf)” in the atelier, then double-click the file and choose Install. It works in Figma, Word, InDesign and any app that reads OpenType fonts.",
   },
   {
     q: "Is it free?",
@@ -54,8 +54,8 @@ export default function AboutPage() {
           rebuilds itself. No letter is ever redrawn by hand.
         </p>
         <div>
-          <Link href="/generator" className={pillLink(true)}>
-            Open the generator
+          <Link href="/atelier" className={pillLink(true)}>
+            Open the atelier
           </Link>
         </div>
       </PageIntro>

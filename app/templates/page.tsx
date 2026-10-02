@@ -7,7 +7,7 @@ import { TemplateGrid } from "@/components/fonderie/template-grid"
 export const metadata: Metadata = {
   title: "Templates · Fonderie modulaire",
   description:
-    "Ready-made starting points. Open any of them in the generator and make it yours.",
+    "Ready-made starting points. Open any of them in the atelier and make it yours.",
 }
 
 export default function TemplatesPage() {
@@ -23,7 +23,7 @@ export default function TemplatesPage() {
       {/* Le gros bouton d'action de la home (tremble et clignote au survol) */}
       <div className="flex justify-center">
         <ShakeLink
-          href="/generator"
+          href="/atelier"
           colors={ACTION_COLORS}
           className={ACTION_BUTTON}
         >
