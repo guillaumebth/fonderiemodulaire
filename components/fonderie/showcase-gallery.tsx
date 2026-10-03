@@ -39,7 +39,7 @@ export function ShowcaseGallery({ items }: { items: ShowcaseItem[] }) {
               />
             </button>
             <p className="text-xs leading-normal font-medium">
-              {it.title}
+              “{it.title}”
               <br />
               <span className="text-[10px] text-muted-foreground">
                 by{" "}
@@ -112,7 +112,7 @@ export function ShowcaseGallery({ items }: { items: ShowcaseItem[] }) {
                   </div>
                 </div>
                 <Dialog.Description className="px-5 pb-5 text-center text-xs leading-normal font-medium md:px-8">
-                  {item.title}{" "}
+                  “{item.title}”{" "}
                   <span className="text-white/60">by {item.author}</span>
                 </Dialog.Description>
               </>

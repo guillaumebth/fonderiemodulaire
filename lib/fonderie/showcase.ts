@@ -7,7 +7,7 @@ import images from "./showcase-images.json"
 
 type Entry = {
   file: string // nom du fichier dans public/showcases/ (ex. "1.png")
-  title: string
+  title: string // affiché entre guillemets sur le site
   alt: string // description de l'image, pour les lecteurs d'écran
   author: string // crédit affiché (« by … »)
   authorUrl?: string
@@ -16,14 +16,14 @@ type Entry = {
 const ENTRIES: Entry[] = [
   {
     file: "1.png",
-    title: "Hello World",
-    alt: "Poster: HELLO WORLD in big merged blue dots, above a glossy blue clog floating on blue circles.",
+    title: "Hello Crocs",
+    alt: "Poster: HELLO CROCS in big merged blue dots, with a translucent blue clog floating over the letters and small blue texts on white.",
     author: "@guillaumebth",
     authorUrl: "https://www.instagram.com/guillaumebth/",
   },
   {
     file: "2.png",
-    title: "F, as in “fine, whatever”",
+    title: "F, as in ‘fine, whatever’",
     alt: "Poster: a giant letter F made of thick white rings with a red path running through them, on a red background.",
     author: "@guillaumebth",
     authorUrl: "https://www.instagram.com/guillaumebth/",
