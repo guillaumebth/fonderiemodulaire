@@ -17,7 +17,11 @@ export default function TemplatesPage() {
       {/* Pas d'introduction visible (le menu et les cartes suffisent) ; titre gardé pour l'accessibilité et Google */}
       <h1 className="sr-only">Templates</h1>
       {/* Bandeau communauté (cliquable en entier) : envoyer sa police depuis l'atelier */}
-      <SubmitBanner />
+      <SubmitBanner
+        href="/atelier"
+        text="Made a font you love? Submit it from the atelier and it could end up here, with your name on it."
+        label="Open the atelier"
+      />
       <TemplateGrid />
       {/* Le gros bouton d'action de la home (tremble et clignote au survol) */}
       <div className="flex justify-center">

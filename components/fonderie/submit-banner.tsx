@@ -12,11 +12,21 @@ import { ACTION_COLORS, PILL } from "./pill-styles"
 
 gsap.registerPlugin(useGSAP)
 
-// Bandeau noir de la page Templates, cliquable en entier, qui mène à l'atelier.
+// Bandeau noir, cliquable en entier (pages Templates et Showcase) : un texte et une pastille.
+// Lien interne (ex. /atelier, avec le « clac ») ou adresse externe / e-mail (mailto:).
 // Sa pastille est le bouton d'action bleu : au survol du bandeau (ou au focus clavier),
 // elle tremble et clignote dans les couleurs « punch », comme « Make your font » sur la home.
 // Clic : le « clac » de fonderie. Rien ne bouge si le système demande de réduire les animations.
-export function SubmitBanner() {
+export function SubmitBanner({
+  href,
+  text,
+  label,
+}: {
+  href: string
+  text: string
+  label: string
+}) {
+  const internal = href.startsWith("/")
   const root = useRef<HTMLAnchorElement>(null)
   const pill = useRef<HTMLSpanElement>(null)
 
@@ -94,23 +104,31 @@ export function SubmitBanner() {
     { scope: root }
   )
 
-  return (
-    <Link
-      ref={root}
-      href="/atelier"
-      onClick={() => playStamp()}
-      className="palette-black flex flex-wrap items-center justify-between gap-x-6 gap-y-3 rounded-[2rem] py-4 pr-4 pl-6 outline-none focus-visible:ring-3 focus-visible:ring-ring/50 md:rounded-full md:pl-8"
-    >
-      <p className="text-sm leading-normal font-medium">
-        Made a font you love? Submit it from the atelier and it could end up
-        here, with your name on it.
-      </p>
+  const className =
+    "palette-black flex flex-wrap items-center justify-between gap-x-6 gap-y-3 rounded-[2rem] py-4 pr-4 pl-6 outline-none focus-visible:ring-3 focus-visible:ring-ring/50 md:rounded-full md:pl-8"
+  const content = (
+    <>
+      <p className="text-sm leading-normal font-medium">{text}</p>
       <span
         ref={pill}
         className={cn(PILL, "bg-action text-action-foreground hover:bg-action")}
       >
-        Open the atelier
+        {label}
       </span>
+    </>
+  )
+  return internal ? (
+    <Link
+      ref={root}
+      href={href}
+      onClick={() => playStamp()}
+      className={className}
+    >
+      {content}
     </Link>
+  ) : (
+    <a ref={root} href={href} className={className}>
+      {content}
+    </a>
   )
 }

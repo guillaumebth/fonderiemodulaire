@@ -38,7 +38,7 @@ Changer la grille, la graisse ou la forme recalcule tout l'alphabet. Aucune lett
 | `app/page.tsx` | Home (titre animé, styles d'exemple) — le logo y ramène |
 | `app/atelier/page.tsx` | L'outil, appelé « Atelier » (pas « Generator », jugé trop « outil web » : vocabulaire de l'atelier, du fait main) ; `/generator` y redirige |
 | `app/templates/page.tsx` | Templates : affiches colorées qui ouvrent le générateur réglé (`lib/fonderie/templates.ts`, palettes `.palette-*` dans globals.css) | Bandeau communauté : les gens envoient leur police par e-mail (section « Submit to templates » de l'atelier, `submitHref` dans `export-panel.tsx`). Pour en ajouter une : décoder le lien reçu avec `decodeShare` (`share.ts`), recopier ses réglages dans `TEMPLATES` avec `author` (crédit « by … »).
-| `app/showcase/page.tsx` | Showcase : vrais projets d'utilisateurs — vide pour l'instant (état d'attente), pas de faux projets |
+| `app/showcase/page.tsx` | Showcase : affiches faites avec les polices (liste dans `lib/fonderie/showcase.ts` : fichier, titre, auteur). Les images déposées dans `public/showcases/` sont optimisées automatiquement avant chaque build (`scripts/optimize-showcase.mjs`, sharp → WebP ≤ 1400 px dans `public/showcases/optimized/`, dimensions dans `showcase-images.json`) |
 | `app/about/page.tsx` | About : présentation, section How it works (#how-it-works), FAQ ; `/how-it-works` y redirige |
 | `lib/fonderie/config.ts` | Liens du footer, `CHECKOUT_URL` (paiement Stripe de la version complète, bloc caché tant qu'il est vide) et `PRICE` (prix affiché) |
 | `lib/fonderie/presets.ts` | Styles d'exemple de la home (LED, Stitch, Melt…) et réglages du titre |
