@@ -19,6 +19,8 @@ export const AUTHOR_URL = "https://bguillaume.info"
 export const TWITTER_URL = "https://x.com/guillaumebth"
 // Ton profil Instagram
 export const INSTAGRAM_URL = "https://www.instagram.com/guillaumebth/"
+// Mon autre outil, présenté dans l'encart de la home
+export const SYMBL_URL = "https://www.symbl.space"
 // Lien « Contact » — exemple : "mailto:hello@bguillaume.info" ou une page de contact
 export const CONTACT_URL = "mailto:guillaumebth@gmail.com"
 // Bouton « Buy a screen » de l'atelier sur mobile (l'outil ne s'utilise que sur ordinateur)
