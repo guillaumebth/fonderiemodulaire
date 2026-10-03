@@ -113,7 +113,7 @@ export function HomeContent() {
         Make your font
       </ShakeLink>
 
-      <p className="mt-7 max-w-[470px] text-center text-[10px]">
+      <p className="mt-7 max-w-[470px] text-center text-xs leading-normal">
         Build your own modular typeface with a few sliders. Every letter is a
         path; pieces (dots, rings, screws, crosses) are laid on it. Change the
         grid and the whole alphabet rebuilds itself. Then download a real font
