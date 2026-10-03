@@ -1,39 +1,20 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import Image from "next/image"
 
 import { SYMBL_URL } from "@/lib/fonderie/config"
 
 import icon from "@/public/images/symbl-appicon.png"
 
-const HIDDEN_KEY = "fonderie:symbl-hidden"
-
 // Encart noir en bas à droite de la home (maquette Figma « HomePage », node 65:1509) :
 // mon autre outil, Symbl, pour tester son logo. La carte est un lien (nouvel onglet).
 // Seulement sur ordinateur (écrans ≥ 1024 px). Il apparaît en douceur une seconde après l'arrivée :
 // fondu et petite montée, sans animation si le système demande de les réduire.
-// Une petite croix le ferme ; le navigateur s'en souvient (il ne revient pas).
+// Une petite croix le ferme, le temps de la visite : il revient quand on revient sur la home.
 export function SymblPromo() {
-  // null : on ne sait pas encore (rien n'est affiché avant d'avoir lu le choix du visiteur)
-  const [hidden, setHidden] = useState<boolean | null>(null)
-
-  useEffect(() => {
-    try {
-      setHidden(localStorage.getItem(HIDDEN_KEY) === "1")
-    } catch {
-      setHidden(false)
-    }
-  }, [])
-
-  function close() {
-    setHidden(true)
-    try {
-      localStorage.setItem(HIDDEN_KEY, "1")
-    } catch {}
-  }
-
-  if (hidden !== false) return null
+  const [hidden, setHidden] = useState(false)
+  if (hidden) return null
 
   return (
     <div
@@ -63,7 +44,7 @@ export function SymblPromo() {
       {/* Croix dessinée (deux traits fins), comme le « + » des sections du panneau */}
       <button
         type="button"
-        onClick={close}
+        onClick={() => setHidden(true)}
         aria-label="Hide this"
         className="group/close absolute top-1.5 right-1.5 grid size-5 place-items-center rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
       >

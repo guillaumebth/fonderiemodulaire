@@ -59,7 +59,6 @@ const ALPHABET = [
   .join("\n")
 // Cascade de tailles dans la vue Text (hauteur des capitales en px), comme le « Typewriter » de Metaflop
 const WATERFALL = [16, 28, 48]
-const ADVANCED_KEY = "fonderie:advanced"
 // Hauteur des capitales de l'aperçu selon la largeur : [< 420 px, < 640 px, au-delà]
 const PREVIEW_SIZES: [number, number, number] = [44, 56, 72]
 // Sélecteur de lettre de la vue Glyph
@@ -134,8 +133,7 @@ export function FontEditor() {
 
   const name = customName ?? autoName(P)
 
-  // Au chargement : réglages et texte depuis l'adresse (lien partagé, ou style choisi sur la home),
-  // et préférence Simple / Advanced
+  // Au chargement : réglages et texte depuis l'adresse (lien partagé, ou style choisi sur la home)
   useEffect(() => {
     // (un simple #download, venu du bouton « Trial ↓ » du menu, n'est pas un lien de réglages)
     if (window.location.hash.includes("=")) {
@@ -143,9 +141,6 @@ export function FontEditor() {
       replace(shared.params, false)
       if (shared.text !== null) setText(shared.text)
     }
-    try {
-      setAdvanced(localStorage.getItem(ADVANCED_KEY) === "1")
-    } catch {}
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -185,11 +180,9 @@ export function FontEditor() {
     )
   }
 
+  // « Show all settings » : toujours désactivé à l'arrivée (pas de mémoire d'une visite à l'autre)
   function toggleAdvanced(on: boolean) {
     setAdvanced(on)
-    try {
-      localStorage.setItem(ADVANCED_KEY, on ? "1" : "0")
-    } catch {}
   }
 
   return (
