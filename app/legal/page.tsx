@@ -81,7 +81,8 @@ export default function LegalPage() {
               <b className="font-medium">Mesure d&apos;audience</b> : Cloudflare
               Web Analytics compte les visites de façon anonyme, sans cookies et
               sans vous suivre d&apos;un site à l&apos;autre (pages vues, pays,
-              type d&apos;appareil).
+              type d&apos;appareil). Le site compte aussi le nombre de polices
+              téléchargées, sans rien enregistrer sur vous.
             </p>
             <p className={P}>
               <b className="font-medium">Hébergement</b> : Cloudflare traite des

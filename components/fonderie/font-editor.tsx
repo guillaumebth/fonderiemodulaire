@@ -26,6 +26,7 @@ import {
 } from "@/lib/fonderie/params"
 import { bleed, layoutText, readColors } from "@/lib/fonderie/render"
 import { vMetrics } from "@/lib/fonderie/skeleton"
+import { autoName } from "@/lib/fonderie/names"
 import { decodeShare, encodeShare } from "@/lib/fonderie/share"
 import { cn } from "@/lib/utils"
 import chevron from "@/public/images/chevron-24.svg"
@@ -117,7 +118,10 @@ export function FontEditor() {
   const [alive, setAlive] = useState(false) // la variation organique ondule en boucle
   const [advanced, setAdvanced] = useState(false) // tous les réglages, ou seulement l'essentiel
   const [glyph, setGlyph] = useState("R") // lettre affichée dans la vue Glyph
-  const [name, setName] = useState("Fonderie modulaire") // nom de la police (téléchargement, Specimen)
+  // Nom de la police (téléchargement, Specimen) : tiré des réglages tant qu'on ne l'a pas changé soi-même,
+  // pour que deux polices téléchargées ne portent jamais le même nom
+  const [customName, setCustomName] = useState<string | null>(null)
+  const [tab, setTab] = useState("text") // vue de l'aperçu : text, glyph, charset ou specimen
   const skipUrlWrite = useRef(true)
   const previewRef = useRef<HTMLDivElement>(null) // aperçu du texte (pour l'export image)
   // Rendu de l'export image ; « Blueprint » s'affiche aussi en direct dans les aperçus.
@@ -127,6 +131,8 @@ export function FontEditor() {
     look === "blueprint"
       ? { ...P, grid: true, mode: "contour", str: Math.min(P.str, 0.06) }
       : P
+
+  const name = customName ?? autoName(P)
 
   // Au chargement : réglages et texte depuis l'adresse (lien partagé, ou style choisi sur la home),
   // et préférence Simple / Advanced
@@ -193,7 +199,8 @@ export function FontEditor() {
         {/* Sur ordinateur, l'aperçu reste à l'écran pendant qu'on fait défiler les réglages à droite.
             S'il est plus haut que l'écran (tailles dépliées…), il défile à l'intérieur de sa colonne. */}
         <Tabs
-          defaultValue="text"
+          value={tab}
+          onValueChange={setTab}
           className="min-w-0 gap-10 md:sticky md:top-6 md:max-h-[calc(100dvh-3rem)] md:[scrollbar-width:thin] md:overflow-y-auto"
         >
           <TabsList aria-label="Preview" className={TAB_LIST}>
@@ -637,7 +644,8 @@ export function FontEditor() {
             <ExportPanel
               params={P}
               name={name}
-              onNameChange={setName}
+              onNameChange={setCustomName}
+              onShowSpecimen={() => setTab("specimen")}
               onExportImage={exportImage}
               look={look}
               onLookChange={setLook}

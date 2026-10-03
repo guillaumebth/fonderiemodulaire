@@ -28,6 +28,8 @@ type ExportPanelProps = {
   // nom de la police : partagé avec l'éditeur (la planche Specimen l'affiche)
   name: string
   onNameChange: (name: string) => void
+  // ouvre l'onglet Specimen de l'aperçu (montre tout ce que contient la version complète)
+  onShowSpecimen?: () => void
   // export image de l'aperçu (SVG vectoriel ou PNG), fourni par l'éditeur qui connaît le texte et sa mise en page
   onExportImage?: (format: "svg" | "png") => void
   // rendu choisi pour l'image ; l'aperçu de l'éditeur l'affiche en direct
@@ -65,6 +67,7 @@ export function ExportPanel({
   params,
   name,
   onNameChange: setName,
+  onShowSpecimen,
   onExportImage,
   look = "shown",
   onLookChange,
@@ -148,6 +151,13 @@ export function ExportPanel({
             window.location.hash,
         }
       )
+      // compteur anonyme des téléchargements (functions/api/count.ts) ; sans effet s'il n'existe pas
+      void fetch("/api/count", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: full ? "full" : "trial" }),
+        keepalive: true,
+      }).catch(() => {})
       toast.success(`${file} downloaded`, {
         description:
           "Unzip it, then double-click the .otf to install the font.",
@@ -187,7 +197,7 @@ export function ExportPanel({
           maxLength={40}
           onChange={(e) => setName(e.target.value)}
           className={FIELD}
-          placeholder="Fonderie modulaire"
+          placeholder="Name your font"
         />
         <div>
           <Pill active onClick={download} disabled={busy}>
@@ -218,7 +228,7 @@ export function ExportPanel({
               Full version: lowercase, accents, punctuation and a commercial
               license, for {PRICE}.
             </p>
-            <div>
+            <div className="flex flex-wrap gap-1">
               {/* Bleu d'action, à la taille d'une pastille ; tremble et clignote au survol, comme sur la home */}
               <ShakeLink
                 href={CHECKOUT_URL}
@@ -240,6 +250,13 @@ export function ExportPanel({
               >
                 Get the full font
               </ShakeLink>
+              {/* La planche montre tout ce que contient la version complète */}
+              {onShowSpecimen && (
+                <button type="button" onClick={onShowSpecimen} className={PILL}>
+                  <DashOutline />
+                  See the specimen
+                </button>
+              )}
             </div>
             <form onSubmit={unlock} className="grid gap-2 pt-2">
               <label
